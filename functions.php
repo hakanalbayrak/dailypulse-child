@@ -96,3 +96,33 @@ function dailypulse_category_color($cat_slug) {
     );
     return isset($colors[$cat_slug]) ? $colors[$cat_slug] : $colors['teknoloji'];
 }
+
+/**
+ * Override Blocksy copyright text
+ */
+function kampanya_override_copyright($text) {
+    if (is_string($text)) {
+        $text = str_replace('The Daily Pulse Team', 'Kampanya.website', $text);
+        $text = str_replace('The Daily Pulse', 'Kampanya.website', $text);
+        $text = str_replace('thedailypulse.com', 'kampanya.website', $text);
+    }
+    return $text;
+}
+add_filter('blocksy:footer:copyright:text', 'kampanya_override_copyright');
+add_filter('the_content', 'kampanya_override_copyright');
+
+/**
+ * Replace copyright in entire footer output
+ */
+function kampanya_footer_copyright_buffer_start() {
+    ob_start();
+}
+function kampanya_footer_copyright_buffer_end() {
+    $html = ob_get_clean();
+    $html = str_replace('The Daily Pulse Team', 'Kampanya.website', $html);
+    $html = str_replace('The Daily Pulse', 'Kampanya.website', $html);
+    $html = str_replace('thedailypulse.com', 'kampanya.website', $html);
+    echo $html;
+}
+add_action('wp_footer', 'kampanya_footer_copyright_buffer_start', 1);
+add_action('wp_footer', 'kampanya_footer_copyright_buffer_end', 999);
