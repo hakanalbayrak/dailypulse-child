@@ -25,18 +25,28 @@
   --k-max-w: 1080px;
 }
 
-/* === BASE === */
+/* === BASE — FORCE CABIN EVERYWHERE === */
+body, body *, html, html *,
+p, li, span, div, td, th, a, label, input, button, select, textarea,
+h1, h2, h3, h4, h5, h6,
+.entry-title, .widget-title, .site-title,
+article, section, aside, nav, footer, header,
+.ct-header *, .ct-footer *, .ct-sidebar *,
+[class*="wp-block"], [class*="entry-"], [class*="post-"],
+.fluentcrm_form_wrapper *, .ff-el-input--content *,
+figcaption, blockquote, cite, code, pre {
+  font-family: var(--k-font) !important;
+}
+
 body {
   background: var(--k-white) !important;
   color: var(--k-gray-700) !important;
-  font-family: var(--k-font) !important;
   line-height: 1.65;
 }
 body::before, body::after { display: none !important; }
 
-h1, h2, h3, h4, h5, h6, .entry-title {
+h1, h2, h3, h4, h5, h6, .entry-title, .widget-title {
   color: var(--k-black) !important;
-  font-family: var(--k-font) !important;
   font-weight: 700 !important;
 }
 p, li, span, div, td, th { color: var(--k-gray-700); }
@@ -265,13 +275,54 @@ footer.ct-footer, .ct-footer, footer {
   color: var(--k-gray-300) !important;
 }
 .ct-footer .ct-container { background: transparent !important; }
-footer *, .ct-footer * { color: var(--k-gray-300) !important; }
+footer *, .ct-footer *, footer p, footer span, footer div,
+footer li, footer a, footer td, footer th,
+.ct-footer p, .ct-footer span, .ct-footer div,
+.ct-footer li, .ct-footer a {
+  color: var(--k-gray-300) !important;
+}
 .ct-footer a:hover, footer a:hover { color: var(--k-white) !important; }
-footer h4, .ct-footer h4 {
+footer h4, .ct-footer h4, footer .widget-title, .ct-footer .widget-title {
   color: var(--k-white) !important;
   font-size: 13px !important;
   text-transform: uppercase;
   letter-spacing: 1px;
+}
+
+/* Footer popular posts / recent posts widget */
+footer .widget, .ct-footer .widget,
+footer [class*="widget_"], .ct-footer [class*="widget_"] {
+  background: transparent !important;
+  border: none !important;
+}
+footer .widget *, .ct-footer .widget * {
+  background: transparent !important;
+  color: var(--k-gray-300) !important;
+}
+footer .widget a, .ct-footer .widget a {
+  color: var(--k-gray-300) !important;
+  text-decoration: none !important;
+}
+footer .widget a:hover, .ct-footer .widget a:hover {
+  color: var(--k-white) !important;
+}
+footer .widget img, .ct-footer .widget img {
+  border-radius: var(--k-radius) !important;
+  opacity: .7;
+  transition: opacity .2s;
+}
+footer .widget img:hover { opacity: 1; }
+
+/* Footer copyright bar */
+.ct-footer [data-row="bottom"],
+footer .copyright, footer .site-info,
+.ct-footer .ct-container [data-column="copyright"] {
+  color: var(--k-gray-500) !important;
+  font-size: 13px !important;
+  border-top: 1px solid rgba(255,255,255,.08) !important;
+}
+.ct-footer [data-row="bottom"] *, footer .copyright * {
+  color: var(--k-gray-500) !important;
 }
 
 /* === SINGLE POST === */
