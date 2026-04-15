@@ -377,6 +377,15 @@ footer .copyright, footer .site-info,
 ::-webkit-scrollbar-thumb { background: var(--k-gray-300); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--k-gray-500); }
 
+/* === HIDE AUTHOR ON POSTS === */
+.single a[href*="/author/"],
+.single [rel="author"],
+.ct-author-box,
+.entry-meta a[href*="/author/"],
+a[href*="/author/kampanya_admin/"] {
+  display: none !important;
+}
+
 /* === RESPONSIVE === */
 @media (max-width: 768px) {
   .hero-section { padding: 40px 20px !important; }
