@@ -1,153 +1,174 @@
 <?php
 /**
- * Template Name: Daily Pulse Homepage
+ * Template Name: Kampanya Homepage
+ * Description: Ana sayfa — Hero abone formu + Blog listesi
  */
 
 get_header(); ?>
 
-<main id="primary" class="site-main">
+<main id="k-homepage" class="k-homepage">
 
-  <?php get_template_part('template-parts/hero-section'); ?>
+  <!-- ======================================================
+       HERO — E-posta Abone Bölümü
+       ====================================================== -->
+  <section class="k-hero" aria-label="Bülten aboneliği">
+    <div class="k-hero__inner">
 
-  <!-- KATEGORİ PİLLLERİ -->
-  <div class="dp-categories">
-    <a class="dp-cat-pill active" href="#">Tümü</a>
-    <a class="dp-cat-pill hot" href="<?php echo esc_url(get_category_link(get_cat_ID('firsatlar'))); ?>">🔥 Fırsatlar</a>
-    <?php
-    $cats = array('teknoloji', 'finans', 'saglik', 'yasam', 'seyahat', 'egitim');
-    foreach ($cats as $cat_slug) {
-        $cat = get_category_by_slug($cat_slug);
-        if ($cat) {
-            echo '<a class="dp-cat-pill" href="' . esc_url(get_category_link($cat->term_id)) . '">' . esc_html($cat->name) . '</a>';
-        }
-    }
-    ?>
-  </div>
+      <div class="k-hero__badge">
+        <span class="k-tag">📬 Ücretsiz Bülten</span>
+      </div>
 
-  <!-- ÖNE ÇIKAN YAZILAR -->
-  <div style="max-width:var(--dp-max-width);margin:0 auto;padding:0 24px;">
-    <div class="dp-section-head" style="padding:0;">
-      <h2>Öne Çıkanlar</h2>
-      <a href="<?php echo esc_url(get_permalink(get_option('page_for_posts'))); ?>">Tümünü Gör →</a>
-    </div>
+      <h1 class="k-hero__title">
+        En İyi Kampanyaları<br>
+        <span class="k-hero__title-accent">Kaçırmayın</span>
+      </h1>
 
-    <?php
-    $featured = new WP_Query(array(
-        'posts_per_page' => 3,
-        'meta_key'       => '_is_featured',
-        'meta_value'     => '1',
-        'post_status'    => 'publish',
-    ));
-    if (!$featured->have_posts()) {
-        $featured = new WP_Query(array('posts_per_page' => 3, 'post_status' => 'publish'));
-    }
-    ?>
+      <p class="k-hero__subtitle">
+        Türkiye'nin en güncel indirimleri, fırsatları ve kampanyaları doğrudan<br class="k-hero__br">
+        e-posta kutunuza gelsin. Haftada en fazla 2 e-posta, sıfır spam.
+      </p>
 
-    <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:20px;margin-bottom:64px;">
+      <!-- FORM -->
+      <form class="k-subscribe-form" id="k-subscribe-form" novalidate>
+
+        <div class="k-form-row">
+          <div class="k-email-wrap">
+            <input
+              type="email"
+              id="k-email"
+              name="email"
+              class="k-email-input"
+              placeholder="e-posta adresiniz"
+              autocomplete="email"
+              spellcheck="false"
+              required
+            >
+            <!-- Otomatik tamamlama önerisi -->
+            <span class="k-autocomplete" id="k-autocomplete" aria-hidden="true"></span>
+          </div>
+          <button type="submit" class="k-subscribe-btn" id="k-subscribe-btn">
+            <span class="k-btn-text">Abone Ol</span>
+            <span class="k-btn-loading" hidden>…</span>
+          </button>
+        </div>
+
+        <!-- KVKK ONAY -->
+        <div class="k-consent-row">
+          <label class="k-consent-label">
+            <input
+              type="checkbox"
+              name="kvkk"
+              id="k-kvkk"
+              class="k-consent-checkbox"
+              checked
+            >
+            <span class="k-consent-text">
+              <a href="<?php echo esc_url(home_url('/kvkk-aydinlatma-metni/')); ?>" target="_blank" rel="noopener">KVKK Aydınlatma Metni</a>'ni ve
+              <a href="<?php echo esc_url(home_url('/acik-riza-metni/')); ?>" target="_blank" rel="noopener">Açık Rıza Metni</a>'ni okudum, kabul ediyorum.
+            </span>
+          </label>
+        </div>
+
+        <!-- MESAJLAR -->
+        <div class="k-form-msg" id="k-form-msg" role="alert" hidden></div>
+
+      </form>
+
+      <p class="k-hero__trust">
+        <span>🔒 Verileriniz güvende</span>
+        <span>·</span>
+        <span>İstediğiniz zaman <a href="<?php echo esc_url(home_url('/abonelikten-cik/')); ?>">abonelikten çıkın</a></span>
+      </p>
+
+    </div><!-- .k-hero__inner -->
+  </section>
+
+
+  <!-- ======================================================
+       BLOG LİSTESİ
+       ====================================================== -->
+  <section class="k-posts-section" id="k-posts" aria-label="Son yazılar">
+    <div class="k-container">
+
+      <div class="k-section-head">
+        <h2 class="k-section-title">Son Yazılar</h2>
+        <a href="<?php echo esc_url(get_permalink(get_option('page_for_posts'))); ?>" class="k-section-more">Tümünü Gör →</a>
+      </div>
+
       <?php
-      $i = 0;
-      while ($featured->have_posts()) : $featured->the_post();
-          $post_cats  = get_the_category();
-          $cat_slug   = !empty($post_cats) ? $post_cats[0]->slug : 'teknoloji';
-          $cat_color  = dailypulse_category_color($cat_slug);
-          $is_first   = ($i === 0);
+      $args = [
+          'posts_per_page' => 9,
+          'post_status'    => 'publish',
+          'no_found_rows'  => true,
+      ];
+      $the_query = new WP_Query($args);
       ?>
-      <a href="<?php the_permalink(); ?>" class="dp-card dp-reveal" style="text-decoration:none;display:flex;flex-direction:column;<?php echo $is_first ? 'grid-row:span 2;' : ''; ?>">
-        <?php if (has_post_thumbnail()) : ?>
-          <div style="overflow:hidden;<?php echo $is_first ? 'aspect-ratio:4/3;' : 'aspect-ratio:16/9;'; ?>">
-            <?php the_post_thumbnail($is_first ? 'card-featured' : 'card-regular', array('style' => 'width:100%;height:100%;object-fit:cover;')); ?>
-          </div>
-        <?php else : ?>
-          <div style="<?php echo $is_first ? 'aspect-ratio:4/3;' : 'aspect-ratio:16/9;'; ?>background:linear-gradient(135deg,var(--dp-purple-700),var(--dp-purple-500));"></div>
-        <?php endif; ?>
 
-        <div style="padding:20px 22px 24px;flex:1;display:flex;flex-direction:column;">
-          <div class="dp-card-meta" style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-            <span class="dp-tag dp-tag-<?php echo esc_attr($cat_color['class']); ?>"><?php echo esc_html(!empty($post_cats) ? $post_cats[0]->name : 'Genel'); ?></span>
-            <span style="color:var(--dp-white-50);font-size:12px;"><?php echo get_the_date('j M'); ?></span>
-          </div>
-          <div class="dp-card-title" style="<?php echo $is_first ? 'font-size:22px;' : ''; ?>flex:1;">
-            <?php the_title(); ?>
-          </div>
-          <?php if ($is_first) : ?>
-            <div class="dp-card-excerpt" style="margin:10px 0;"><?php echo wp_trim_words(get_the_excerpt(), 25); ?></div>
-          <?php endif; ?>
-          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--dp-white-05);margin-top:auto;">
-            <span class="dp-card-read">Devamını Oku</span>
-            <span style="font-size:11px;color:var(--dp-white-50);"><?php echo dailypulse_reading_time(); ?> dk okuma</span>
-          </div>
+      <?php if ($the_query->have_posts()) : ?>
+        <div class="k-posts-grid">
+          <?php
+          $index = 0;
+          while ($the_query->have_posts()) :
+              $the_query->the_post();
+              $cats     = get_the_category();
+              $cat_name = !empty($cats) ? esc_html($cats[0]->name) : 'Genel';
+              $is_hero  = ($index === 0);
+          ?>
+          <article class="k-post-card<?php echo $is_hero ? ' k-post-card--hero' : ''; ?>">
+            <a href="<?php the_permalink(); ?>" class="k-post-card__link" tabindex="-1" aria-hidden="true">
+              <?php if (has_post_thumbnail()) : ?>
+                <div class="k-post-card__img-wrap">
+                  <?php the_post_thumbnail(
+                      $is_hero ? 'card-featured' : 'card-regular',
+                      ['class' => 'k-post-card__img', 'alt' => get_the_title()]
+                  ); ?>
+                </div>
+              <?php else : ?>
+                <div class="k-post-card__img-wrap k-post-card__img-wrap--placeholder"></div>
+              <?php endif; ?>
+            </a>
+
+            <div class="k-post-card__body">
+              <div class="k-post-card__meta">
+                <span class="k-tag k-post-cat"><?php echo $cat_name; ?></span>
+                <time class="k-post-card__date" datetime="<?php echo get_the_date('Y-m-d'); ?>">
+                  <?php echo get_the_date('j M Y'); ?>
+                </time>
+              </div>
+
+              <h3 class="k-post-card__title">
+                <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+              </h3>
+
+              <?php if ($is_hero || !empty(get_the_excerpt())) : ?>
+                <p class="k-post-card__excerpt"><?php echo wp_trim_words(get_the_excerpt(), $is_hero ? 30 : 18); ?></p>
+              <?php endif; ?>
+
+              <a href="<?php the_permalink(); ?>" class="k-post-card__read">
+                Devamını Oku <span aria-hidden="true">→</span>
+              </a>
+            </div>
+          </article>
+          <?php
+          $index++;
+          endwhile;
+          wp_reset_postdata();
+          ?>
+        </div><!-- .k-posts-grid -->
+
+        <!-- DAHA FAZLA butonu -->
+        <div class="k-posts-more">
+          <a href="<?php echo esc_url(get_permalink(get_option('page_for_posts'))); ?>" class="k-btn-outline">
+            Tüm Yazılara Git
+          </a>
         </div>
-      </a>
-      <?php $i++; endwhile; wp_reset_postdata(); ?>
-    </div>
-  </div>
 
-  <!-- GÜNÜN FIRSATLARI -->
-  <div style="max-width:var(--dp-max-width);margin:0 auto;padding:0 24px;">
-    <div class="dp-section-head" style="padding:0;">
-      <h2>Günün Fırsatları</h2>
-      <a href="<?php echo esc_url(get_category_link(get_cat_ID('firsatlar'))); ?>">Tüm Fırsatlar →</a>
-    </div>
-  </div>
-  <?php get_template_part('template-parts/deals-strip'); ?>
+      <?php else : ?>
+        <p class="k-no-posts">Henüz yayınlanmış yazı bulunmuyor. Yakında!</p>
+      <?php endif; ?>
 
-  <!-- MID CTA -->
-  <div style="padding:0 24px;">
-    <?php get_template_part('template-parts/mid-cta'); ?>
-  </div>
-
-  <!-- SON YAZILAR -->
-  <div style="max-width:var(--dp-max-width);margin:0 auto;padding:0 24px;">
-    <div class="dp-section-head" style="padding:0;">
-      <h2>Son Yazılar</h2>
-      <a href="<?php echo esc_url(get_permalink(get_option('page_for_posts'))); ?>">Arşiv →</a>
-    </div>
-
-    <?php
-    $recent = new WP_Query(array(
-        'posts_per_page' => 6,
-        'offset'         => 3,
-        'post_status'    => 'publish',
-    ));
-    ?>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:64px;">
-      <?php while ($recent->have_posts()) : $recent->the_post();
-          $post_cats = get_the_category();
-          $cat_slug  = !empty($post_cats) ? $post_cats[0]->slug : 'teknoloji';
-          $cat_color = dailypulse_category_color($cat_slug);
-      ?>
-      <a href="<?php the_permalink(); ?>" class="dp-card dp-reveal" style="text-decoration:none;display:flex;flex-direction:column;">
-        <?php if (has_post_thumbnail()) : ?>
-          <div style="overflow:hidden;aspect-ratio:16/9;">
-            <?php the_post_thumbnail('card-regular', array('style' => 'width:100%;height:100%;object-fit:cover;')); ?>
-          </div>
-        <?php else : ?>
-          <div style="aspect-ratio:16/9;background:linear-gradient(135deg,var(--dp-purple-700),var(--dp-purple-500));"></div>
-        <?php endif; ?>
-        <div style="padding:20px 22px 24px;flex:1;display:flex;flex-direction:column;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-            <span class="dp-tag dp-tag-<?php echo esc_attr($cat_color['class']); ?>"><?php echo esc_html(!empty($post_cats) ? $post_cats[0]->name : 'Genel'); ?></span>
-            <span style="color:var(--dp-white-50);font-size:12px;"><?php echo get_the_date('j M'); ?></span>
-          </div>
-          <div class="dp-card-title" style="flex:1;"><?php the_title(); ?></div>
-          <div class="dp-card-excerpt" style="margin:8px 0;"><?php echo wp_trim_words(get_the_excerpt(), 15); ?></div>
-          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--dp-white-05);margin-top:auto;">
-            <span class="dp-card-read">Devamını Oku</span>
-            <span style="font-size:11px;color:var(--dp-white-50);"><?php echo dailypulse_reading_time(); ?> dk</span>
-          </div>
-        </div>
-      </a>
-      <?php endwhile; wp_reset_postdata(); ?>
-    </div>
-  </div>
-
-  <!-- SOCIAL PROOF -->
-  <div style="padding:0 24px;">
-    <?php get_template_part('template-parts/proof-bar'); ?>
-  </div>
-
-  <!-- FİNAL CTA -->
-  <?php get_template_part('template-parts/final-cta'); ?>
+    </div><!-- .k-container -->
+  </section>
 
 </main>
 

@@ -1,104 +1,263 @@
 /**
- * The Daily Pulse — Custom JS
+ * Kampanya.website — Custom JS
+ * Email autocomplete + abone ol / abonelikten çık formu
  */
-(function() {
+(function () {
   'use strict';
 
-  // Orb elementlerini body'ye ekle
-  function addOrbs() {
-    const orbs = ['dp-orb dp-orb-1', 'dp-orb dp-orb-2', 'dp-orb dp-orb-3'];
-    orbs.forEach(cls => {
-      const orb = document.createElement('div');
-      orb.className = cls;
-      document.body.appendChild(orb);
+  /* -------------------------------------------------- *
+   *  YARDIMCI FONKSİYONLAR
+   * -------------------------------------------------- */
+  function $(sel, ctx) { return (ctx || document).querySelector(sel); }
+  function $$(sel, ctx) { return Array.from((ctx || document).querySelectorAll(sel)); }
+
+  /* -------------------------------------------------- *
+   *  E-POSTA ALAN ADLARI (autocomplete için)
+   * -------------------------------------------------- */
+  var EMAIL_DOMAINS = [
+    'gmail.com',
+    'hotmail.com',
+    'outlook.com',
+    'yahoo.com',
+    'icloud.com',
+    'yandex.com',
+    'hotmail.com.tr',
+    'yahoo.com.tr',
+    'mynet.com',
+    'superonline.com',
+    'turk.net',
+    'windowslive.com',
+    'live.com',
+    'live.com.tr',
+    'googlemail.com',
+  ];
+
+  /* -------------------------------------------------- *
+   *  E-POSTA OTOMATİK TAMAMLAMA
+   * -------------------------------------------------- */
+  function initEmailAutocomplete() {
+    var input = document.getElementById('k-email');
+    var hint  = document.getElementById('k-autocomplete');
+    if (!input || !hint) return;
+
+    var currentSuggestion = '';
+
+    function getSuggestion(val) {
+      if (!val) return '';
+      var atIdx = val.indexOf('@');
+      if (atIdx === -1) return ''; // @ henüz girilmemiş
+
+      var typed  = val.slice(atIdx + 1).toLowerCase();
+      if (typed.length === 0) return EMAIL_DOMAINS[0]; // @ sonrası boş → ilk domain
+
+      for (var i = 0; i < EMAIL_DOMAINS.length; i++) {
+        if (EMAIL_DOMAINS[i].indexOf(typed) === 0 && EMAIL_DOMAINS[i] !== typed) {
+          return EMAIL_DOMAINS[i];
+        }
+      }
+      return '';
+    }
+
+    function renderHint(val, domain) {
+      if (!domain) {
+        hint.textContent = '';
+        hint.innerHTML   = '';
+        return;
+      }
+      var atIdx  = val.indexOf('@');
+      var before = val.slice(0, atIdx + 1);         // "ali@"
+      var typed  = val.slice(atIdx + 1);             // "gm"
+      var rest   = domain.slice(typed.length);       // "ail.com"
+
+      // Hint katmanını oluştur: görünmez typed kısım + gri rest kısım
+      hint.innerHTML =
+        '<span class="k-autocomplete__typed">' + escHtml(before + typed) + '</span>' +
+        '<span class="k-autocomplete__suggest">' + escHtml(rest) + '</span>';
+    }
+
+    function escHtml(s) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function acceptSuggestion() {
+      if (!currentSuggestion) return false;
+      var val   = input.value;
+      var atIdx = val.indexOf('@');
+      if (atIdx === -1) return false;
+      input.value       = val.slice(0, atIdx + 1) + currentSuggestion;
+      currentSuggestion = '';
+      hint.innerHTML    = '';
+      return true;
+    }
+
+    input.addEventListener('input', function () {
+      var domain       = getSuggestion(input.value);
+      currentSuggestion = domain;
+      renderHint(input.value, domain);
+    });
+
+    input.addEventListener('keydown', function (e) {
+      if ((e.key === 'Tab' || e.key === 'ArrowRight') && currentSuggestion) {
+        e.preventDefault();
+        acceptSuggestion();
+      }
+    });
+
+    // Mobil: hint'e dokunma ile tamamla
+    hint.addEventListener('click', function () { acceptSuggestion(); input.focus(); });
+    hint.style.cursor = 'text';
+  }
+
+  /* -------------------------------------------------- *
+   *  ABONE OL FORMU
+   * -------------------------------------------------- */
+  function initSubscribeForm() {
+    var form = document.getElementById('k-subscribe-form');
+    if (!form) return;
+
+    var emailEl  = document.getElementById('k-email');
+    var kvkkEl   = document.getElementById('k-kvkk');
+    var btnEl    = document.getElementById('k-subscribe-btn');
+    var btnText  = form.querySelector('.k-btn-text');
+    var btnLoad  = form.querySelector('.k-btn-loading');
+    var msgEl    = document.getElementById('k-form-msg');
+
+    function showMsg(type, text) {
+      msgEl.className = 'k-form-msg k-msg-' + type;
+      msgEl.textContent = text;
+      msgEl.removeAttribute('hidden');
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      var email = emailEl.value.trim();
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showMsg('error', 'Lütfen geçerli bir e-posta adresi girin.');
+        emailEl.focus();
+        return;
+      }
+      if (kvkkEl && !kvkkEl.checked) {
+        showMsg('error', 'Devam etmek için KVKK ve Açık Rıza Metni\'ni onaylamanız gerekiyor.');
+        return;
+      }
+
+      // Yükleniyor durumu
+      btnEl.disabled    = true;
+      btnText.hidden    = true;
+      btnLoad.hidden    = false;
+      msgEl.hidden      = true;
+
+      fetch('/wp-json/kampanya/v1/subscribe', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ email: email }),
+      })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.success) {
+          showMsg('success', data.message || 'Abone oldunuz! 🎉');
+          emailEl.value = '';
+          document.getElementById('k-autocomplete').innerHTML = '';
+          // Butonu başarı rengine çevir
+          btnEl.style.background = '#16a34a';
+          btnText.textContent    = '✓';
+          btnText.hidden         = false;
+          btnLoad.hidden         = true;
+        } else {
+          showMsg('error', (data.message || data.data && data.data.message) || 'Bir hata oluştu.');
+          btnEl.disabled  = false;
+          btnText.hidden  = false;
+          btnLoad.hidden  = true;
+        }
+      })
+      .catch(function () {
+        showMsg('error', 'Bağlantı hatası. Lütfen tekrar deneyin.');
+        btnEl.disabled  = false;
+        btnText.hidden  = false;
+        btnLoad.hidden  = true;
+      });
     });
   }
 
-  // Scroll reveal animasyonları
+  /* -------------------------------------------------- *
+   *  ABONELİKTEN ÇIK FORMU
+   * -------------------------------------------------- */
+  function initUnsubscribeForm() {
+    var form = document.getElementById('k-unsub-form');
+    if (!form) return;
+
+    var emailEl = form.querySelector('input[type="email"]');
+    var btnEl   = form.querySelector('button[type="submit"]');
+    var msgEl   = document.getElementById('k-unsub-msg');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      var email = emailEl.value.trim();
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        msgEl.className   = 'k-unsub-msg error';
+        msgEl.textContent = 'Lütfen geçerli bir e-posta adresi girin.';
+        msgEl.hidden      = false;
+        return;
+      }
+
+      btnEl.disabled    = true;
+      btnEl.textContent = '…';
+      msgEl.hidden      = true;
+
+      fetch('/wp-json/kampanya/v1/unsubscribe', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ email: email }),
+      })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.success) {
+          msgEl.className   = 'k-unsub-msg success';
+          msgEl.textContent = data.message || 'Aboneliğiniz iptal edildi.';
+          emailEl.value     = '';
+        } else {
+          msgEl.className   = 'k-unsub-msg error';
+          msgEl.textContent = (data.message || data.data && data.data.message) || 'Bir hata oluştu.';
+          btnEl.disabled    = false;
+          btnEl.textContent = 'Aboneliği İptal Et';
+        }
+        msgEl.hidden = false;
+      })
+      .catch(function () {
+        msgEl.className   = 'k-unsub-msg error';
+        msgEl.textContent = 'Bağlantı hatası. Lütfen tekrar deneyin.';
+        msgEl.hidden      = false;
+        btnEl.disabled    = false;
+        btnEl.textContent = 'Aboneliği İptal Et';
+      });
+    });
+  }
+
+  /* -------------------------------------------------- *
+   *  SCROLL REVEAL
+   * -------------------------------------------------- */
   function initReveal() {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
+    if (!window.IntersectionObserver) return;
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
         if (entry.isIntersecting) {
           entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
+          obs.unobserve(entry.target);
         }
       });
     }, { threshold: 0.1 });
-
-    document.querySelectorAll('.dp-reveal').forEach(el => observer.observe(el));
+    $$('.dp-reveal').forEach(function (el) { obs.observe(el); });
   }
 
-  // Kategori pill toggle
-  function initCategoryPills() {
-    document.querySelectorAll('.dp-cat-pill').forEach(pill => {
-      pill.addEventListener('click', function(e) {
-        if (this.getAttribute('href') === '#') {
-          e.preventDefault();
-          document.querySelectorAll('.dp-cat-pill').forEach(p => p.classList.remove('active'));
-          this.classList.add('active');
-        }
-      });
-    });
-  }
-
-  // Email form submit handling
-  function initForms() {
-    document.querySelectorAll('.dp-subscribe-form').forEach(form => {
-      form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const email = this.querySelector('input[type="email"]');
-        const btn = this.querySelector('button');
-        const originalText = btn.textContent;
-
-        if (email && email.value) {
-          btn.textContent = 'Gönderiliyor...';
-          btn.disabled = true;
-
-          // AJAX submit — FluentCRM veya özel endpoint
-          const formData = new FormData();
-          formData.append('action', 'dp_subscribe');
-          formData.append('email', email.value);
-          formData.append('nonce', (typeof dpAjax !== 'undefined') ? dpAjax.nonce : '');
-
-          const nameInput = this.querySelector('input[name="name"]');
-          if (nameInput) formData.append('name', nameInput.value);
-
-          fetch((typeof dpAjax !== 'undefined') ? dpAjax.url : '/wp-admin/admin-ajax.php', {
-            method: 'POST',
-            body: formData
-          })
-          .then(r => r.json())
-          .then(data => {
-            btn.textContent = 'Teşekkürler! ✓';
-            btn.style.background = '#00e676';
-            btn.style.color = '#030014';
-            email.value = '';
-            if (nameInput) nameInput.value = '';
-          })
-          .catch(() => {
-            btn.textContent = 'Teşekkürler! ✓';
-            btn.style.background = '#00e676';
-            btn.style.color = '#030014';
-            email.value = '';
-          })
-          .finally(() => {
-            setTimeout(() => {
-              btn.textContent = originalText;
-              btn.style.background = '';
-              btn.style.color = '';
-              btn.disabled = false;
-            }, 3000);
-          });
-        }
-      });
-    });
-  }
-
-  // Smooth scroll
+  /* -------------------------------------------------- *
+   *  SMOOTH SCROLL
+   * -------------------------------------------------- */
   function initSmoothScroll() {
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function(e) {
-        const target = document.querySelector(this.getAttribute('href'));
+    $$('a[href^="#"]').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        var target = document.querySelector(this.getAttribute('href'));
         if (target) {
           e.preventDefault();
           target.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -107,12 +266,14 @@
     });
   }
 
-  // Init
-  document.addEventListener('DOMContentLoaded', function() {
-    addOrbs();
+  /* -------------------------------------------------- *
+   *  BAŞLAT
+   * -------------------------------------------------- */
+  document.addEventListener('DOMContentLoaded', function () {
+    initEmailAutocomplete();
+    initSubscribeForm();
+    initUnsubscribeForm();
     initReveal();
-    initCategoryPills();
-    initForms();
     initSmoothScroll();
   });
 

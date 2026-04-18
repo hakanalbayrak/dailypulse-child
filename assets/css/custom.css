@@ -390,3 +390,491 @@ a[href*="/author/kampanya_admin/"] {
 @media (max-width: 768px) {
   .hero-section { padding: 40px 20px !important; }
 }
+
+/* =============================================
+   HOMEPAGE — HERO ABONE FORMU
+   ============================================= */
+
+.k-homepage {
+  margin: 0;
+  padding: 0;
+}
+
+/* Hero bölümü */
+.k-hero {
+  background: var(--k-black);
+  padding: 80px 24px 72px;
+  text-align: center;
+}
+
+.k-hero__inner {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.k-hero__badge {
+  margin-bottom: 20px;
+}
+
+.k-hero__title {
+  font-family: var(--k-font) !important;
+  font-size: clamp(32px, 5vw, 52px) !important;
+  font-weight: 700 !important;
+  color: var(--k-white) !important;
+  line-height: 1.15 !important;
+  margin: 0 0 16px !important;
+  letter-spacing: -0.5px;
+}
+
+.k-hero__title-accent {
+  color: var(--k-yellow);
+  display: inline;
+}
+
+.k-hero__subtitle {
+  font-size: 16px !important;
+  color: var(--k-gray-300) !important;
+  line-height: 1.65 !important;
+  margin: 0 auto 36px !important;
+  max-width: 520px;
+}
+
+.k-hero__br { display: none; }
+@media (min-width: 540px) { .k-hero__br { display: inline; } }
+
+/* Form satırı */
+.k-subscribe-form {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.k-form-row {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  margin-bottom: 14px;
+}
+
+/* E-posta input sarmalayıcı */
+.k-email-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.k-email-input {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  background: var(--k-white) !important;
+  border: 2px solid var(--k-white) !important;
+  border-radius: var(--k-radius) !important;
+  color: var(--k-black) !important;
+  padding: 14px 16px !important;
+  font-family: var(--k-font) !important;
+  font-size: 15px !important;
+  line-height: 1.4 !important;
+  transition: border-color .15s !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+.k-email-input:focus {
+  border-color: var(--k-yellow) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Otomatik tamamlama katmanı */
+.k-autocomplete {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  pointer-events: none;
+  font-family: var(--k-font);
+  font-size: 15px;
+  line-height: 1.4;
+  color: transparent;  /* kullanıcı girişini gizle */
+  white-space: nowrap;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.k-autocomplete__typed {
+  color: transparent; /* gerçek input üstünde — görünmez */
+}
+
+.k-autocomplete__suggest {
+  color: var(--k-gray-300);  /* gri öneri kısmı */
+  background: transparent;
+}
+
+/* Abone ol butonu */
+.k-subscribe-btn {
+  flex-shrink: 0;
+  background: var(--k-yellow) !important;
+  color: var(--k-black) !important;
+  border: none !important;
+  border-radius: var(--k-radius) !important;
+  padding: 14px 24px !important;
+  font-family: var(--k-font) !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  cursor: pointer;
+  transition: background .15s, transform .1s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.k-subscribe-btn:hover {
+  background: var(--k-yellow-dark) !important;
+  transform: translateY(-1px);
+}
+
+.k-subscribe-btn:active { transform: translateY(0); }
+.k-subscribe-btn:disabled { opacity: .7; cursor: not-allowed; transform: none; }
+
+/* KVKK onay satırı */
+.k-consent-row {
+  margin-bottom: 14px;
+  text-align: left;
+}
+
+.k-consent-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.k-consent-checkbox {
+  flex-shrink: 0;
+  width: 16px !important;
+  height: 16px !important;
+  margin-top: 2px !important;
+  border: 1.5px solid var(--k-gray-300) !important;
+  border-radius: 3px !important;
+  accent-color: var(--k-yellow) !important;
+  cursor: pointer;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.k-consent-text {
+  font-size: 12px !important;
+  color: var(--k-gray-300) !important;
+  line-height: 1.5 !important;
+}
+
+.k-consent-text a {
+  color: var(--k-yellow) !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px;
+}
+
+.k-consent-text a:hover { color: var(--k-white) !important; }
+
+/* Form mesajları */
+.k-form-msg {
+  padding: 12px 16px;
+  border-radius: var(--k-radius);
+  font-size: 14px !important;
+  font-weight: 600;
+  text-align: left;
+  margin-top: 8px;
+}
+.k-form-msg.k-msg-success {
+  background: rgba(0,180,100,.15);
+  color: #4ade80 !important;
+  border: 1px solid rgba(74,222,128,.3);
+}
+.k-form-msg.k-msg-error {
+  background: rgba(211,47,47,.12);
+  color: #f87171 !important;
+  border: 1px solid rgba(248,113,113,.3);
+}
+
+/* Alt güven metni */
+.k-hero__trust {
+  margin: 20px 0 0 !important;
+  font-size: 12px !important;
+  color: var(--k-gray-500) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.k-hero__trust a { color: var(--k-gray-500) !important; text-decoration: underline; }
+.k-hero__trust a:hover { color: var(--k-gray-300) !important; }
+
+/* Mobil form düzeni */
+@media (max-width: 500px) {
+  .k-hero { padding: 60px 20px 56px; }
+  .k-form-row { flex-direction: column; }
+  .k-subscribe-btn { width: 100% !important; justify-content: center; }
+}
+
+/* =============================================
+   HOMEPAGE — BLOG LİSTESİ
+   ============================================= */
+
+.k-posts-section {
+  padding: 64px 0 80px;
+  background: var(--k-white);
+}
+
+.k-container {
+  max-width: var(--k-max-w);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.k-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  border-bottom: 2px solid var(--k-black);
+  padding-bottom: 12px;
+}
+
+.k-section-title {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  color: var(--k-black) !important;
+  margin: 0 !important;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+.k-section-more {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: var(--k-gray-500) !important;
+  text-decoration: none !important;
+  letter-spacing: .3px;
+  transition: color .2s;
+}
+.k-section-more:hover { color: var(--k-black) !important; }
+
+/* Yazı grid — 3 sütun, ilk kart tam genişlik hero */
+.k-posts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto;
+  gap: 24px;
+}
+
+/* Hero kart — ilk yazı iki sütun kaplıyor */
+.k-post-card--hero {
+  grid-column: 1 / 3;
+}
+
+/* Kart temel stili */
+.k-post-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--k-white);
+  border: 1px solid var(--k-gray-100);
+  border-radius: var(--k-radius);
+  overflow: hidden;
+  transition: box-shadow .2s, border-color .2s, transform .2s;
+}
+.k-post-card:hover {
+  box-shadow: 0 6px 24px rgba(0,0,0,.07);
+  border-color: var(--k-gray-300);
+  transform: translateY(-2px);
+}
+
+/* Kart görsel */
+.k-post-card__link { display: block; }
+
+.k-post-card__img-wrap {
+  overflow: hidden;
+  background: var(--k-gray-100);
+  aspect-ratio: 16/9;
+}
+.k-post-card--hero .k-post-card__img-wrap { aspect-ratio: 16/7; }
+
+.k-post-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .3s;
+}
+.k-post-card:hover .k-post-card__img { transform: scale(1.03); }
+
+.k-post-card__img-wrap--placeholder {
+  background: linear-gradient(135deg, var(--k-gray-100) 0%, var(--k-gray-300) 100%);
+}
+
+/* Kart gövde */
+.k-post-card__body {
+  padding: 20px 22px 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.k-post-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.k-post-cat {
+  background: var(--k-gray-100) !important;
+  color: var(--k-gray-700) !important;
+}
+
+.k-post-card__date {
+  font-size: 12px;
+  color: var(--k-gray-500);
+}
+
+.k-post-card__title {
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  color: var(--k-black) !important;
+  line-height: 1.35 !important;
+  margin: 0 0 10px !important;
+  flex: 1;
+}
+.k-post-card--hero .k-post-card__title { font-size: 22px !important; }
+.k-post-card__title a {
+  color: var(--k-black) !important;
+  text-decoration: none !important;
+  transition: color .2s;
+}
+.k-post-card__title a:hover { color: var(--k-gray-700) !important; }
+
+.k-post-card__excerpt {
+  font-size: 14px !important;
+  color: var(--k-gray-500) !important;
+  line-height: 1.6 !important;
+  margin: 0 0 16px !important;
+}
+
+.k-post-card__read {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: var(--k-black) !important;
+  text-decoration: none !important;
+  border-bottom: 1px solid var(--k-gray-300);
+  padding-bottom: 1px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: auto;
+  transition: border-color .2s, color .2s;
+}
+.k-post-card__read:hover {
+  color: var(--k-gray-500) !important;
+  border-color: transparent;
+}
+
+/* "Tüm Yazılara Git" butonu */
+.k-posts-more {
+  text-align: center;
+  margin-top: 40px;
+}
+.k-btn-outline {
+  display: inline-block;
+  border: 2px solid var(--k-black) !important;
+  color: var(--k-black) !important;
+  background: transparent !important;
+  border-radius: var(--k-radius) !important;
+  padding: 12px 32px !important;
+  font-family: var(--k-font) !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  text-decoration: none !important;
+  transition: background .2s, color .2s;
+}
+.k-btn-outline:hover {
+  background: var(--k-black) !important;
+  color: var(--k-white) !important;
+}
+
+.k-no-posts {
+  color: var(--k-gray-500) !important;
+  text-align: center;
+  padding: 40px 0;
+  font-size: 16px !important;
+}
+
+/* Blog listeleme responsive */
+@media (max-width: 900px) {
+  .k-posts-grid { grid-template-columns: 1fr 1fr; }
+  .k-post-card--hero { grid-column: 1 / 3; }
+}
+
+@media (max-width: 580px) {
+  .k-posts-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .k-post-card--hero { grid-column: auto; }
+  .k-posts-section { padding: 48px 0 64px; }
+}
+
+/* =============================================
+   ABONELİKTEN ÇIK SAYFASI
+   ============================================= */
+
+.k-unsub-page {
+  max-width: 480px;
+  margin: 80px auto;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.k-unsub-page h1 {
+  font-size: 28px !important;
+  color: var(--k-black) !important;
+  margin-bottom: 12px !important;
+}
+
+.k-unsub-page p {
+  color: var(--k-gray-500) !important;
+  margin-bottom: 28px !important;
+}
+
+.k-unsub-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.k-unsub-form input[type="email"] {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.k-unsub-msg {
+  padding: 12px 16px;
+  border-radius: var(--k-radius);
+  font-size: 14px !important;
+  font-weight: 600;
+}
+.k-unsub-msg.success {
+  background: rgba(0,180,100,.12);
+  color: #16a34a !important;
+  border: 1px solid rgba(22,163,74,.3);
+}
+.k-unsub-msg.error {
+  background: rgba(211,47,47,.08);
+  color: var(--k-red) !important;
+  border: 1px solid rgba(211,47,47,.25);
+}

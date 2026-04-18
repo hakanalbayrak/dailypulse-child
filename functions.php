@@ -126,3 +126,86 @@ function kampanya_footer_copyright_buffer_end() {
 }
 add_action('wp_footer', 'kampanya_footer_copyright_buffer_start', 1);
 add_action('wp_footer', 'kampanya_footer_copyright_buffer_end', 999);
+
+/* ============================================================
+   KAMPANYA REST API — Abone ol / Abonelikten çık
+   ============================================================ */
+
+add_action('rest_api_init', function () {
+
+    // Abone ol
+    register_rest_route('kampanya/v1', '/subscribe', [
+        'methods'             => 'POST',
+        'callback'            => 'kampanya_rest_subscribe',
+        'permission_callback' => '__return_true',
+    ]);
+
+    // Abonelikten çık
+    register_rest_route('kampanya/v1', '/unsubscribe', [
+        'methods'             => 'POST',
+        'callback'            => 'kampanya_rest_unsubscribe',
+        'permission_callback' => '__return_true',
+    ]);
+});
+
+function kampanya_rest_subscribe(WP_REST_Request $request) {
+    $email = sanitize_email(trim($request->get_param('email')));
+
+    if (!is_email($email)) {
+        return new WP_Error('invalid_email', 'Lütfen geçerli bir e-posta adresi girin.', ['status' => 400]);
+    }
+
+    if (!function_exists('FluentCrmApi')) {
+        return new WP_Error('plugin_unavailable', 'Abonelik servisi şu an kullanılamıyor.', ['status' => 503]);
+    }
+
+    $contact_api = FluentCrmApi('contacts');
+
+    $data = [
+        'email'  => $email,
+        'status' => 'subscribed',
+        'lists'  => [3], // Genel Aboneler listesi
+    ];
+
+    $result = $contact_api->createOrUpdate($data);
+
+    if (is_wp_error($result)) {
+        return new WP_Error('subscribe_failed', 'Kayıt sırasında bir hata oluştu, lütfen tekrar deneyin.', ['status' => 500]);
+    }
+
+    return rest_ensure_response([
+        'success' => true,
+        'message' => 'Abone oldunuz! En güncel fırsatlar yakında e-postanızda. 🎉',
+    ]);
+}
+
+function kampanya_rest_unsubscribe(WP_REST_Request $request) {
+    $email = sanitize_email(trim($request->get_param('email')));
+
+    if (!is_email($email)) {
+        return new WP_Error('invalid_email', 'Lütfen geçerli bir e-posta adresi girin.', ['status' => 400]);
+    }
+
+    if (!function_exists('FluentCrmApi')) {
+        return new WP_Error('plugin_unavailable', 'Servis şu an kullanılamıyor.', ['status' => 503]);
+    }
+
+    $contact_api = FluentCrmApi('contacts');
+    $contact     = $contact_api->getContact($email);
+
+    if (!$contact) {
+        // Sessizce başarı dön — kullanıcıya "zaten abone değilsin" demek yerine
+        return rest_ensure_response([
+            'success' => true,
+            'message' => 'Aboneliğiniz iptal edildi.',
+        ]);
+    }
+
+    $contact->status = 'unsubscribed';
+    $contact->save();
+
+    return rest_ensure_response([
+        'success' => true,
+        'message' => 'Aboneliğiniz başarıyla iptal edildi. Artık e-posta almayacaksınız.',
+    ]);
+}
