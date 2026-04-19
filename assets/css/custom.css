@@ -617,12 +617,12 @@ a[href*="/author/kampanya_admin/"] {
 .k-autocomplete__typed  { color: transparent; }
 .k-autocomplete__suggest { color: var(--k-gray-300); background: transparent; } /* öneri gri — geçerli */
 
-/* Abone ol butonu — ghost style: white outline + white text on dark hero */
+/* Abone ol butonu — white bg, black text, black border */
 .k-subscribe-btn {
   flex-shrink: 0;
-  background: transparent !important;
-  color: var(--k-white) !important;
-  border: 2px solid var(--k-white) !important;
+  background: var(--k-white) !important;
+  color: var(--k-black) !important;
+  border: 2px solid var(--k-black) !important;
   border-radius: var(--k-radius) !important;
   padding: 14px 24px !important;
   font-family: var(--k-font) !important;
@@ -638,8 +638,9 @@ a[href*="/author/kampanya_admin/"] {
   gap: 6px;
 }
 .k-subscribe-btn:hover {
-  background: var(--k-white) !important;
-  color: var(--k-black) !important;
+  background: var(--k-black) !important;
+  color: var(--k-white) !important;
+  border-color: var(--k-black) !important;
 }
 .k-subscribe-btn:active { opacity: .85; }
 .k-subscribe-btn:disabled {
