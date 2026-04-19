@@ -736,8 +736,23 @@ button.k-subscribe-btn:disabled,
 @media (max-width: 500px) {
   .k-hero { padding: 60px 20px 56px; }
   .k-form-row { flex-direction: column; }
+  button.k-subscribe-btn,
   .k-subscribe-btn { width: 100% !important; justify-content: center; }
 }
+
+/* ── COPYRIGHT FIX ── hide default Blocksy copyright, show correct one */
+.ct-footer-copyright p { visibility: hidden; font-size: 0 !important; height: 0; }
+.ct-footer-copyright::after {
+  content: 'Copyright © 2026 - Kampanya.website';
+  font-size: 15px;
+  line-height: 1.3;
+  display: block;
+  visibility: visible;
+  color: inherit;
+}
+
+/* ── FOOTER CLEANUP ── hide duplicate link widgets kept for legacy */
+#text-8, #text-9, #block-14 { display: none !important; }
 
 /* =============================================
    HOMEPAGE — BLOG LİSTESİ
