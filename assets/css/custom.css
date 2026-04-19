@@ -4,7 +4,7 @@
    Yellow supermarket tags · Red sale banners
    ============================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Cabin:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
   --k-black: #111111;
@@ -19,7 +19,8 @@
   --k-yellow-dark: #e6c200;
   --k-red: #d32f2f;
   --k-red-dark: #b71c1c;
-  --k-font: 'Cabin', -apple-system, sans-serif;
+  --k-font: 'JetBrains Mono', 'Courier New', monospace;
+  --k-font-heading: 'Barlow Condensed', 'Arial Narrow', sans-serif;
   --k-radius: 4px;
   --k-radius-sm: 2px;
   --k-max-w: 1080px;
@@ -42,18 +43,33 @@
 
 /* The SVG itself — height drives sizing, width scales proportionally */
 .k-logo-svg {
-  height: 38px !important;
+  height: 52px !important;
   width: auto !important;
   display: block !important;
-  /* Barlow Condensed must be loaded before render for correct spacing */
-  font-display: block;
 }
 
 @media (max-width: 900px) {
-  .k-logo-svg { height: 30px !important; }
+  .k-logo-svg { height: 38px !important; }
 }
 @media (max-width: 600px) {
-  .k-logo-svg { height: 26px !important; }
+  .k-logo-svg { height: 30px !important; }
+}
+
+/* Suppress hover bg/decoration that bleeds onto the logo link */
+.site-logo-container a,
+.custom-logo-link,
+.k-logo-link {
+  background: transparent !important;
+  text-decoration: none !important;
+}
+.site-logo-container a:hover,
+.custom-logo-link:hover,
+.k-logo-link:hover {
+  background: transparent !important;
+  color: inherit !important;
+  text-decoration: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* Hide Blocksy's site title text (shown when no logo is set — our filter bypasses this,
@@ -86,7 +102,10 @@ body::before, body::after { display: none !important; }
 /* ANA METİN — sadece siyah/beyaz */
 h1, h2, h3, h4, h5, h6, .entry-title, .widget-title {
   color: var(--k-black) !important;
-  font-weight: 700 !important;
+  font-family: var(--k-font-heading) !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
 }
 p, li, td, th { color: var(--k-black) !important; }
 
@@ -126,11 +145,11 @@ header[data-id="type-1"],
 header .menu > li > a,
 .ct-header .ct-menu > li > a {
   color: var(--k-black) !important;
-  font-family: var(--k-font) !important;
-  font-size: 14px !important;
-  font-weight: 600 !important;
+  font-family: var(--k-font-heading) !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
   text-transform: uppercase;
-  letter-spacing: .5px;
+  letter-spacing: .8px;
   text-decoration: none !important;
   padding: 4px 8px !important;
   border-radius: var(--k-radius-sm) !important;
@@ -152,11 +171,11 @@ header .ct-button,
   border: 2px solid var(--k-black) !important;
   border-radius: var(--k-radius) !important;
   padding: 8px 20px !important;
-  font-family: var(--k-font) !important;
-  font-size: 13px !important;
-  font-weight: 700 !important;
+  font-family: var(--k-font-heading) !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
   text-transform: uppercase;
-  letter-spacing: .5px;
+  letter-spacing: .8px;
   text-decoration: none !important;
   transition: background .15s, color .15s !important;
 }
@@ -301,11 +320,11 @@ input[type="submit"] {
   color: var(--k-white) !important;
   border: 2px solid var(--k-black) !important;
   border-radius: var(--k-radius) !important;
-  font-family: var(--k-font) !important;
-  font-weight: 700 !important;
-  font-size: 14px !important;
+  font-family: var(--k-font-heading) !important;
+  font-weight: 800 !important;
+  font-size: 16px !important;
   text-transform: uppercase;
-  letter-spacing: .5px;
+  letter-spacing: .8px;
   padding: 12px 28px !important;
   cursor: pointer;
   transition: background .15s, color .15s !important;
@@ -348,13 +367,9 @@ article.post, .entry-card, .dp-card {
   transition: box-shadow .2s, transform .2s !important;
 }
 article.post:hover, .entry-card:hover, .dp-card:hover {
-  background: var(--k-black) !important;
+  background: var(--k-white) !important;
   transform: translateY(-2px) !important;
   box-shadow: 0 4px 20px rgba(0,0,0,.12) !important;
-}
-/* Card içindeki metin hover'da beyaza döner */
-article.post:hover *, .entry-card:hover *, .dp-card:hover * {
-  color: var(--k-white) !important;
 }
 
 article.post .entry-title a, .entry-card .entry-title a {
@@ -567,9 +582,9 @@ a[href*="/author/kampanya_admin/"] {
 }
 
 .k-hero__title {
-  font-family: var(--k-font) !important;
-  font-size: clamp(32px, 5vw, 52px) !important;
-  font-weight: 700 !important;
+  font-family: var(--k-font-heading) !important;
+  font-size: clamp(40px, 7vw, 72px) !important;
+  font-weight: 900 !important;
   color: var(--k-white) !important;
   line-height: 1.15 !important;
   margin: 0 0 16px !important;
@@ -666,9 +681,9 @@ button.k-subscribe-btn,
   border: 2px solid var(--k-black) !important;
   border-radius: var(--k-radius) !important;
   padding: 14px 24px !important;
-  font-family: var(--k-font) !important;
-  font-size: 14px !important;
-  font-weight: 700 !important;
+  font-family: var(--k-font-heading) !important;
+  font-size: 17px !important;
+  font-weight: 800 !important;
   text-transform: uppercase;
   letter-spacing: .5px;
   cursor: pointer;
@@ -894,21 +909,9 @@ button.k-subscribe-btn:disabled,
   transition: background .2s, box-shadow .2s, transform .2s;
 }
 .k-post-card:hover {
-  background: var(--k-black);
-  box-shadow: 0 6px 24px rgba(0,0,0,.15);
+  background: var(--k-white);
+  box-shadow: 0 6px 24px rgba(0,0,0,.12);
   transform: translateY(-2px);
-}
-/* Hover: kart içindeki tüm metinler beyaza */
-.k-post-card:hover .k-post-card__title a,
-.k-post-card:hover .k-post-card__excerpt,
-.k-post-card:hover .k-post-card__date,
-.k-post-card:hover .k-post-card__read {
-  color: var(--k-white) !important;
-  background: none !important;
-}
-.k-post-card:hover .k-post-cat {
-  background: var(--k-white) !important;
-  color: var(--k-black) !important;
 }
 
 /* Kart görsel */
@@ -924,7 +927,7 @@ button.k-subscribe-btn:disabled,
   object-fit: cover; display: block;
   transition: transform .3s;
 }
-.k-post-card:hover .k-post-card__img { transform: scale(1.03); }
+.k-post-card:hover .k-post-card__img { transform: none; }
 .k-post-card__img-wrap--placeholder {
   background: var(--k-gray-100);
 }
@@ -1072,6 +1075,30 @@ button.k-subscribe-btn:disabled,
   background: var(--k-red);
   color: var(--k-white) !important;
   border: 1.5px solid var(--k-red-dark);
+}
+
+/* =============================================
+   FOOTER LOGO
+   ============================================= */
+
+/* Dark logo injected via JS into footer bottom bar */
+.k-footer-logo-wrap {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-decoration: none !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin-right: 16px;
+}
+.k-footer-logo-wrap:hover {
+  background: transparent !important;
+  opacity: .8;
+}
+.k-footer-logo-wrap .k-logo-svg {
+  height: 24px !important;
+  width: auto !important;
 }
 
 /* =============================================

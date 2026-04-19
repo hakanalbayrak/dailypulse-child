@@ -19,7 +19,7 @@ require_once DAILYPULSE_DIR . '/inc/shortcodes.php';
  * Google Fonts yükle — Cabin (body) + Barlow Condensed (logo/wordmark)
  */
 function dailypulse_google_fonts() {
-    $fonts_url = 'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Cabin:wght@400;500;600;700&display=swap';
+    $fonts_url = 'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=JetBrains+Mono:wght@400;500&display=swap';
     wp_enqueue_style('dailypulse-google-fonts', $fonts_url, array(), null);
 }
 add_action('wp_enqueue_scripts', 'dailypulse_google_fonts');
@@ -122,9 +122,9 @@ function kampanya_logo_inline($html, $attachment_id, $size, $icon, $attr) {
  * inline SVG can use it correctly.
  */
 function kampanya_logo_svg() {
+    // No <title> element — avoids browser native tooltip on hover
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 220"'
         . ' class="k-logo-svg" role="img" aria-label="kampanya.website">'
-        . '<title>kampanya.website</title>'
         . '<path d="M 14 30 L 132 30 L 186 100 L 132 170 L 14 170 Z" fill="#FFD600" stroke="#111111" stroke-width="3"/>'
         . '<circle cx="150" cy="100" r="9" fill="#111111"/>'
         . '<text x="26" y="145" font-family="\'Barlow Condensed\',sans-serif" font-weight="900" font-size="140" fill="#111111" letter-spacing="-2">k</text>'
@@ -133,6 +133,52 @@ function kampanya_logo_svg() {
         . '<rect x="248" y="178" width="790" height="2.5" fill="#111111"/>'
         . '<text x="248" y="208" font-size="25" font-family="\'Barlow Condensed\',sans-serif" font-weight="700" fill="#111111" letter-spacing="7">.WEBSITE</text>'
         . '</svg>';
+}
+
+/**
+ * Dark variant — white wordmark + yellow tag mark for use on black footer
+ */
+function kampanya_logo_svg_dark() {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 220"'
+        . ' class="k-logo-svg k-logo-svg--dark" role="img" aria-label="kampanya.website">'
+        . '<path d="M 14 30 L 132 30 L 186 100 L 132 170 L 14 170 Z" fill="#FFD600" stroke="#FFD600" stroke-width="1"/>'
+        . '<circle cx="150" cy="100" r="9" fill="#111111"/>'
+        . '<text x="26" y="145" font-family="\'Barlow Condensed\',sans-serif" font-weight="900" font-size="140" fill="#111111" letter-spacing="-2">k</text>'
+        . '<line x1="222" y1="28" x2="222" y2="210" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>'
+        . '<text x="248" y="162" font-size="180" font-family="\'Barlow Condensed\',sans-serif" font-weight="900" fill="#FFFFFF" letter-spacing="-2" textLength="790" lengthAdjust="spacingAndGlyphs">kampanya</text>'
+        . '<rect x="248" y="178" width="790" height="2.5" fill="#FFD600"/>'
+        . '<text x="248" y="208" font-size="25" font-family="\'Barlow Condensed\',sans-serif" font-weight="700" fill="rgba(255,255,255,0.6)" letter-spacing="7">.WEBSITE</text>'
+        . '</svg>';
+}
+
+/* ============================================================
+   FOOTER LOGO — inject dark logo SVG into footer bottom bar
+   ============================================================ */
+
+add_action('wp_footer', 'kampanya_footer_logo_inject', 21);
+function kampanya_footer_logo_inject() {
+    $svg = kampanya_logo_svg_dark();
+    ?>
+    <script>
+    (function(){
+        function inject() {
+            var bar = document.querySelector('.ct-footer [data-row*="bottom"] > div');
+            if (!bar || document.querySelector('.k-footer-logo-wrap')) return;
+            var link = document.createElement('a');
+            link.className = 'k-footer-logo-wrap';
+            link.href = '/';
+            link.setAttribute('aria-label', 'Kampanya.website');
+            link.innerHTML = <?php echo json_encode($svg); ?>;
+            bar.insertBefore(link, bar.firstChild);
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', inject);
+        } else {
+            inject();
+        }
+    })();
+    </script>
+    <?php
 }
 
 /* ============================================================
