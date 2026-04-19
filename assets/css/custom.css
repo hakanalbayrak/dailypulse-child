@@ -145,14 +145,14 @@ header .ct-button:hover, .ct-header .ct-button:hover {
   background: var(--k-black) !important;
 }
 
-/* Mobile menu — white background, black text, clear borders */
+/* Mobile menu — light gray background for button contrast */
 .ct-mobile-overlay,
 .ct-panel[data-behaviour],
 .ct-drawer,
 .ct-header .ct-panel,
 [data-id="mobile-menu"],
 .ct-header [data-id="offcanvas"] {
-  background: var(--k-white) !important;
+  background: var(--k-gray-50) !important;
   color: var(--k-black) !important;
 }
 
@@ -197,8 +197,8 @@ header .ct-button:hover, .ct-header .ct-button:hover {
 .ct-mobile-overlay .ct-button,
 .ct-panel .ct-button,
 .ct-drawer .ct-button {
-  background: var(--k-black) !important;
-  color: var(--k-white) !important;
+  background: var(--k-white) !important;
+  color: var(--k-black) !important;
   border: 2px solid var(--k-black) !important;
   display: inline-block !important;
   padding: 10px 20px !important;
@@ -207,8 +207,8 @@ header .ct-button:hover, .ct-header .ct-button:hover {
 }
 .ct-mobile-overlay .ct-button:hover,
 .ct-panel .ct-button:hover {
-  background: var(--k-white) !important;
-  color: var(--k-black) !important;
+  background: var(--k-black) !important;
+  color: var(--k-white) !important;
 }
 
 /* === YELLOW SUPERMARKET TAG === */
