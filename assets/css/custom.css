@@ -4,7 +4,7 @@
    Yellow supermarket tags · Red sale banners
    ============================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Cabin:wght@400;500;600;700&display=swap');
 
 :root {
   --k-black: #111111;
@@ -23,6 +23,44 @@
   --k-radius: 4px;
   --k-radius-sm: 2px;
   --k-max-w: 1080px;
+}
+
+/* =============================================
+   LOGO — inline SVG lockup
+   ============================================= */
+
+/* Anchor wrapper */
+.k-logo-link,
+.custom-logo-link.k-logo-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  line-height: 0 !important;
+  text-decoration: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* The SVG itself — height drives sizing, width scales proportionally */
+.k-logo-svg {
+  height: 38px !important;
+  width: auto !important;
+  display: block !important;
+  /* Barlow Condensed must be loaded before render for correct spacing */
+  font-display: block;
+}
+
+@media (max-width: 900px) {
+  .k-logo-svg { height: 30px !important; }
+}
+@media (max-width: 600px) {
+  .k-logo-svg { height: 26px !important; }
+}
+
+/* Hide Blocksy's site title text (shown when no logo is set — our filter bypasses this,
+   but keep as safety net) */
+[data-header*="type-1"] .ct-header .site-title,
+[data-header*="type-1"] .ct-header .site-description {
+  display: none !important;
 }
 
 /* === BASE — FORCE CABIN EVERYWHERE === */

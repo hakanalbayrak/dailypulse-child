@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Yellow price-tag mark with K — kampanya.website favicon -->
+  <path d="M 7 15 L 66 15 L 93 50 L 66 85 L 7 85 Z" fill="#FFD600"/>
+  <circle cx="75" cy="50" r="5" fill="#111111"/>
+  <text x="13" y="73"
+    font-family="'Barlow Condensed','Arial Narrow',Impact,sans-serif"
+    font-weight="900"
+    font-size="70"
+    fill="#111111"
+    letter-spacing="-1">k</text>
+</svg>

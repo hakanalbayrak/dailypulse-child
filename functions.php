@@ -16,10 +16,10 @@ require_once DAILYPULSE_DIR . '/inc/widgets.php';
 require_once DAILYPULSE_DIR . '/inc/shortcodes.php';
 
 /**
- * Google Fonts yükle
+ * Google Fonts yükle — Cabin (body) + Barlow Condensed (logo/wordmark)
  */
 function dailypulse_google_fonts() {
-    $fonts_url = 'https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&display=swap';
+    $fonts_url = 'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Cabin:wght@400;500;600;700&display=swap';
     wp_enqueue_style('dailypulse-google-fonts', $fonts_url, array(), null);
 }
 add_action('wp_enqueue_scripts', 'dailypulse_google_fonts');
@@ -95,6 +95,61 @@ function dailypulse_category_color($cat_slug) {
         'trending'  => array('bg' => 'rgba(255,23,68,0.15)', 'text' => '#ff1744', 'class' => 'trending'),
     );
     return isset($colors[$cat_slug]) ? $colors[$cat_slug] : $colors['teknoloji'];
+}
+
+/* ============================================================
+   LOGO — Inline SVG (price-tag mark + Barlow Condensed wordmark)
+   ============================================================ */
+
+/**
+ * Always treat as having a custom logo so Blocksy uses the_custom_logo()
+ */
+add_filter('has_custom_logo', '__return_true');
+
+/**
+ * Replace WordPress custom logo output with our inline SVG
+ */
+add_filter('get_custom_logo', 'kampanya_inline_svg_logo');
+function kampanya_inline_svg_logo($html) {
+    $home = esc_url(home_url('/'));
+    return '<a href="' . $home . '" class="custom-logo-link k-logo-link" rel="home" itemprop="url">'
+         . kampanya_logo_svg()
+         . '</a>';
+}
+
+/**
+ * The logo SVG — horizontal lockup, light variant
+ * viewBox: 1060 x 220 (tag mark 200 wide, wordmark 790 wide, padding)
+ */
+function kampanya_logo_svg() {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 220"
+        class="k-logo-svg" role="img" aria-label="kampanya.website">'
+        . '<title>kampanya.website</title>'
+        /* Price-tag mark: chevron-right pentagon */
+        . '<path d="M 14 30 L 132 30 L 186 100 L 132 170 L 14 170 Z" fill="#FFD600" stroke="#111111" stroke-width="3"/>'
+        /* Punch hole */
+        . '<circle cx="150" cy="100" r="9" fill="#111111"/>'
+        /* K cut into tag */
+        . '<text x="26" y="145" font-family="\'Barlow Condensed\',sans-serif" font-weight="900" font-size="140" fill="#111111" letter-spacing="-2">k</text>'
+        /* Vertical hairline divider */
+        . '<line x1="222" y1="28" x2="222" y2="210" stroke="#111111" stroke-width="1"/>'
+        /* "kampanya" wordmark */
+        . '<text x="248" y="162" font-size="180" font-family="\'Barlow Condensed\',sans-serif" font-weight="900" fill="#111111" letter-spacing="-2" textLength="790" lengthAdjust="spacingAndGlyphs">kampanya</text>'
+        /* Underline rule */
+        . '<rect x="248" y="178" width="790" height="2.5" fill="#111111"/>'
+        /* ".WEBSITE" subtitle */
+        . '<text x="248" y="208" font-size="25" font-family="\'Barlow Condensed\',sans-serif" font-weight="700" fill="#111111" letter-spacing="7">.WEBSITE</text>'
+        . '</svg>';
+}
+
+/* ============================================================
+   FAVİCON — SVG (yellow tag mark with K)
+   ============================================================ */
+
+add_action('wp_head', 'kampanya_favicon_links', 1);
+function kampanya_favicon_links() {
+    $uri = DAILYPULSE_URI;
+    echo '<link rel="icon" type="image/svg+xml" href="' . $uri . '/assets/images/favicon.svg">' . "\n";
 }
 
 /**
