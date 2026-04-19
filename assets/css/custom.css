@@ -622,9 +622,9 @@ a[href*="/author/kampanya_admin/"] {
 button.k-subscribe-btn,
 .k-subscribe-btn {
   flex-shrink: 0;
-  background: var(--k-white) !important;
+  background: var(--k-yellow) !important;
   color: var(--k-black) !important;
-  border: 2px solid var(--k-black) !important;
+  border: 2px solid var(--k-yellow) !important;
   border-radius: var(--k-radius) !important;
   padding: 14px 24px !important;
   font-family: var(--k-font) !important;
@@ -642,7 +642,7 @@ button.k-subscribe-btn,
 button.k-subscribe-btn:hover,
 .k-subscribe-btn:hover {
   background: var(--k-black) !important;
-  color: var(--k-white) !important;
+  color: var(--k-yellow) !important;
   border-color: var(--k-black) !important;
 }
 button.k-subscribe-btn:active,
