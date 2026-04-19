@@ -98,49 +98,63 @@ function dailypulse_category_color($cat_slug) {
 }
 
 /* ============================================================
-   LOGO — Inline SVG (price-tag mark + Barlow Condensed wordmark)
+   LOGO — Inline SVG injected via wp_get_attachment_image filter
+   Blocksy renders logos via wp_get_attachment_image(), so we
+   intercept that call for the known logo attachment IDs and
+   return our inline SVG (which can use fonts loaded on the page).
    ============================================================ */
 
-/**
- * Always treat as having a custom logo so Blocksy uses the_custom_logo()
- */
-add_filter('has_custom_logo', '__return_true');
+/** Logo attachment IDs: 3060 = old placeholder, 3332 = new kampanya-logo.svg */
+define('KAMPANYA_LOGO_IDS', [3060, 3332]);
 
-/**
- * Replace WordPress custom logo output with our inline SVG
- */
-add_filter('get_custom_logo', 'kampanya_inline_svg_logo');
-function kampanya_inline_svg_logo($html) {
-    $home = esc_url(home_url('/'));
-    return '<a href="' . $home . '" class="custom-logo-link k-logo-link" rel="home" itemprop="url">'
-         . kampanya_logo_svg()
-         . '</a>';
+add_filter('wp_get_attachment_image', 'kampanya_logo_inline', 10, 5);
+function kampanya_logo_inline($html, $attachment_id, $size, $icon, $attr) {
+    if (in_array((int) $attachment_id, KAMPANYA_LOGO_IDS)) {
+        return kampanya_logo_svg();
+    }
+    return $html;
 }
 
 /**
- * The logo SVG — horizontal lockup, light variant
- * viewBox: 1060 x 220 (tag mark 200 wide, wordmark 790 wide, padding)
+ * The logo SVG — horizontal lockup.
+ * viewBox 1060 × 220: tag mark 200 px, hairline, wordmark 790 px.
+ * Barlow Condensed is loaded on the page via Google Fonts so
+ * inline SVG can use it correctly.
  */
 function kampanya_logo_svg() {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 220"
-        class="k-logo-svg" role="img" aria-label="kampanya.website">'
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 220"'
+        . ' class="k-logo-svg" role="img" aria-label="kampanya.website">'
         . '<title>kampanya.website</title>'
-        /* Price-tag mark: chevron-right pentagon */
         . '<path d="M 14 30 L 132 30 L 186 100 L 132 170 L 14 170 Z" fill="#FFD600" stroke="#111111" stroke-width="3"/>'
-        /* Punch hole */
         . '<circle cx="150" cy="100" r="9" fill="#111111"/>'
-        /* K cut into tag */
         . '<text x="26" y="145" font-family="\'Barlow Condensed\',sans-serif" font-weight="900" font-size="140" fill="#111111" letter-spacing="-2">k</text>'
-        /* Vertical hairline divider */
         . '<line x1="222" y1="28" x2="222" y2="210" stroke="#111111" stroke-width="1"/>'
-        /* "kampanya" wordmark */
         . '<text x="248" y="162" font-size="180" font-family="\'Barlow Condensed\',sans-serif" font-weight="900" fill="#111111" letter-spacing="-2" textLength="790" lengthAdjust="spacingAndGlyphs">kampanya</text>'
-        /* Underline rule */
         . '<rect x="248" y="178" width="790" height="2.5" fill="#111111"/>'
-        /* ".WEBSITE" subtitle */
         . '<text x="248" y="208" font-size="25" font-family="\'Barlow Condensed\',sans-serif" font-weight="700" fill="#111111" letter-spacing="7">.WEBSITE</text>'
         . '</svg>';
 }
+
+/* ============================================================
+   REST: kampanya/v1/set-logo — update custom_logo theme mod
+   ============================================================ */
+add_action('rest_api_init', function () {
+    register_rest_route('kampanya/v1', '/set-logo', [
+        'methods'             => 'POST',
+        'callback'            => function (WP_REST_Request $r) {
+            $id = intval($r->get_param('id'));
+            if ($id <= 0) {
+                return new WP_Error('invalid_id', 'Valid attachment ID required.', ['status' => 400]);
+            }
+            set_theme_mod('custom_logo', $id);
+            return rest_ensure_response([
+                'success'  => true,
+                'logo_id'  => get_theme_mod('custom_logo'),
+            ]);
+        },
+        'permission_callback' => function () { return current_user_can('manage_options'); },
+    ]);
+});
 
 /* ============================================================
    FAVİCON — SVG (yellow tag mark with K)
