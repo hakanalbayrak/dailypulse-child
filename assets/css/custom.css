@@ -622,9 +622,10 @@ a[href*="/author/kampanya_admin/"] {
 button.k-subscribe-btn,
 .k-subscribe-btn {
   flex-shrink: 0;
+  align-self: stretch !important;
   background: var(--k-yellow) !important;
   color: var(--k-black) !important;
-  border: 2px solid var(--k-yellow) !important;
+  border: 2px solid var(--k-black) !important;
   border-radius: var(--k-radius) !important;
   padding: 14px 24px !important;
   font-family: var(--k-font) !important;
@@ -740,6 +741,16 @@ button.k-subscribe-btn:disabled,
   .k-subscribe-btn { width: 100% !important; justify-content: center; }
 }
 
+/* ── HEADER: remove top secondary nav bar, keep only main nav ── */
+[data-header*="type-1"] .ct-header [data-row*="top"] { display: none !important; }
+
+/* ── HEADER: hide Blocksy demo "Contribute" CTA button ── */
+.ct-header [data-id="button"] { display: none !important; }
+
+/* ── FOOTER: keep only the bottom bar, hide top & middle rows ── */
+[data-footer*="type-1"] .ct-footer [data-row*="top"]    { display: none !important; }
+[data-footer*="type-1"] .ct-footer [data-row*="middle"] { display: none !important; }
+
 /* ── COPYRIGHT FIX ── hide default Blocksy copyright, show correct one */
 .ct-footer-copyright p { visibility: hidden; font-size: 0 !important; height: 0; }
 .ct-footer-copyright::after {
@@ -751,8 +762,29 @@ button.k-subscribe-btn:disabled,
   color: inherit;
 }
 
-/* ── FOOTER CLEANUP ── hide duplicate link widgets kept for legacy */
-#text-8, #text-9, #block-14 { display: none !important; }
+/* ── FOOTER bottom bar: flex row, links alongside copyright ── */
+[data-footer*="type-1"] .ct-footer [data-row*="bottom"] > div {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+[data-footer*="type-1"] .ct-footer [data-row*="bottom"] [data-column="widget-area-4"] {
+  text-align: right !important;
+}
+[data-footer*="type-1"] .ct-footer [data-row*="bottom"] [data-column="widget-area-4"] a {
+  font-size: 12px !important;
+  color: inherit !important;
+  text-decoration: none !important;
+  white-space: nowrap;
+}
+[data-footer*="type-1"] .ct-footer [data-row*="bottom"] [data-column="widget-area-4"] a:hover {
+  text-decoration: underline !important;
+}
+
+/* ── HIDE legacy duplicate widgets ── */
+#text-8, #text-9 { display: none !important; }
 
 /* =============================================
    HOMEPAGE — BLOG LİSTESİ
