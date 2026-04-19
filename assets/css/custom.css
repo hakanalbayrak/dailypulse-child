@@ -145,8 +145,71 @@ header .ct-button:hover, .ct-header .ct-button:hover {
   background: var(--k-black) !important;
 }
 
-.ct-mobile-overlay, .ct-panel[data-behaviour] { background: var(--k-white) !important; }
-.ct-mobile-overlay nav a, .ct-panel nav a { color: var(--k-black) !important; }
+/* Mobile menu — white background, black text, clear borders */
+.ct-mobile-overlay,
+.ct-panel[data-behaviour],
+.ct-drawer,
+.ct-header .ct-panel,
+[data-id="mobile-menu"],
+.ct-header [data-id="offcanvas"] {
+  background: var(--k-white) !important;
+  color: var(--k-black) !important;
+}
+
+/* All text and links inside mobile menu */
+.ct-mobile-overlay *,
+.ct-panel[data-behaviour] *,
+.ct-drawer * {
+  color: var(--k-black) !important;
+  background-color: transparent !important;
+}
+
+/* Nav links */
+.ct-mobile-overlay nav a,
+.ct-panel nav a,
+.ct-drawer nav a,
+.ct-mobile-overlay .menu-item a,
+.ct-panel .menu-item a {
+  color: var(--k-black) !important;
+  border-bottom: 1px solid var(--k-gray-100) !important;
+  padding: 12px 0 !important;
+  display: block !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+}
+.ct-mobile-overlay nav a:hover,
+.ct-panel nav a:hover {
+  color: var(--k-white) !important;
+  background: var(--k-black) !important;
+  padding-left: 8px !important;
+}
+
+/* Mobile hamburger icon — always black on white header */
+.ct-header .ct-toggle,
+.ct-header [data-id="hamburger"] span,
+.ct-header [data-id="hamburger"] svg,
+.ct-header .hamburger-bar {
+  color: var(--k-black) !important;
+  background: var(--k-black) !important;
+}
+
+/* Mobile CTA button inside panel */
+.ct-mobile-overlay .ct-button,
+.ct-panel .ct-button,
+.ct-drawer .ct-button {
+  background: var(--k-black) !important;
+  color: var(--k-white) !important;
+  border: 2px solid var(--k-black) !important;
+  display: inline-block !important;
+  padding: 10px 20px !important;
+  border-radius: var(--k-radius) !important;
+  margin-top: 8px !important;
+}
+.ct-mobile-overlay .ct-button:hover,
+.ct-panel .ct-button:hover {
+  background: var(--k-white) !important;
+  color: var(--k-black) !important;
+}
 
 /* === YELLOW SUPERMARKET TAG === */
 .k-tag {
@@ -554,11 +617,11 @@ a[href*="/author/kampanya_admin/"] {
 .k-autocomplete__typed  { color: transparent; }
 .k-autocomplete__suggest { color: var(--k-gray-300); background: transparent; } /* öneri gri — geçerli */
 
-/* Abone ol butonu */
+/* Abone ol butonu — ghost style: white outline + white text on dark hero */
 .k-subscribe-btn {
   flex-shrink: 0;
-  background: var(--k-white) !important;
-  color: var(--k-black) !important;
+  background: transparent !important;
+  color: var(--k-white) !important;
   border: 2px solid var(--k-white) !important;
   border-radius: var(--k-radius) !important;
   padding: 14px 24px !important;
@@ -575,9 +638,8 @@ a[href*="/author/kampanya_admin/"] {
   gap: 6px;
 }
 .k-subscribe-btn:hover {
-  background: var(--k-black) !important;
-  color: var(--k-white) !important;
-  border-color: var(--k-white) !important;
+  background: var(--k-white) !important;
+  color: var(--k-black) !important;
 }
 .k-subscribe-btn:active { opacity: .85; }
 .k-subscribe-btn:disabled {
