@@ -557,9 +557,9 @@ a[href*="/author/kampanya_admin/"] {
 /* Abone ol butonu */
 .k-subscribe-btn {
   flex-shrink: 0;
-  background: var(--k-yellow) !important;
+  background: var(--k-white) !important;
   color: var(--k-black) !important;
-  border: 2px solid var(--k-yellow) !important;
+  border: 2px solid var(--k-white) !important;
   border-radius: var(--k-radius) !important;
   padding: 14px 24px !important;
   font-family: var(--k-font) !important;
@@ -576,8 +576,8 @@ a[href*="/author/kampanya_admin/"] {
 }
 .k-subscribe-btn:hover {
   background: var(--k-black) !important;
-  color: var(--k-yellow) !important;
-  border-color: var(--k-yellow) !important;
+  color: var(--k-white) !important;
+  border-color: var(--k-white) !important;
 }
 .k-subscribe-btn:active { opacity: .85; }
 .k-subscribe-btn:disabled {
