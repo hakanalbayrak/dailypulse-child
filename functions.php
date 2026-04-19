@@ -128,6 +128,51 @@ add_action('wp_footer', 'kampanya_footer_copyright_buffer_start', 1);
 add_action('wp_footer', 'kampanya_footer_copyright_buffer_end', 999);
 
 /* ============================================================
+   KAMPANYA REST API — Cache Purge
+   ============================================================ */
+
+add_action('rest_api_init', function () {
+    register_rest_route('kampanya/v1', '/purge-cache', [
+        'methods'             => 'POST',
+        'callback'            => 'kampanya_purge_cache',
+        'permission_callback' => function (WP_REST_Request $r) {
+            return current_user_can('manage_options');
+        },
+    ]);
+});
+
+function kampanya_purge_cache() {
+    $purged = [];
+
+    // LiteSpeed Cache
+    if (class_exists('\LiteSpeed\Purge')) {
+        \LiteSpeed\Purge::purge_all();
+        $purged[] = 'litespeed';
+    } elseif (function_exists('litespeed_purge_all')) {
+        litespeed_purge_all();
+        $purged[] = 'litespeed_fn';
+    }
+
+    // W3 Total Cache (fallback)
+    if (function_exists('w3tc_pgcache_flush')) {
+        w3tc_pgcache_flush();
+        $purged[] = 'w3tc';
+    }
+
+    // WP Super Cache (fallback)
+    if (function_exists('wp_cache_clear_cache')) {
+        wp_cache_clear_cache();
+        $purged[] = 'wpsc';
+    }
+
+    return rest_ensure_response([
+        'success' => true,
+        'purged'  => $purged,
+        'message' => empty($purged) ? 'No cache plugin found' : 'Cache purged: ' . implode(', ', $purged),
+    ]);
+}
+
+/* ============================================================
    KAMPANYA REST API — Abone ol / Abonelikten çık
    ============================================================ */
 
