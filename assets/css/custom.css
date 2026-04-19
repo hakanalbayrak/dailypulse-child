@@ -40,18 +40,26 @@ figcaption, blockquote, cite, code, pre {
 
 body {
   background: var(--k-white) !important;
-  color: var(--k-gray-700) !important;
+  color: var(--k-black) !important;
   line-height: 1.65;
 }
 body::before, body::after { display: none !important; }
 
+/* ANA METİN — sadece siyah/beyaz */
 h1, h2, h3, h4, h5, h6, .entry-title, .widget-title {
   color: var(--k-black) !important;
   font-weight: 700 !important;
 }
-p, li, span, div, td, th { color: var(--k-gray-700); }
-a { color: var(--k-black); text-decoration: underline; transition: color .2s; }
-a:hover { color: var(--k-gray-500); }
+p, li, td, th { color: var(--k-black) !important; }
+
+/* Linklerde tersine hover */
+a {
+  color: var(--k-black) !important;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color .15s, background .15s;
+}
+a:hover { color: var(--k-white) !important; background: var(--k-black); }
 
 /* === HEADER === */
 header[data-id="type-1"],
@@ -70,32 +78,40 @@ header[data-id="type-1"],
   font-size: 20px !important;
   color: var(--k-black) !important;
   text-decoration: none !important;
+  background: none !important;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
+/* Navigasyon linkleri — tersine hover */
 .ct-header nav > ul > li > a,
 header .menu > li > a,
 .ct-header .ct-menu > li > a {
-  color: var(--k-gray-700) !important;
+  color: var(--k-black) !important;
   font-family: var(--k-font) !important;
   font-size: 14px !important;
   font-weight: 600 !important;
   text-transform: uppercase;
   letter-spacing: .5px;
   text-decoration: none !important;
+  padding: 4px 8px !important;
+  border-radius: var(--k-radius-sm) !important;
+  transition: background .15s, color .15s !important;
+  background: transparent !important;
 }
 .ct-header nav > ul > li > a:hover,
 .ct-header .ct-menu > li > a:hover {
-  color: var(--k-black) !important;
+  color: var(--k-white) !important;
+  background: var(--k-black) !important;
 }
 
+/* Header CTA butonu */
 header .ct-button,
 .ct-header [data-button] a,
 .ct-header .ct-button {
   background: var(--k-black) !important;
   color: var(--k-white) !important;
-  border: none !important;
+  border: 2px solid var(--k-black) !important;
   border-radius: var(--k-radius) !important;
   padding: 8px 20px !important;
   font-family: var(--k-font) !important;
@@ -104,26 +120,33 @@ header .ct-button,
   text-transform: uppercase;
   letter-spacing: .5px;
   text-decoration: none !important;
+  transition: background .15s, color .15s !important;
 }
 header .ct-button:hover, .ct-header .ct-button:hover {
-  background: var(--k-gray-700) !important;
+  background: var(--k-white) !important;
+  color: var(--k-black) !important;
 }
 
+/* Alt menü */
 .ct-header .sub-menu, header .sub-menu {
   background: var(--k-white) !important;
-  border: 1px solid var(--k-gray-100) !important;
+  border: 1.5px solid var(--k-black) !important;
   border-radius: var(--k-radius) !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,.08) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,.10) !important;
 }
 .ct-header .sub-menu li a, header .sub-menu li a {
-  color: var(--k-gray-700) !important;
+  color: var(--k-black) !important;
   font-size: 13px !important;
   text-decoration: none !important;
+  transition: background .15s, color .15s !important;
 }
-.ct-header .sub-menu li a:hover { color: var(--k-black) !important; background: var(--k-gray-50) !important; }
+.ct-header .sub-menu li a:hover {
+  color: var(--k-white) !important;
+  background: var(--k-black) !important;
+}
 
 .ct-mobile-overlay, .ct-panel[data-behaviour] { background: var(--k-white) !important; }
-.ct-mobile-overlay nav a, .ct-panel nav a { color: var(--k-gray-700) !important; }
+.ct-mobile-overlay nav a, .ct-panel nav a { color: var(--k-black) !important; }
 
 /* === YELLOW SUPERMARKET TAG === */
 .k-tag {
@@ -169,13 +192,13 @@ header .ct-button:hover, .ct-header .ct-button:hover {
   letter-spacing: 1px !important;
 }
 
-/* === BUTTONS === */
+/* === BUTTONS — siyah arka plan, hover: tersine === */
 .wp-block-button__link,
 button[type="submit"],
 input[type="submit"] {
   background: var(--k-black) !important;
   color: var(--k-white) !important;
-  border: none !important;
+  border: 2px solid var(--k-black) !important;
   border-radius: var(--k-radius) !important;
   font-family: var(--k-font) !important;
   font-weight: 700 !important;
@@ -184,12 +207,14 @@ input[type="submit"] {
   letter-spacing: .5px;
   padding: 12px 28px !important;
   cursor: pointer;
-  transition: background .2s;
+  transition: background .15s, color .15s !important;
   text-decoration: none !important;
 }
 .wp-block-button__link:hover,
-button[type="submit"]:hover {
-  background: var(--k-gray-700) !important;
+button[type="submit"]:hover,
+input[type="submit"]:hover {
+  background: var(--k-white) !important;
+  color: var(--k-black) !important;
 }
 
 /* === FORMS === */
@@ -197,7 +222,7 @@ input[type="text"], input[type="email"], input[type="tel"],
 input[type="url"], input[type="search"], input[type="password"],
 select, textarea {
   background: var(--k-white) !important;
-  border: 1.5px solid var(--k-gray-300) !important;
+  border: 1.5px solid var(--k-black) !important;
   border-radius: var(--k-radius) !important;
   color: var(--k-black) !important;
   padding: 12px 16px !important;
@@ -206,22 +231,29 @@ select, textarea {
 }
 input:focus, select:focus, textarea:focus {
   border-color: var(--k-black) !important;
-  box-shadow: none !important;
+  box-shadow: 0 0 0 2px rgba(17,17,17,.15) !important;
   outline: none !important;
 }
-input::placeholder, textarea::placeholder { color: var(--k-gray-300) !important; }
+/* Placeholder ve helper text — gri kullanımı geçerli */
+input::placeholder, textarea::placeholder {
+  color: var(--k-gray-500) !important;
+}
 
 /* === CARDS === */
 article.post, .entry-card, .dp-card {
   background: var(--k-white) !important;
-  border: 1px solid var(--k-gray-100) !important;
+  border: 1.5px solid var(--k-black) !important;
   border-radius: var(--k-radius) !important;
   transition: box-shadow .2s, transform .2s !important;
 }
 article.post:hover, .entry-card:hover, .dp-card:hover {
-  border-color: var(--k-gray-300) !important;
+  background: var(--k-black) !important;
   transform: translateY(-2px) !important;
-  box-shadow: 0 4px 16px rgba(0,0,0,.06) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,.12) !important;
+}
+/* Card içindeki metin hover'da beyaza döner */
+article.post:hover *, .entry-card:hover *, .dp-card:hover * {
+  color: var(--k-white) !important;
 }
 
 article.post .entry-title a, .entry-card .entry-title a {
@@ -229,13 +261,15 @@ article.post .entry-title a, .entry-card .entry-title a {
   font-family: var(--k-font) !important;
   font-weight: 700 !important;
   text-decoration: none !important;
+  background: none !important;
 }
+/* Yardımcı metinler (tarih, okuma süresi, meta) — gri geçerli */
 article.post .entry-excerpt, .entry-card .entry-excerpt {
-  color: var(--k-gray-500) !important;
+  color: var(--k-gray-700) !important;
   font-size: 14px !important;
 }
 article.post .entry-meta, .entry-card .entry-meta {
-  color: var(--k-gray-500) !important;
+  color: var(--k-gray-700) !important;
   font-size: 12px !important;
 }
 
@@ -246,42 +280,53 @@ article.post .entry-meta, .entry-card .entry-meta {
   text-align: center;
 }
 .hero-section h1 { color: var(--k-white) !important; }
-.hero-section p { color: var(--k-gray-300) !important; }
+.hero-section p   { color: var(--k-gray-300) !important; } /* açıklama — gri geçerli */
 
 /* === ABONE SECTION === */
 .abone-section {
-  background: var(--k-gray-50) !important;
-  border: 1px solid var(--k-gray-100) !important;
+  background: var(--k-white) !important;
+  border: 1.5px solid var(--k-black) !important;
   padding: 48px 32px !important;
   border-radius: var(--k-radius) !important;
 }
 .abone-section h2, .abone-section h3 { color: var(--k-black) !important; }
-.abone-section p { color: var(--k-gray-500) !important; }
+.abone-section p { color: var(--k-black) !important; }
 
-/* === SECTION MOR override → now light gray === */
+/* === SECTION MOR → artık B&W === */
 .section-mor {
-  background: var(--k-gray-50) !important;
-  border: 1px solid var(--k-gray-100) !important;
+  background: var(--k-white) !important;
+  border: 1.5px solid var(--k-black) !important;
   border-radius: var(--k-radius) !important;
   padding: 48px 32px !important;
 }
 .section-mor h2, .section-mor h3 { color: var(--k-black) !important; }
-.section-mor p { color: var(--k-gray-500) !important; }
+.section-mor p { color: var(--k-black) !important; }
 
 /* === FOOTER === */
 footer.ct-footer, .ct-footer, footer {
   background: var(--k-black) !important;
   border-top: none !important;
-  color: var(--k-gray-300) !important;
+  color: var(--k-white) !important;
 }
 .ct-footer .ct-container { background: transparent !important; }
 footer *, .ct-footer *, footer p, footer span, footer div,
 footer li, footer a, footer td, footer th,
 .ct-footer p, .ct-footer span, .ct-footer div,
 .ct-footer li, .ct-footer a {
-  color: var(--k-gray-300) !important;
+  color: var(--k-white) !important;
 }
-.ct-footer a:hover, footer a:hover { color: var(--k-white) !important; }
+/* Footer link hover: beyaz arka plan + siyah metin (tersine) */
+.ct-footer a, footer a {
+  text-decoration: none !important;
+  padding: 2px 4px;
+  border-radius: 2px;
+  transition: background .15s, color .15s !important;
+}
+.ct-footer a:hover, footer a:hover {
+  background: var(--k-white) !important;
+  color: var(--k-black) !important;
+}
+
 footer h4, .ct-footer h4, footer .widget-title, .ct-footer .widget-title {
   color: var(--k-white) !important;
   font-size: 13px !important;
@@ -289,42 +334,30 @@ footer h4, .ct-footer h4, footer .widget-title, .ct-footer .widget-title {
   letter-spacing: 1px;
 }
 
-/* Footer popular posts / recent posts widget */
+/* Footer widget */
 footer .widget, .ct-footer .widget,
 footer [class*="widget_"], .ct-footer [class*="widget_"] {
   background: transparent !important;
   border: none !important;
 }
-footer .widget *, .ct-footer .widget * {
-  background: transparent !important;
-  color: var(--k-gray-300) !important;
-}
-footer .widget a, .ct-footer .widget a {
-  color: var(--k-gray-300) !important;
-  text-decoration: none !important;
-}
-footer .widget a:hover, .ct-footer .widget a:hover {
-  color: var(--k-white) !important;
-}
 footer .widget img, .ct-footer .widget img {
   border-radius: var(--k-radius) !important;
-  opacity: .7;
+  opacity: .75;
   transition: opacity .2s;
 }
 footer .widget img:hover { opacity: 1; }
 
-/* Footer copyright bar — hide original, inject new */
+/* Footer copyright bar */
 .ct-footer [data-row="bottom"],
 footer .copyright, footer .site-info,
 .ct-footer .ct-container [data-column="copyright"] {
-  color: var(--k-gray-500) !important;
+  color: var(--k-gray-300) !important; /* açıklama satırı — gri geçerli */
   font-size: 13px !important;
-  border-top: 1px solid rgba(255,255,255,.08) !important;
+  border-top: 1px solid rgba(255,255,255,.15) !important;
 }
 .ct-footer [data-row="bottom"] *, footer .copyright * {
-  color: var(--k-gray-500) !important;
+  color: var(--k-gray-300) !important;
 }
-/* Hide "The Daily Pulse" copyright, replace via PHP */
 .ct-footer [data-row="bottom"] [data-column="copyright"] .ct-footer-text {
   font-size: 0 !important;
   visibility: hidden !important;
@@ -334,36 +367,52 @@ footer .copyright, footer .site-info,
   content: "© 2026 Kampanya.website — Tüm hakları saklıdır.";
   visibility: visible;
   font-size: 13px;
-  color: var(--k-gray-500);
+  color: var(--k-gray-300);
   position: absolute;
-  left: 0;
-  top: 0;
+  left: 0; top: 0;
   white-space: nowrap;
 }
 
 /* === SINGLE POST === */
-.single-post .entry-content p { color: var(--k-gray-700); font-size: 16px; line-height: 1.8; }
-.single-post .entry-content h2, .single-post .entry-content h3 { color: var(--k-black) !important; margin-top: 2em; }
-.single-post .entry-content a { color: var(--k-black); text-decoration: underline; }
+.single-post .entry-content p {
+  color: var(--k-black) !important;
+  font-size: 16px;
+  line-height: 1.8;
+}
+.single-post .entry-content h2,
+.single-post .entry-content h3 {
+  color: var(--k-black) !important;
+  margin-top: 2em;
+}
+.single-post .entry-content a {
+  color: var(--k-black) !important;
+  text-decoration: underline;
+}
+.single-post .entry-content a:hover {
+  color: var(--k-white) !important;
+  background: var(--k-black);
+}
 .single-post .entry-content blockquote {
-  border-left: 3px solid var(--k-gray-300);
+  border-left: 3px solid var(--k-black);
   padding-left: 20px;
-  color: var(--k-gray-500);
+  color: var(--k-gray-700) !important; /* alıntı — gri geçerli */
   font-style: italic;
 }
 
 /* === PAGINATION === */
 .ct-pagination a, .page-numbers {
   background: var(--k-white) !important;
-  border: 1px solid var(--k-gray-300) !important;
+  border: 1.5px solid var(--k-black) !important;
   border-radius: var(--k-radius) !important;
-  color: var(--k-gray-700) !important;
+  color: var(--k-black) !important;
   padding: 8px 14px !important;
   font-size: 13px !important;
+  text-decoration: none !important;
+  transition: background .15s, color .15s !important;
 }
 .ct-pagination a:hover, .page-numbers:hover {
-  background: var(--k-gray-50) !important;
-  color: var(--k-black) !important;
+  background: var(--k-black) !important;
+  color: var(--k-white) !important;
 }
 .page-numbers.current {
   background: var(--k-black) !important;
@@ -374,8 +423,8 @@ footer .copyright, footer .site-info,
 /* === SCROLLBAR === */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--k-gray-100); }
-::-webkit-scrollbar-thumb { background: var(--k-gray-300); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--k-gray-500); }
+::-webkit-scrollbar-thumb { background: var(--k-black); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--k-gray-700); }
 
 /* === HIDE AUTHOR ON POSTS === */
 .single a[href*="/author/"],
@@ -433,7 +482,7 @@ a[href*="/author/kampanya_admin/"] {
 
 .k-hero__subtitle {
   font-size: 16px !important;
-  color: var(--k-gray-300) !important;
+  color: var(--k-gray-300) !important; /* açıklama — gri geçerli */
   line-height: 1.65 !important;
   margin: 0 auto 36px !important;
   max-width: 520px;
@@ -496,27 +545,21 @@ a[href*="/author/kampanya_admin/"] {
   font-family: var(--k-font);
   font-size: 15px;
   line-height: 1.4;
-  color: transparent;  /* kullanıcı girişini gizle */
+  color: transparent;
   white-space: nowrap;
   overflow: hidden;
   z-index: 1;
 }
 
-.k-autocomplete__typed {
-  color: transparent; /* gerçek input üstünde — görünmez */
-}
-
-.k-autocomplete__suggest {
-  color: var(--k-gray-300);  /* gri öneri kısmı */
-  background: transparent;
-}
+.k-autocomplete__typed  { color: transparent; }
+.k-autocomplete__suggest { color: var(--k-gray-300); background: transparent; } /* öneri gri — geçerli */
 
 /* Abone ol butonu */
 .k-subscribe-btn {
   flex-shrink: 0;
   background: var(--k-yellow) !important;
   color: var(--k-black) !important;
-  border: none !important;
+  border: 2px solid var(--k-yellow) !important;
   border-radius: var(--k-radius) !important;
   padding: 14px 24px !important;
   font-family: var(--k-font) !important;
@@ -525,60 +568,59 @@ a[href*="/author/kampanya_admin/"] {
   text-transform: uppercase;
   letter-spacing: .5px;
   cursor: pointer;
-  transition: background .15s, transform .1s;
+  transition: background .15s, color .15s, border-color .15s;
   white-space: nowrap;
   display: flex;
   align-items: center;
   gap: 6px;
 }
-
 .k-subscribe-btn:hover {
-  background: var(--k-yellow-dark) !important;
-  transform: translateY(-1px);
+  background: var(--k-black) !important;
+  color: var(--k-yellow) !important;
+  border-color: var(--k-yellow) !important;
 }
-
-.k-subscribe-btn:active { transform: translateY(0); }
-.k-subscribe-btn:disabled { opacity: .7; cursor: not-allowed; transform: none; }
+.k-subscribe-btn:active { opacity: .85; }
+.k-subscribe-btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
 
 /* KVKK onay satırı */
-.k-consent-row {
-  margin-bottom: 14px;
-  text-align: left;
-}
-
+.k-consent-row { margin-bottom: 14px; text-align: left; }
 .k-consent-label {
   display: flex;
   align-items: flex-start;
   gap: 10px;
   cursor: pointer;
 }
-
 .k-consent-checkbox {
   flex-shrink: 0;
   width: 16px !important;
   height: 16px !important;
   margin-top: 2px !important;
-  border: 1.5px solid var(--k-gray-300) !important;
+  border: 1.5px solid var(--k-white) !important;
   border-radius: 3px !important;
   accent-color: var(--k-yellow) !important;
   cursor: pointer;
   padding: 0 !important;
   background: transparent !important;
 }
-
+/* KVKK metni — yardımcı açıklama, gri geçerli */
 .k-consent-text {
   font-size: 12px !important;
   color: var(--k-gray-300) !important;
   line-height: 1.5 !important;
 }
-
 .k-consent-text a {
   color: var(--k-yellow) !important;
   text-decoration: underline !important;
   text-underline-offset: 2px;
+  background: none !important;
 }
-
-.k-consent-text a:hover { color: var(--k-white) !important; }
+.k-consent-text a:hover {
+  color: var(--k-black) !important;
+  background: var(--k-yellow) !important;
+}
 
 /* Form mesajları */
 .k-form-msg {
@@ -590,17 +632,17 @@ a[href*="/author/kampanya_admin/"] {
   margin-top: 8px;
 }
 .k-form-msg.k-msg-success {
-  background: rgba(0,180,100,.15);
-  color: #4ade80 !important;
-  border: 1px solid rgba(74,222,128,.3);
+  background: var(--k-white);
+  color: var(--k-black) !important;
+  border: 1.5px solid var(--k-white);
 }
 .k-form-msg.k-msg-error {
-  background: rgba(211,47,47,.12);
-  color: #f87171 !important;
-  border: 1px solid rgba(248,113,113,.3);
+  background: var(--k-red-dark);
+  color: var(--k-white) !important;
+  border: 1.5px solid var(--k-red);
 }
 
-/* Alt güven metni */
+/* Alt güven metni — yardımcı açıklama, gri geçerli */
 .k-hero__trust {
   margin: 20px 0 0 !important;
   font-size: 12px !important;
@@ -611,10 +653,18 @@ a[href*="/author/kampanya_admin/"] {
   gap: 8px;
   flex-wrap: wrap;
 }
-.k-hero__trust a { color: var(--k-gray-500) !important; text-decoration: underline; }
-.k-hero__trust a:hover { color: var(--k-gray-300) !important; }
+.k-hero__trust a {
+  color: var(--k-gray-300) !important;
+  text-decoration: underline;
+  background: none !important;
+  padding: 0 !important;
+}
+.k-hero__trust a:hover {
+  color: var(--k-white) !important;
+  background: none !important;
+}
 
-/* Mobil form düzeni */
+/* Mobil form */
 @media (max-width: 500px) {
   .k-hero { padding: 60px 20px 56px; }
   .k-form-row { flex-direction: column; }
@@ -657,90 +707,99 @@ a[href*="/author/kampanya_admin/"] {
 .k-section-more {
   font-size: 13px !important;
   font-weight: 600 !important;
-  color: var(--k-gray-500) !important;
+  color: var(--k-black) !important;
   text-decoration: none !important;
+  background: none !important;
   letter-spacing: .3px;
-  transition: color .2s;
+  padding: 4px 10px;
+  border: 1.5px solid var(--k-black);
+  border-radius: var(--k-radius);
+  transition: background .15s, color .15s;
 }
-.k-section-more:hover { color: var(--k-black) !important; }
+.k-section-more:hover {
+  background: var(--k-black) !important;
+  color: var(--k-white) !important;
+}
 
-/* Yazı grid — 3 sütun, ilk kart tam genişlik hero */
+/* Yazı grid */
 .k-posts-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: auto;
   gap: 24px;
 }
 
-/* Hero kart — ilk yazı iki sütun kaplıyor */
-.k-post-card--hero {
-  grid-column: 1 / 3;
-}
+.k-post-card--hero { grid-column: 1 / 3; }
 
-/* Kart temel stili */
+/* Kart */
 .k-post-card {
   display: flex;
   flex-direction: column;
   background: var(--k-white);
-  border: 1px solid var(--k-gray-100);
+  border: 1.5px solid var(--k-black);
   border-radius: var(--k-radius);
   overflow: hidden;
-  transition: box-shadow .2s, border-color .2s, transform .2s;
+  transition: background .2s, box-shadow .2s, transform .2s;
 }
 .k-post-card:hover {
-  box-shadow: 0 6px 24px rgba(0,0,0,.07);
-  border-color: var(--k-gray-300);
+  background: var(--k-black);
+  box-shadow: 0 6px 24px rgba(0,0,0,.15);
   transform: translateY(-2px);
+}
+/* Hover: kart içindeki tüm metinler beyaza */
+.k-post-card:hover .k-post-card__title a,
+.k-post-card:hover .k-post-card__excerpt,
+.k-post-card:hover .k-post-card__date,
+.k-post-card:hover .k-post-card__read {
+  color: var(--k-white) !important;
+  background: none !important;
+}
+.k-post-card:hover .k-post-cat {
+  background: var(--k-white) !important;
+  color: var(--k-black) !important;
 }
 
 /* Kart görsel */
 .k-post-card__link { display: block; }
-
 .k-post-card__img-wrap {
   overflow: hidden;
   background: var(--k-gray-100);
   aspect-ratio: 16/9;
 }
 .k-post-card--hero .k-post-card__img-wrap { aspect-ratio: 16/7; }
-
 .k-post-card__img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
   transition: transform .3s;
 }
 .k-post-card:hover .k-post-card__img { transform: scale(1.03); }
-
 .k-post-card__img-wrap--placeholder {
-  background: linear-gradient(135deg, var(--k-gray-100) 0%, var(--k-gray-300) 100%);
+  background: var(--k-gray-100);
 }
 
 /* Kart gövde */
 .k-post-card__body {
   padding: 20px 22px 24px;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
+  display: flex; flex-direction: column; flex: 1;
 }
-
 .k-post-card__meta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
+  display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
 }
-
+/* Kategori tag — gri değil, siyah kenarlık */
 .k-post-cat {
-  background: var(--k-gray-100) !important;
-  color: var(--k-gray-700) !important;
+  background: var(--k-black) !important;
+  color: var(--k-white) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  padding: 2px 8px !important;
+  border-radius: var(--k-radius-sm) !important;
 }
-
+/* Tarih — yardımcı meta bilgi, gri geçerli */
 .k-post-card__date {
   font-size: 12px;
-  color: var(--k-gray-500);
+  color: var(--k-gray-700) !important;
 }
-
 .k-post-card__title {
   font-size: 17px !important;
   font-weight: 700 !important;
@@ -753,40 +812,33 @@ a[href*="/author/kampanya_admin/"] {
 .k-post-card__title a {
   color: var(--k-black) !important;
   text-decoration: none !important;
-  transition: color .2s;
+  background: none !important;
 }
-.k-post-card__title a:hover { color: var(--k-gray-700) !important; }
-
+/* Özet — biraz daha açık ama siyah, gri değil */
 .k-post-card__excerpt {
   font-size: 14px !important;
-  color: var(--k-gray-500) !important;
+  color: var(--k-gray-700) !important;
   line-height: 1.6 !important;
   margin: 0 0 16px !important;
 }
-
 .k-post-card__read {
   font-size: 13px !important;
-  font-weight: 600 !important;
+  font-weight: 700 !important;
   color: var(--k-black) !important;
   text-decoration: none !important;
-  border-bottom: 1px solid var(--k-gray-300);
-  padding-bottom: 1px;
+  background: none !important;
   display: inline-flex;
   align-items: center;
   gap: 4px;
   margin-top: auto;
-  transition: border-color .2s, color .2s;
-}
-.k-post-card__read:hover {
-  color: var(--k-gray-500) !important;
-  border-color: transparent;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  border-bottom: 1.5px solid var(--k-black);
+  padding-bottom: 1px;
 }
 
 /* "Tüm Yazılara Git" butonu */
-.k-posts-more {
-  text-align: center;
-  margin-top: 40px;
-}
+.k-posts-more { text-align: center; margin-top: 40px; }
 .k-btn-outline {
   display: inline-block;
   border: 2px solid var(--k-black) !important;
@@ -800,7 +852,7 @@ a[href*="/author/kampanya_admin/"] {
   text-transform: uppercase;
   letter-spacing: .5px;
   text-decoration: none !important;
-  transition: background .2s, color .2s;
+  transition: background .15s, color .15s;
 }
 .k-btn-outline:hover {
   background: var(--k-black) !important;
@@ -808,23 +860,19 @@ a[href*="/author/kampanya_admin/"] {
 }
 
 .k-no-posts {
-  color: var(--k-gray-500) !important;
+  color: var(--k-black) !important;
   text-align: center;
   padding: 40px 0;
   font-size: 16px !important;
 }
 
-/* Blog listeleme responsive */
+/* Blog grid responsive */
 @media (max-width: 900px) {
   .k-posts-grid { grid-template-columns: 1fr 1fr; }
   .k-post-card--hero { grid-column: 1 / 3; }
 }
-
 @media (max-width: 580px) {
-  .k-posts-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
+  .k-posts-grid { grid-template-columns: 1fr; gap: 16px; }
   .k-post-card--hero { grid-column: auto; }
   .k-posts-section { padding: 48px 0 64px; }
 }
@@ -839,29 +887,23 @@ a[href*="/author/kampanya_admin/"] {
   padding: 0 24px;
   text-align: center;
 }
-
 .k-unsub-page h1 {
   font-size: 28px !important;
   color: var(--k-black) !important;
   margin-bottom: 12px !important;
 }
-
-.k-unsub-page p {
-  color: var(--k-gray-500) !important;
+/* Açıklama metni — gri geçerli */
+.k-unsub-page > p {
+  color: var(--k-gray-700) !important;
   margin-bottom: 28px !important;
 }
-
 .k-unsub-form {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  display: flex; flex-direction: column; gap: 14px;
 }
-
 .k-unsub-form input[type="email"] {
   width: 100% !important;
   box-sizing: border-box !important;
 }
-
 .k-unsub-msg {
   padding: 12px 16px;
   border-radius: var(--k-radius);
@@ -869,12 +911,12 @@ a[href*="/author/kampanya_admin/"] {
   font-weight: 600;
 }
 .k-unsub-msg.success {
-  background: rgba(0,180,100,.12);
-  color: #16a34a !important;
-  border: 1px solid rgba(22,163,74,.3);
+  background: var(--k-black);
+  color: var(--k-white) !important;
+  border: 1.5px solid var(--k-black);
 }
 .k-unsub-msg.error {
-  background: rgba(211,47,47,.08);
-  color: var(--k-red) !important;
-  border: 1px solid rgba(211,47,47,.25);
+  background: var(--k-red);
+  color: var(--k-white) !important;
+  border: 1.5px solid var(--k-red-dark);
 }
