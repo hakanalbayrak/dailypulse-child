@@ -79,9 +79,10 @@
   display: none !important;
 }
 
-/* === BASE — FORCE CABIN EVERYWHERE === */
-body, body *, html, html *,
-p, li, span, div, td, th, a, label, input, button, select, textarea,
+/* === BASE — FORCE FONT EVERYWHERE (excluding WP admin bar) === */
+body:not(#wpadminbar), body :not(#wpadminbar):not(#wpadminbar *),
+p, li, span:not(#wpadminbar *), div:not(#wpadminbar *),
+td, th, label, input, select, textarea,
 h1, h2, h3, h4, h5, h6,
 .entry-title, .widget-title, .site-title,
 article, section, aside, nav, footer, header,
@@ -90,6 +91,25 @@ article, section, aside, nav, footer, header,
 .fluentcrm_form_wrapper *, .ff-el-input--content *,
 figcaption, blockquote, cite, code, pre {
   font-family: var(--k-font) !important;
+}
+
+/* === WP ADMIN BAR — fully isolated, never touched by our CSS === */
+#wpadminbar,
+#wpadminbar * {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+#wpadminbar a,
+#wpadminbar a:hover,
+#wpadminbar a:focus,
+#wpadminbar li:hover > a,
+#wpadminbar li a:hover {
+  color: inherit !important;
+  background: inherit !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 body {
@@ -117,6 +137,16 @@ a {
   transition: color .15s, background .15s;
 }
 a:hover { color: var(--k-white) !important; background: var(--k-black); }
+
+/* Card links must NEVER pick up the global a:hover black bg */
+.k-post-card a:hover,
+.k-post-card a:focus,
+.k-post-card__link:hover,
+article.post a:hover,
+.entry-card a:hover {
+  background: transparent !important;
+  color: inherit !important;
+}
 
 /* === HEADER === */
 header[data-id="type-1"],
