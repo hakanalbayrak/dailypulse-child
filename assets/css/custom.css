@@ -1035,3 +1035,10 @@ button.k-subscribe-btn:disabled,
   color: var(--k-white) !important;
   border: 1.5px solid var(--k-red-dark);
 }
+
+/* =============================================
+   TRENDING BLOCK — HIDE (Blocksy page component)
+   ============================================= */
+.ct-trending-block {
+  display: none !important;
+}
