@@ -618,6 +618,8 @@ a[href*="/author/kampanya_admin/"] {
 .k-autocomplete__suggest { color: var(--k-gray-300); background: transparent; } /* öneri gri — geçerli */
 
 /* Abone ol butonu — white bg, black text, black border */
+/* Use high-specificity selector to beat global button[type="submit"] rule */
+button.k-subscribe-btn,
 .k-subscribe-btn {
   flex-shrink: 0;
   background: var(--k-white) !important;
@@ -637,12 +639,15 @@ a[href*="/author/kampanya_admin/"] {
   align-items: center;
   gap: 6px;
 }
+button.k-subscribe-btn:hover,
 .k-subscribe-btn:hover {
   background: var(--k-black) !important;
   color: var(--k-white) !important;
   border-color: var(--k-black) !important;
 }
+button.k-subscribe-btn:active,
 .k-subscribe-btn:active { opacity: .85; }
+button.k-subscribe-btn:disabled,
 .k-subscribe-btn:disabled {
   opacity: .5;
   cursor: not-allowed;
