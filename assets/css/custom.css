@@ -1,36 +1,67 @@
 /* =============================================
-   KAMPANYA.WEBSITE — MINIMAL B&W DESIGN
-   Cabin font · White bg · Black/white palette
-   Yellow supermarket tags · Red sale banners
+   KAMPANYA.WEBSITE — VISUAL IDENTITY v02
+   Barlow Condensed (display) · Newsreader (body) · Barlow (UI)
+   Warm paper · Ink · Yellow · Signal vermillion
    ============================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&display=swap');
 
 :root {
-  --k-black: #111111;
-  --k-white: #ffffff;
-  --k-gray-900: #1a1a1a;
-  --k-gray-700: #444444;
-  --k-gray-500: #777777;
-  --k-gray-300: #bbbbbb;
-  --k-gray-100: #f2f2f2;
-  --k-gray-50: #f8f8f8;
-  --k-yellow: #ffd600;
-  --k-yellow-dark: #e6c200;
-  --k-red: #d32f2f;
-  --k-red-dark: #b71c1c;
-  --k-font: 'JetBrains Mono', 'Courier New', monospace;
-  --k-font-heading: 'Barlow Condensed', 'Arial Narrow', sans-serif;
-  --k-radius: 4px;
+  /* ── Primary palette ── */
+  --k-yellow:       #FFD600;
+  --k-yellow-dim:   #F5C400;
+  --k-yellow-wash:  #FFF6B8;
+
+  --k-ink:          #17141A;   /* warm ink — all headings, hero bg, footer bg */
+  --k-ink-2:        #2B1B2E;   /* body copy */
+  --k-ink-3:        #5A5560;   /* secondary / muted */
+  --k-ink-4:        #8E8892;   /* meta, timestamps */
+
+  --k-paper:        #F7F4EC;   /* warm off-white page bg */
+  --k-paper-2:      #EFEBE0;   /* section bands */
+  --k-paper-3:      #E6E1D3;   /* card image wash */
+  --k-white:        #FFFFFF;   /* card surface only */
+
+  --k-rule:         #D9D3C3;   /* hairline borders */
+  --k-rule-ink:     #17141A;   /* hover / active border */
+
+  --k-signal:       #E4442B;   /* warm vermillion — urgency only */
+  --k-signal-wash:  #F8E2DC;
+
+  /* ── Legacy aliases (used throughout) ── */
+  --k-black:        #17141A;
+  --k-gray-900:     #2B1B2E;
+  --k-gray-700:     #5A5560;
+  --k-gray-500:     #8E8892;
+  --k-gray-300:     #D9D3C3;
+  --k-gray-100:     #EFEBE0;
+  --k-gray-50:      #F7F4EC;
+  --k-red:          #E4442B;
+  --k-red-dark:     #C4391F;
+
+  /* ── Font stacks ── */
+  --f-display:      'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --f-body:         'Newsreader', Georgia, 'Times New Roman', serif;
+  --f-ui:           'Barlow', 'Helvetica Neue', Arial, sans-serif;
+
+  /* Legacy font aliases */
+  --k-font:         var(--f-ui);
+  --k-font-heading: var(--f-display);
+
+  /* ── Motion ── */
+  --ease: cubic-bezier(.2,.7,.2,1);
+  --dur:  160ms;
+
+  /* ── Layout ── */
+  --k-radius:    4px;
   --k-radius-sm: 2px;
-  --k-max-w: 1080px;
+  --k-max-w:     1080px;
 }
 
 /* =============================================
    LOGO — inline SVG lockup
    ============================================= */
 
-/* Anchor wrapper */
 .k-logo-link,
 .custom-logo-link.k-logo-link {
   display: inline-flex !important;
@@ -41,7 +72,6 @@
   box-shadow: none !important;
 }
 
-/* The SVG itself — height drives sizing, width scales proportionally */
 .k-logo-svg {
   height: 52px !important;
   width: auto !important;
@@ -55,7 +85,7 @@
   .k-logo-svg { height: 30px !important; }
 }
 
-/* Suppress hover bg/decoration that bleeds onto the logo link */
+/* Suppress hover bg on logo link */
 .site-logo-container a,
 .custom-logo-link,
 .k-logo-link {
@@ -72,28 +102,16 @@
   box-shadow: none !important;
 }
 
-/* Hide Blocksy's site title text (shown when no logo is set — our filter bypasses this,
-   but keep as safety net) */
+/* Hide Blocksy site title fallback */
 [data-header*="type-1"] .ct-header .site-title,
 [data-header*="type-1"] .ct-header .site-description {
   display: none !important;
 }
 
-/* === BASE — FORCE FONT EVERYWHERE (excluding WP admin bar) === */
-body:not(#wpadminbar), body :not(#wpadminbar):not(#wpadminbar *),
-p, li, span:not(#wpadminbar *), div:not(#wpadminbar *),
-td, th, label, input, select, textarea,
-h1, h2, h3, h4, h5, h6,
-.entry-title, .widget-title, .site-title,
-article, section, aside, nav, footer, header,
-.ct-header *, .ct-footer *, .ct-sidebar *,
-[class*="wp-block"], [class*="entry-"], [class*="post-"],
-.fluentcrm_form_wrapper *, .ff-el-input--content *,
-figcaption, blockquote, cite, code, pre {
-  font-family: var(--k-font) !important;
-}
+/* =============================================
+   WP ADMIN BAR — fully isolated
+   ============================================= */
 
-/* === WP ADMIN BAR — fully isolated, never touched by our CSS === */
 #wpadminbar,
 #wpadminbar * {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
@@ -110,155 +128,204 @@ figcaption, blockquote, cite, code, pre {
   text-decoration: none !important;
   box-shadow: none !important;
   border: none !important;
+  transform: none !important;
 }
 
+/* =============================================
+   BASE
+   ============================================= */
+
 body {
-  background: var(--k-white) !important;
-  color: var(--k-black) !important;
+  background: var(--k-paper) !important;
+  color: var(--k-ink-2) !important;
+  font-family: var(--f-body) !important;
   line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
 }
 body::before, body::after { display: none !important; }
 
-/* ANA METİN — sadece siyah/beyaz */
-h1, h2, h3, h4, h5, h6, .entry-title, .widget-title {
-  color: var(--k-black) !important;
-  font-family: var(--k-font-heading) !important;
+/* Headings — Barlow Condensed display */
+h1, h2, h3, h4, h5, h6,
+.entry-title, .widget-title {
+  font-family: var(--f-display) !important;
   font-weight: 800 !important;
+  color: var(--k-ink) !important;
   text-transform: uppercase;
   letter-spacing: -0.01em;
 }
-p, li, td, th { color: var(--k-black) !important; }
 
-/* Linklerde tersine hover */
+/* Body text */
+p, li, td, th, figcaption, blockquote, cite {
+  font-family: var(--f-body) !important;
+  color: var(--k-ink-2) !important;
+}
+
+/* UI chrome: nav, buttons, labels, inputs */
+nav, button, input, select, textarea, label,
+.ct-header *, .ct-footer *,
+[class*="menu-item"],
+.wp-block-button__link,
+button[type="submit"], input[type="submit"] {
+  font-family: var(--f-ui) !important;
+}
+
+/* Global link base */
 a {
-  color: var(--k-black) !important;
+  color: var(--k-ink-2) !important;
   text-decoration: underline;
   text-underline-offset: 2px;
-  transition: color .15s, background .15s;
+  transition: color var(--dur) var(--ease), background-size var(--dur) var(--ease);
 }
-a:hover { color: var(--k-white) !important; background: var(--k-black); }
+a:hover {
+  color: var(--k-ink) !important;
+  background: transparent !important;
+  text-decoration: underline;
+}
 
-/* Card links must NEVER pick up the global a:hover black bg */
+/* Card links never get underline-decoration */
+.k-post-card a,
 .k-post-card a:hover,
-.k-post-card a:focus,
+.k-post-card__link,
 .k-post-card__link:hover,
 article.post a:hover,
-.entry-card a:hover {
+.entry-card a:hover,
+.k-post-card__title a,
+.k-post-card__read {
+  text-decoration: none !important;
   background: transparent !important;
   color: inherit !important;
 }
 
-/* === HEADER === */
+/* =============================================
+   HEADER
+   ============================================= */
+
 header[data-id="type-1"],
 .ct-header,
 .ct-header[data-id="type-1"] {
-  background: var(--k-white) !important;
+  background: var(--k-paper) !important;
   backdrop-filter: none !important;
-  border-bottom: 2px solid var(--k-black) !important;
+  border-bottom: 2px solid var(--k-ink) !important;
 }
-.ct-header .ct-container, .ct-header [data-row] { background: transparent !important; }
+.ct-header .ct-container,
+.ct-header [data-row] { background: transparent !important; }
 
 .site-logo-container .site-title,
 .ct-header .site-branding .site-title a {
-  font-family: var(--k-font) !important;
-  font-weight: 700 !important;
+  font-family: var(--f-display) !important;
+  font-weight: 900 !important;
   font-size: 20px !important;
-  color: var(--k-black) !important;
+  color: var(--k-ink) !important;
   text-decoration: none !important;
   background: none !important;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
-/* Navigasyon linkleri — tersine hover */
+/* Nav links — Barlow, yellow underline-grow hover */
 .ct-header nav > ul > li > a,
 header .menu > li > a,
 .ct-header .ct-menu > li > a {
-  color: var(--k-black) !important;
-  font-family: var(--k-font-heading) !important;
-  font-size: 16px !important;
+  font-family: var(--f-ui) !important;
+  color: var(--k-ink) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  text-decoration: none !important;
+  padding: 4px 0 !important;
+  margin: 0 8px !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  position: relative;
+  transition: color var(--dur) var(--ease) !important;
+}
+.ct-header nav > ul > li > a::after,
+.ct-header .ct-menu > li > a::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: -2px;
+  height: 2px; width: 0;
+  background: var(--k-yellow);
+  transition: width var(--dur) var(--ease);
+}
+.ct-header nav > ul > li > a:hover,
+.ct-header .ct-menu > li > a:hover {
+  color: var(--k-ink) !important;
+  background: transparent !important;
+}
+.ct-header nav > ul > li > a:hover::after,
+.ct-header .ct-menu > li > a:hover::after {
+  width: 100%;
+}
+
+/* Header CTA button */
+header .ct-button,
+.ct-header [data-button] a,
+.ct-header .ct-button {
+  background: var(--k-ink) !important;
+  color: var(--k-paper) !important;
+  border: none !important;
+  border-radius: var(--k-radius) !important;
+  padding: 9px 20px !important;
+  font-family: var(--f-ui) !important;
+  font-size: 12px !important;
   font-weight: 700 !important;
   text-transform: uppercase;
   letter-spacing: .8px;
   text-decoration: none !important;
-  padding: 4px 8px !important;
-  border-radius: var(--k-radius-sm) !important;
-  transition: background .15s, color .15s !important;
-  background: transparent !important;
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease) !important;
 }
-.ct-header nav > ul > li > a:hover,
-.ct-header .ct-menu > li > a:hover {
-  color: var(--k-white) !important;
-  background: var(--k-black) !important;
-}
-
-/* Header CTA butonu */
-header .ct-button,
-.ct-header [data-button] a,
-.ct-header .ct-button {
-  background: var(--k-black) !important;
-  color: var(--k-white) !important;
-  border: 2px solid var(--k-black) !important;
-  border-radius: var(--k-radius) !important;
-  padding: 8px 20px !important;
-  font-family: var(--k-font-heading) !important;
-  font-size: 15px !important;
-  font-weight: 800 !important;
-  text-transform: uppercase;
-  letter-spacing: .8px;
-  text-decoration: none !important;
-  transition: background .15s, color .15s !important;
-}
-header .ct-button:hover, .ct-header .ct-button:hover {
-  background: var(--k-white) !important;
-  color: var(--k-black) !important;
+header .ct-button:hover,
+.ct-header .ct-button:hover {
+  background: var(--k-ink) !important;
+  color: var(--k-paper) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 0 -1px var(--k-yellow) !important;
 }
 
-/* Alt menü */
+/* Dropdown */
 .ct-header .sub-menu, header .sub-menu {
-  background: var(--k-white) !important;
-  border: 1.5px solid var(--k-black) !important;
+  background: var(--k-paper) !important;
+  border: 1.5px solid var(--k-ink) !important;
   border-radius: var(--k-radius) !important;
-  box-shadow: 0 4px 16px rgba(0,0,0,.10) !important;
+  box-shadow: 0 4px 16px rgba(23,20,26,.10) !important;
 }
 .ct-header .sub-menu li a, header .sub-menu li a {
-  color: var(--k-black) !important;
+  color: var(--k-ink) !important;
+  font-family: var(--f-ui) !important;
   font-size: 13px !important;
   text-decoration: none !important;
-  transition: background .15s, color .15s !important;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease) !important;
 }
 .ct-header .sub-menu li a:hover {
-  color: var(--k-white) !important;
-  background: var(--k-black) !important;
+  color: var(--k-paper) !important;
+  background: var(--k-ink) !important;
 }
 
-/* Mobile menu — light gray background for button contrast */
+/* Mobile menu */
 .ct-mobile-overlay,
 .ct-panel[data-behaviour],
 .ct-drawer,
 .ct-header .ct-panel,
 [data-id="mobile-menu"],
 .ct-header [data-id="offcanvas"] {
-  background: var(--k-gray-50) !important;
-  color: var(--k-black) !important;
+  background: var(--k-paper) !important;
+  color: var(--k-ink) !important;
 }
-
-/* All text and links inside mobile menu */
 .ct-mobile-overlay *,
 .ct-panel[data-behaviour] *,
 .ct-drawer * {
-  color: var(--k-black) !important;
+  color: var(--k-ink) !important;
   background-color: transparent !important;
 }
-
-/* Nav links */
 .ct-mobile-overlay nav a,
 .ct-panel nav a,
 .ct-drawer nav a,
 .ct-mobile-overlay .menu-item a,
 .ct-panel .menu-item a {
-  color: var(--k-black) !important;
-  border-bottom: 1px solid var(--k-gray-100) !important;
+  color: var(--k-ink) !important;
+  border-bottom: 1px solid var(--k-rule) !important;
   padding: 12px 0 !important;
   display: block !important;
   text-decoration: none !important;
@@ -266,46 +333,44 @@ header .ct-button:hover, .ct-header .ct-button:hover {
 }
 .ct-mobile-overlay nav a:hover,
 .ct-panel nav a:hover {
-  color: var(--k-white) !important;
-  background: var(--k-black) !important;
+  color: var(--k-ink) !important;
+  background: var(--k-yellow-wash) !important;
   padding-left: 8px !important;
 }
-
-/* Mobile hamburger icon — always black on white header */
 .ct-header .ct-toggle,
 .ct-header [data-id="hamburger"] span,
 .ct-header [data-id="hamburger"] svg,
 .ct-header .hamburger-bar {
-  color: var(--k-black) !important;
-  background: var(--k-black) !important;
+  color: var(--k-ink) !important;
+  background: var(--k-ink) !important;
 }
-
-/* Mobile CTA button inside panel */
 .ct-mobile-overlay .ct-button,
 .ct-panel .ct-button,
 .ct-drawer .ct-button {
-  background: var(--k-white) !important;
-  color: var(--k-black) !important;
-  border: 2px solid var(--k-black) !important;
+  background: var(--k-ink) !important;
+  color: var(--k-paper) !important;
+  border: none !important;
   display: inline-block !important;
   padding: 10px 20px !important;
   border-radius: var(--k-radius) !important;
   margin-top: 8px !important;
 }
-.ct-mobile-overlay .ct-button:hover,
-.ct-panel .ct-button:hover {
-  background: var(--k-black) !important;
-  color: var(--k-white) !important;
-}
 
-/* === YELLOW SUPERMARKET TAG === */
+/* Remove top nav bar */
+[data-header*="type-1"] .ct-header [data-row*="top"] { display: none !important; }
+.ct-header [data-id="button"] { display: none !important; }
+
+/* =============================================
+   TAGS & CHIPS
+   ============================================= */
+
 .k-tag {
   display: inline-block;
   background: var(--k-yellow);
-  color: var(--k-black);
-  font-family: var(--k-font);
+  color: var(--k-ink);
+  font-family: var(--f-ui);
   font-weight: 700;
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: .5px;
   padding: 3px 10px;
@@ -313,266 +378,357 @@ header .ct-button:hover, .ct-header .ct-button:hover {
   line-height: 1.4;
 }
 
-/* === RED SALE BANNER === */
-.k-sale {
-  display: inline-block;
-  background: var(--k-red);
-  color: var(--k-white);
-  font-family: var(--k-font);
-  font-weight: 700;
-  font-size: 12px;
+/* chip tags (topic tags inside cards) */
+.k-post-cat,
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border: 1px solid var(--k-rule) !important;
+  background: var(--k-paper) !important;
+  color: var(--k-ink-2) !important;
+  font-family: var(--f-ui) !important;
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: .14em;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 4px 12px;
-  border-radius: var(--k-radius-sm);
+  border-radius: 2px;
+  text-decoration: none !important;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.k-post-cat:hover,
+.chip:hover {
+  background: var(--k-yellow-wash) !important;
+  border-color: var(--k-ink) !important;
 }
 
-/* Gutenberg inline versions */
-.has-background[style*="ffd600"] {
-  border-radius: var(--k-radius-sm) !important;
-  font-weight: 700 !important;
-  text-transform: uppercase !important;
-  letter-spacing: .5px !important;
-}
-.has-background[style*="d32f2f"],
-.has-background[style*="ff1744"] {
-  border-radius: var(--k-radius-sm) !important;
-  font-weight: 700 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 1px !important;
-}
+/* =============================================
+   BUTTONS — lift + yellow shadow (no fill change)
+   ============================================= */
 
-/* === BUTTONS — siyah arka plan, hover: tersine === */
 .wp-block-button__link,
 button[type="submit"],
 input[type="submit"] {
-  background: var(--k-black) !important;
-  color: var(--k-white) !important;
-  border: 2px solid var(--k-black) !important;
+  background: var(--k-ink) !important;
+  color: var(--k-paper) !important;
+  border: none !important;
   border-radius: var(--k-radius) !important;
-  font-family: var(--k-font-heading) !important;
-  font-weight: 800 !important;
-  font-size: 16px !important;
+  font-family: var(--f-ui) !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
   text-transform: uppercase;
   letter-spacing: .8px;
   padding: 12px 28px !important;
   cursor: pointer;
-  transition: background .15s, color .15s !important;
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease) !important;
   text-decoration: none !important;
 }
 .wp-block-button__link:hover,
 button[type="submit"]:hover,
 input[type="submit"]:hover {
-  background: var(--k-white) !important;
-  color: var(--k-black) !important;
+  background: var(--k-ink) !important;
+  color: var(--k-paper) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 0 -1px var(--k-yellow) !important;
 }
 
-/* === FORMS === */
+/* =============================================
+   FORMS
+   ============================================= */
+
 input[type="text"], input[type="email"], input[type="tel"],
 input[type="url"], input[type="search"], input[type="password"],
 select, textarea {
   background: var(--k-white) !important;
-  border: 1.5px solid var(--k-black) !important;
+  border: 1.5px solid var(--k-rule) !important;
   border-radius: var(--k-radius) !important;
-  color: var(--k-black) !important;
+  color: var(--k-ink) !important;
   padding: 12px 16px !important;
-  font-family: var(--k-font) !important;
-  font-size: 14px !important;
+  font-family: var(--f-body) !important;
+  font-size: 15px !important;
 }
 input:focus, select:focus, textarea:focus {
-  border-color: var(--k-black) !important;
-  box-shadow: 0 0 0 2px rgba(17,17,17,.15) !important;
+  border-color: var(--k-ink) !important;
+  box-shadow: 0 0 0 2px rgba(23,20,26,.10) !important;
   outline: none !important;
 }
-/* Placeholder ve helper text — gri kullanımı geçerli */
 input::placeholder, textarea::placeholder {
-  color: var(--k-gray-500) !important;
+  color: var(--k-ink-4) !important;
 }
 
-/* === CARDS === */
+/* =============================================
+   CARDS (Blocksy / theme default)
+   ============================================= */
+
 article.post, .entry-card, .dp-card {
   background: var(--k-white) !important;
-  border: 1.5px solid var(--k-black) !important;
+  border: 1px solid var(--k-rule) !important;
   border-radius: var(--k-radius) !important;
-  transition: box-shadow .2s, transform .2s !important;
+  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease) !important;
 }
 article.post:hover, .entry-card:hover, .dp-card:hover {
   background: var(--k-white) !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 20px rgba(0,0,0,.12) !important;
+  border-color: var(--k-rule-ink) !important;
+  transform: translateY(-3px) !important;
+  box-shadow: 0 6px 0 -2px rgba(23,20,26,.08), 0 14px 24px -16px rgba(23,20,26,.18) !important;
 }
 
 article.post .entry-title a, .entry-card .entry-title a {
-  color: var(--k-black) !important;
-  font-family: var(--k-font) !important;
-  font-weight: 700 !important;
+  color: var(--k-ink) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 800 !important;
   text-decoration: none !important;
   background: none !important;
 }
-/* Yardımcı metinler (tarih, okuma süresi, meta) — gri geçerli */
 article.post .entry-excerpt, .entry-card .entry-excerpt {
-  color: var(--k-gray-700) !important;
-  font-size: 14px !important;
+  font-family: var(--f-body) !important;
+  color: var(--k-ink-3) !important;
+  font-size: 15px !important;
 }
 article.post .entry-meta, .entry-card .entry-meta {
-  color: var(--k-gray-700) !important;
-  font-size: 12px !important;
+  font-family: var(--f-ui) !important;
+  color: var(--k-ink-4) !important;
+  font-size: 11px !important;
 }
 
-/* === HERO (page content) === */
+/* =============================================
+   HERO
+   ============================================= */
+
 .hero-section {
-  background: var(--k-black) !important;
+  background: var(--k-ink) !important;
   padding: 60px 40px !important;
   text-align: center;
 }
-.hero-section h1 { color: var(--k-white) !important; }
-.hero-section p   { color: var(--k-gray-300) !important; } /* açıklama — gri geçerli */
+.hero-section h1 { color: var(--k-paper) !important; }
+.hero-section p   { color: rgba(247,244,236,.75) !important; }
 
-/* === ABONE SECTION === */
+/* =============================================
+   ABONE / SECTION BLOCKS
+   ============================================= */
+
 .abone-section {
   background: var(--k-white) !important;
-  border: 1.5px solid var(--k-black) !important;
+  border: 1px solid var(--k-rule) !important;
   padding: 48px 32px !important;
   border-radius: var(--k-radius) !important;
 }
-.abone-section h2, .abone-section h3 { color: var(--k-black) !important; }
-.abone-section p { color: var(--k-black) !important; }
+.abone-section h2, .abone-section h3 { color: var(--k-ink) !important; }
+.abone-section p { color: var(--k-ink-2) !important; }
 
-/* === SECTION MOR → artık B&W === */
 .section-mor {
   background: var(--k-white) !important;
-  border: 1.5px solid var(--k-black) !important;
+  border: 1px solid var(--k-rule) !important;
   border-radius: var(--k-radius) !important;
   padding: 48px 32px !important;
 }
-.section-mor h2, .section-mor h3 { color: var(--k-black) !important; }
-.section-mor p { color: var(--k-black) !important; }
+.section-mor h2, .section-mor h3 { color: var(--k-ink) !important; }
+.section-mor p { color: var(--k-ink-2) !important; }
 
-/* === FOOTER === */
+/* =============================================
+   FOOTER
+   ============================================= */
+
 footer.ct-footer, .ct-footer, footer {
-  background: var(--k-black) !important;
+  background: var(--k-ink) !important;
   border-top: none !important;
-  color: var(--k-white) !important;
+  color: var(--k-paper) !important;
+  position: relative;
+}
+/* Yellow hairline at top of footer */
+footer.ct-footer::before,
+.ct-footer::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--k-yellow);
+  pointer-events: none;
 }
 .ct-footer .ct-container { background: transparent !important; }
 footer *, .ct-footer *, footer p, footer span, footer div,
 footer li, footer a, footer td, footer th,
 .ct-footer p, .ct-footer span, .ct-footer div,
 .ct-footer li, .ct-footer a {
-  color: var(--k-white) !important;
+  color: var(--k-paper) !important;
 }
-/* Footer link hover: beyaz arka plan + siyah metin (tersine) */
+
+/* Footer links — yellow underline-grow + yellow color on hover */
 .ct-footer a, footer a {
+  font-family: var(--f-body) !important;
+  font-size: 15px !important;
   text-decoration: none !important;
-  padding: 2px 4px;
-  border-radius: 2px;
-  transition: background .15s, color .15s !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  background-image: linear-gradient(var(--k-yellow), var(--k-yellow)) !important;
+  background-repeat: no-repeat !important;
+  background-position: 0 100% !important;
+  background-size: 0% 2px !important;
+  transition: background-size var(--dur) var(--ease), color var(--dur) var(--ease) !important;
+  display: inline;
 }
 .ct-footer a:hover, footer a:hover {
-  background: var(--k-white) !important;
-  color: var(--k-black) !important;
+  color: var(--k-yellow) !important;
+  background-size: 100% 2px !important;
+  background-color: transparent !important;
 }
 
 footer h4, .ct-footer h4, footer .widget-title, .ct-footer .widget-title {
-  color: var(--k-white) !important;
+  font-family: var(--f-display) !important;
+  color: rgba(247,244,236,.7) !important;
   font-size: 13px !important;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: .2em;
 }
 
-/* Footer widget */
 footer .widget, .ct-footer .widget,
 footer [class*="widget_"], .ct-footer [class*="widget_"] {
   background: transparent !important;
   border: none !important;
 }
-footer .widget img, .ct-footer .widget img {
-  border-radius: var(--k-radius) !important;
-  opacity: .75;
-  transition: opacity .2s;
-}
-footer .widget img:hover { opacity: 1; }
 
-/* Footer copyright bar */
-.ct-footer [data-row="bottom"],
-footer .copyright, footer .site-info,
-.ct-footer .ct-container [data-column="copyright"] {
-  color: var(--k-gray-300) !important; /* açıklama satırı — gri geçerli */
-  font-size: 13px !important;
-  border-top: 1px solid rgba(255,255,255,.15) !important;
-}
-.ct-footer [data-row="bottom"] *, footer .copyright * {
-  color: var(--k-gray-300) !important;
-}
-.ct-footer [data-row="bottom"] [data-column="copyright"] .ct-footer-text {
-  font-size: 0 !important;
-  visibility: hidden !important;
-  position: relative;
-}
-.ct-footer [data-row="bottom"] [data-column="copyright"] .ct-footer-text::after {
-  content: "© 2026 Kampanya.website — Tüm hakları saklıdır.";
+/* Footer hide top/middle rows, keep bottom bar */
+[data-footer*="type-1"] .ct-footer [data-row*="top"]    { display: none !important; }
+[data-footer*="type-1"] .ct-footer [data-row*="middle"] { display: none !important; }
+
+/* Copyright */
+.ct-footer-copyright p { visibility: hidden; font-size: 0 !important; height: 0; }
+.ct-footer-copyright::after {
+  content: 'Copyright © 2026 - Kampanya.website';
+  font-family: var(--f-ui);
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  line-height: 1.3;
+  display: block;
   visibility: visible;
-  font-size: 13px;
-  color: var(--k-gray-300);
-  position: absolute;
-  left: 0; top: 0;
-  white-space: nowrap;
+  color: rgba(247,244,236,.5);
 }
 
-/* === SINGLE POST === */
+/* Footer bottom bar */
+[data-footer*="type-1"] .ct-footer [data-row*="bottom"] > div {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+[data-footer*="type-1"] .ct-footer [data-row*="bottom"] {
+  border-top: 1px solid rgba(247,244,236,.1) !important;
+}
+[data-footer*="type-1"] .ct-footer [data-row*="bottom"] [data-column="widget-area-4"] {
+  text-align: right !important;
+}
+[data-footer*="type-1"] .ct-footer [data-row*="bottom"] [data-column="widget-area-4"] a {
+  font-family: var(--f-ui) !important;
+  font-size: 11px !important;
+  letter-spacing: .14em !important;
+  text-transform: uppercase !important;
+  color: rgba(247,244,236,.5) !important;
+  text-decoration: none !important;
+  white-space: nowrap;
+  background-image: none !important;
+}
+[data-footer*="type-1"] .ct-footer [data-row*="bottom"] [data-column="widget-area-4"] a:hover {
+  color: var(--k-yellow) !important;
+  background-image: none !important;
+}
+
+/* Footer dark logo */
+.k-footer-logo-wrap {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-decoration: none !important;
+  background: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin-right: 16px;
+}
+.k-footer-logo-wrap:hover {
+  background: transparent !important;
+  background-image: none !important;
+  opacity: .8;
+}
+.k-footer-logo-wrap .k-logo-svg {
+  height: 24px !important;
+  width: auto !important;
+}
+
+/* Hide legacy duplicate widgets */
+#text-8, #text-9 { display: none !important; }
+
+/* =============================================
+   SINGLE POST
+   ============================================= */
+
 .single-post .entry-content p {
-  color: var(--k-black) !important;
-  font-size: 16px;
-  line-height: 1.8;
+  font-family: var(--f-body) !important;
+  color: var(--k-ink-2) !important;
+  font-size: 17px;
+  line-height: 1.75;
 }
 .single-post .entry-content h2,
 .single-post .entry-content h3 {
-  color: var(--k-black) !important;
+  color: var(--k-ink) !important;
   margin-top: 2em;
 }
 .single-post .entry-content a {
-  color: var(--k-black) !important;
+  color: var(--k-ink-2) !important;
   text-decoration: underline;
+  text-underline-offset: 2px;
 }
 .single-post .entry-content a:hover {
-  color: var(--k-white) !important;
-  background: var(--k-black);
+  color: var(--k-ink) !important;
 }
 .single-post .entry-content blockquote {
-  border-left: 3px solid var(--k-black);
+  border-left: 3px solid var(--k-yellow);
   padding-left: 20px;
-  color: var(--k-gray-700) !important; /* alıntı — gri geçerli */
+  color: var(--k-ink-3) !important;
   font-style: italic;
 }
 
-/* === PAGINATION === */
+/* =============================================
+   PAGINATION
+   ============================================= */
+
 .ct-pagination a, .page-numbers {
   background: var(--k-white) !important;
-  border: 1.5px solid var(--k-black) !important;
+  border: 1px solid var(--k-rule) !important;
   border-radius: var(--k-radius) !important;
-  color: var(--k-black) !important;
+  color: var(--k-ink) !important;
+  font-family: var(--f-ui) !important;
   padding: 8px 14px !important;
   font-size: 13px !important;
   text-decoration: none !important;
-  transition: background .15s, color .15s !important;
+  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease) !important;
 }
 .ct-pagination a:hover, .page-numbers:hover {
-  background: var(--k-black) !important;
-  color: var(--k-white) !important;
+  background: var(--k-white) !important;
+  color: var(--k-ink) !important;
+  border-color: var(--k-ink) !important;
+  transform: translateY(-1px) !important;
 }
 .page-numbers.current {
-  background: var(--k-black) !important;
-  color: var(--k-white) !important;
-  border-color: var(--k-black) !important;
+  background: var(--k-ink) !important;
+  color: var(--k-paper) !important;
+  border-color: var(--k-ink) !important;
 }
 
-/* === SCROLLBAR === */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--k-gray-100); }
-::-webkit-scrollbar-thumb { background: var(--k-black); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--k-gray-700); }
+/* =============================================
+   SCROLLBAR
+   ============================================= */
 
-/* === HIDE AUTHOR ON POSTS === */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--k-paper-2); }
+::-webkit-scrollbar-thumb { background: var(--k-ink-3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--k-ink); }
+
+/* =============================================
+   AUTHOR HIDE
+   ============================================= */
+
 .single a[href*="/author/"],
 .single [rel="author"],
 .ct-author-box,
@@ -581,13 +737,16 @@ a[href*="/author/kampanya_admin/"] {
   display: none !important;
 }
 
-/* === RESPONSIVE === */
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+
 @media (max-width: 768px) {
   .hero-section { padding: 40px 20px !important; }
 }
 
 /* =============================================
-   HOMEPAGE — HERO ABONE FORMU
+   HOMEPAGE — HERO & SUBSCRIBE FORM
    ============================================= */
 
 .k-homepage {
@@ -595,49 +754,104 @@ a[href*="/author/kampanya_admin/"] {
   padding: 0;
 }
 
-/* Hero bölümü */
+/* Hero */
 .k-hero {
-  background: var(--k-black);
+  background: var(--k-ink);
   padding: 80px 24px 72px;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle yellow diagonal slash — receipt/flyer energy */
+.k-hero::before {
+  content: "";
+  position: absolute;
+  inset: auto -80px -60px auto;
+  width: 520px; height: 180px;
+  background: var(--k-yellow);
+  transform: rotate(-6deg);
+  opacity: .07;
+  border-radius: 2px;
+  pointer-events: none;
 }
 
 .k-hero__inner {
   max-width: 640px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
+/* Badge/pill */
 .k-hero__badge {
   margin-bottom: 20px;
 }
+.k-hero__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px 8px 10px;
+  background: transparent;
+  border: 1px solid rgba(247,244,236,.15);
+  border-radius: 999px;
+  font-family: var(--f-ui);
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(247,244,236,.7);
+  text-decoration: none !important;
+  background-image: none !important;
+}
+.k-hero__pill-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--k-yellow);
+  animation: k-pulse 2.4s infinite;
+  flex-shrink: 0;
+}
+@keyframes k-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,214,0,.4); }
+  50%      { box-shadow: 0 0 0 6px rgba(255,214,0,0); }
+}
 
 .k-hero__title {
-  font-family: var(--k-font-heading) !important;
+  font-family: var(--f-display) !important;
   font-size: clamp(40px, 7vw, 72px) !important;
   font-weight: 900 !important;
-  color: var(--k-white) !important;
-  line-height: 1.15 !important;
+  color: var(--k-paper) !important;
+  line-height: 1.0 !important;
   margin: 0 0 16px !important;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
 }
 
 .k-hero__title-accent {
-  color: var(--k-yellow);
-  display: inline;
+  background: var(--k-yellow);
+  color: var(--k-ink);
+  padding: 0 .08em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
 .k-hero__subtitle {
-  font-size: 16px !important;
-  color: var(--k-gray-300) !important; /* açıklama — gri geçerli */
-  line-height: 1.65 !important;
+  font-family: var(--f-body) !important;
+  font-size: 18px !important;
+  color: rgba(247,244,236,.8) !important;
+  line-height: 1.6 !important;
   margin: 0 auto 36px !important;
   max-width: 520px;
+}
+.k-hero__subtitle em {
+  color: var(--k-yellow);
+  font-style: normal;
+  font-weight: 500;
 }
 
 .k-hero__br { display: none; }
 @media (min-width: 540px) { .k-hero__br { display: inline; } }
 
-/* Form satırı */
+/* Subscribe form */
 .k-subscribe-form {
   max-width: 520px;
   margin: 0 auto;
@@ -645,12 +859,19 @@ a[href*="/author/kampanya_admin/"] {
 
 .k-form-row {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: stretch;
   margin-bottom: 14px;
+  background: rgba(247,244,236,.07);
+  border: 1px solid rgba(247,244,236,.15);
+  border-radius: 10px;
+  padding: 6px;
+  transition: border-color var(--dur) var(--ease);
+}
+.k-form-row:focus-within {
+  border-color: var(--k-yellow);
 }
 
-/* E-posta input sarmalayıcı */
 .k-email-wrap {
   position: relative;
   flex: 1;
@@ -660,35 +881,35 @@ a[href*="/author/kampanya_admin/"] {
 .k-email-input {
   width: 100% !important;
   box-sizing: border-box !important;
-  background: var(--k-white) !important;
-  border: 2px solid var(--k-white) !important;
-  border-radius: var(--k-radius) !important;
-  color: var(--k-black) !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  color: var(--k-paper) !important;
   padding: 14px 16px !important;
-  font-family: var(--k-font) !important;
+  font-family: var(--f-body) !important;
   font-size: 15px !important;
   line-height: 1.4 !important;
-  transition: border-color .15s !important;
-  position: relative !important;
-  z-index: 2 !important;
-}
-
-.k-email-input:focus {
-  border-color: var(--k-yellow) !important;
   outline: none !important;
   box-shadow: none !important;
 }
+.k-email-input:focus {
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+.k-email-input::placeholder {
+  color: rgba(247,244,236,.4) !important;
+}
 
-/* Otomatik tamamlama katmanı */
+/* Autocomplete overlay */
 .k-autocomplete {
   position: absolute;
   top: 0; left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   padding: 14px 16px;
   box-sizing: border-box;
   pointer-events: none;
-  font-family: var(--k-font);
+  font-family: var(--f-body);
   font-size: 15px;
   line-height: 1.4;
   color: transparent;
@@ -696,48 +917,45 @@ a[href*="/author/kampanya_admin/"] {
   overflow: hidden;
   z-index: 1;
 }
-
 .k-autocomplete__typed  { color: transparent; }
-.k-autocomplete__suggest { color: var(--k-gray-300); background: transparent; } /* öneri gri — geçerli */
+.k-autocomplete__suggest { color: rgba(247,244,236,.3); }
 
-/* Abone ol butonu — white bg, black text, black border */
-/* Use high-specificity selector to beat global button[type="submit"] rule */
+/* Subscribe button — yellow fill, lift on hover */
 button.k-subscribe-btn,
 .k-subscribe-btn {
   flex-shrink: 0;
   align-self: stretch !important;
   background: var(--k-yellow) !important;
-  color: var(--k-black) !important;
-  border: 2px solid var(--k-black) !important;
-  border-radius: var(--k-radius) !important;
-  padding: 14px 24px !important;
-  font-family: var(--k-font-heading) !important;
-  font-size: 17px !important;
-  font-weight: 800 !important;
+  color: var(--k-ink) !important;
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 12px 22px !important;
+  font-family: var(--f-ui) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
   text-transform: uppercase;
-  letter-spacing: .5px;
+  letter-spacing: .14em;
   cursor: pointer;
-  transition: background .15s, color .15s, border-color .15s;
+  transition: background var(--dur) var(--ease), transform var(--dur) var(--ease) !important;
   white-space: nowrap;
   display: flex;
   align-items: center;
   gap: 6px;
+  box-shadow: none !important;
 }
 button.k-subscribe-btn:hover,
 .k-subscribe-btn:hover {
-  background: var(--k-black) !important;
-  color: var(--k-yellow) !important;
-  border-color: var(--k-black) !important;
+  background: var(--k-yellow-dim) !important;
+  color: var(--k-ink) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: none !important;
 }
 button.k-subscribe-btn:active,
-.k-subscribe-btn:active { opacity: .85; }
+.k-subscribe-btn:active { opacity: .85; transform: translateY(0) !important; }
 button.k-subscribe-btn:disabled,
-.k-subscribe-btn:disabled {
-  opacity: .5;
-  cursor: not-allowed;
-}
+.k-subscribe-btn:disabled { opacity: .5; cursor: not-allowed; }
 
-/* KVKK onay satırı */
+/* KVKK consent */
 .k-consent-row { margin-bottom: 14px; text-align: left; }
 .k-consent-label {
   display: flex;
@@ -750,55 +968,61 @@ button.k-subscribe-btn:disabled,
   width: 16px !important;
   height: 16px !important;
   margin-top: 2px !important;
-  border: 1.5px solid var(--k-white) !important;
+  border: 1.5px solid rgba(247,244,236,.4) !important;
   border-radius: 3px !important;
   accent-color: var(--k-yellow) !important;
   cursor: pointer;
   padding: 0 !important;
   background: transparent !important;
 }
-/* KVKK metni — yardımcı açıklama, gri geçerli */
 .k-consent-text {
-  font-size: 12px !important;
-  color: var(--k-gray-300) !important;
+  font-family: var(--f-ui) !important;
+  font-size: 11px !important;
+  color: rgba(247,244,236,.5) !important;
   line-height: 1.5 !important;
+  letter-spacing: .04em;
 }
 .k-consent-text a {
   color: var(--k-yellow) !important;
   text-decoration: underline !important;
   text-underline-offset: 2px;
   background: none !important;
+  background-image: none !important;
 }
 .k-consent-text a:hover {
-  color: var(--k-black) !important;
-  background: var(--k-yellow) !important;
+  color: var(--k-yellow-dim) !important;
 }
 
-/* Form mesajları */
+/* Form messages */
 .k-form-msg {
   padding: 12px 16px;
   border-radius: var(--k-radius);
-  font-size: 14px !important;
+  font-family: var(--f-ui) !important;
+  font-size: 13px !important;
   font-weight: 600;
   text-align: left;
   margin-top: 8px;
+  letter-spacing: .04em;
 }
 .k-form-msg.k-msg-success {
-  background: var(--k-white);
-  color: var(--k-black) !important;
-  border: 1.5px solid var(--k-white);
+  background: rgba(247,244,236,.12);
+  color: var(--k-paper) !important;
+  border: 1.5px solid rgba(247,244,236,.25);
 }
 .k-form-msg.k-msg-error {
-  background: var(--k-red-dark);
-  color: var(--k-white) !important;
-  border: 1.5px solid var(--k-red);
+  background: var(--k-signal);
+  color: var(--k-paper) !important;
+  border: 1.5px solid var(--k-signal);
 }
 
-/* Alt güven metni — yardımcı açıklama, gri geçerli */
+/* Trust meta */
 .k-hero__trust {
   margin: 20px 0 0 !important;
-  font-size: 12px !important;
-  color: var(--k-gray-500) !important;
+  font-family: var(--f-ui) !important;
+  font-size: 11px !important;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(247,244,236,.45) !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -806,76 +1030,31 @@ button.k-subscribe-btn:disabled,
   flex-wrap: wrap;
 }
 .k-hero__trust a {
-  color: var(--k-gray-300) !important;
-  text-decoration: underline;
+  color: rgba(247,244,236,.45) !important;
   background: none !important;
+  background-image: none !important;
+  text-decoration: underline;
   padding: 0 !important;
 }
 .k-hero__trust a:hover {
-  color: var(--k-white) !important;
-  background: none !important;
+  color: var(--k-paper) !important;
 }
 
-/* Mobil form */
+/* Mobile form */
 @media (max-width: 500px) {
   .k-hero { padding: 60px 20px 56px; }
-  .k-form-row { flex-direction: column; }
+  .k-form-row { flex-direction: column; border-radius: 8px; }
   button.k-subscribe-btn,
-  .k-subscribe-btn { width: 100% !important; justify-content: center; }
+  .k-subscribe-btn { width: 100% !important; justify-content: center; border-radius: 6px !important; }
 }
-
-/* ── HEADER: remove top secondary nav bar, keep only main nav ── */
-[data-header*="type-1"] .ct-header [data-row*="top"] { display: none !important; }
-
-/* ── HEADER: hide Blocksy demo "Contribute" CTA button ── */
-.ct-header [data-id="button"] { display: none !important; }
-
-/* ── FOOTER: keep only the bottom bar, hide top & middle rows ── */
-[data-footer*="type-1"] .ct-footer [data-row*="top"]    { display: none !important; }
-[data-footer*="type-1"] .ct-footer [data-row*="middle"] { display: none !important; }
-
-/* ── COPYRIGHT FIX ── hide default Blocksy copyright, show correct one */
-.ct-footer-copyright p { visibility: hidden; font-size: 0 !important; height: 0; }
-.ct-footer-copyright::after {
-  content: 'Copyright © 2026 - Kampanya.website';
-  font-size: 15px;
-  line-height: 1.3;
-  display: block;
-  visibility: visible;
-  color: inherit;
-}
-
-/* ── FOOTER bottom bar: flex row, links alongside copyright ── */
-[data-footer*="type-1"] .ct-footer [data-row*="bottom"] > div {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  flex-wrap: wrap !important;
-  gap: 8px !important;
-}
-[data-footer*="type-1"] .ct-footer [data-row*="bottom"] [data-column="widget-area-4"] {
-  text-align: right !important;
-}
-[data-footer*="type-1"] .ct-footer [data-row*="bottom"] [data-column="widget-area-4"] a {
-  font-size: 12px !important;
-  color: inherit !important;
-  text-decoration: none !important;
-  white-space: nowrap;
-}
-[data-footer*="type-1"] .ct-footer [data-row*="bottom"] [data-column="widget-area-4"] a:hover {
-  text-decoration: underline !important;
-}
-
-/* ── HIDE legacy duplicate widgets ── */
-#text-8, #text-9 { display: none !important; }
 
 /* =============================================
-   HOMEPAGE — BLOG LİSTESİ
+   HOMEPAGE — BLOG LIST
    ============================================= */
 
 .k-posts-section {
   padding: 64px 0 80px;
-  background: var(--k-white);
+  background: var(--k-paper);
 }
 
 .k-container {
@@ -889,80 +1068,102 @@ button.k-subscribe-btn:disabled,
   align-items: baseline;
   justify-content: space-between;
   margin-bottom: 32px;
-  border-bottom: 2px solid var(--k-black);
+  border-bottom: 2px solid var(--k-ink);
   padding-bottom: 12px;
 }
 
 .k-section-title {
+  font-family: var(--f-display) !important;
   font-size: 20px !important;
-  font-weight: 700 !important;
-  color: var(--k-black) !important;
+  font-weight: 800 !important;
+  color: var(--k-ink) !important;
   margin: 0 !important;
   text-transform: uppercase;
   letter-spacing: .5px;
 }
 
 .k-section-more {
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  color: var(--k-black) !important;
+  font-family: var(--f-ui) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--k-ink) !important;
   text-decoration: none !important;
   background: none !important;
-  letter-spacing: .3px;
+  background-image: none !important;
   padding: 4px 10px;
-  border: 1.5px solid var(--k-black);
+  border: 1px solid var(--k-rule);
   border-radius: var(--k-radius);
-  transition: background .15s, color .15s;
+  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease) !important;
 }
 .k-section-more:hover {
-  background: var(--k-black) !important;
-  color: var(--k-white) !important;
+  border-color: var(--k-ink) !important;
+  background: none !important;
+  color: var(--k-ink) !important;
+  transform: translateY(-1px) !important;
 }
 
-/* Yazı grid */
+/* Cards grid */
 .k-posts-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 }
-
 .k-post-card--hero { grid-column: 1 / 3; }
 
-/* Kart */
+/* ── k-post-card ── */
 .k-post-card {
   display: flex;
   flex-direction: column;
   background: var(--k-white);
-  border: 1.5px solid var(--k-black);
+  border: 1px solid var(--k-rule);
   border-radius: var(--k-radius);
   overflow: hidden;
-  transition: background .2s, box-shadow .2s, transform .2s;
+  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
 .k-post-card:hover {
   background: var(--k-white);
-  box-shadow: 0 6px 24px rgba(0,0,0,.12);
-  transform: translateY(-2px);
+  border-color: var(--k-rule-ink);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 0 -2px rgba(23,20,26,.07), 0 14px 24px -16px rgba(23,20,26,.16);
 }
 
-/* Kart görsel */
+/* All links inside cards: never trigger global hover black bg */
+.k-post-card a,
+.k-post-card a:hover,
+.k-post-card a:focus {
+  background: transparent !important;
+  background-image: none !important;
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+/* Card image */
 .k-post-card__link { display: block; }
 .k-post-card__img-wrap {
   overflow: hidden;
-  background: var(--k-gray-100);
+  background: var(--k-paper-3);
   aspect-ratio: 16/9;
+  border-bottom: 1px solid var(--k-rule);
+  transition: border-color var(--dur) var(--ease);
+}
+.k-post-card:hover .k-post-card__img-wrap {
+  border-color: var(--k-rule-ink);
 }
 .k-post-card--hero .k-post-card__img-wrap { aspect-ratio: 16/7; }
 .k-post-card__img {
   width: 100%; height: 100%;
   object-fit: cover; display: block;
-  transition: transform .3s;
+  transition: transform var(--dur) var(--ease);
 }
 .k-post-card:hover .k-post-card__img { transform: none; }
 .k-post-card__img-wrap--placeholder {
-  background: var(--k-gray-100);
+  background: var(--k-paper-3);
+  background-image: repeating-linear-gradient(135deg, transparent 0 14px, rgba(23,20,26,.05) 14px 15px);
 }
 
-/* Kart gövde */
+/* Card body */
 .k-post-card__body {
   padding: 20px 22px 24px;
   display: flex; flex-direction: column; flex: 1;
@@ -970,83 +1171,97 @@ button.k-subscribe-btn:disabled,
 .k-post-card__meta {
   display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
 }
-/* Kategori tag — gri değil, siyah kenarlık */
-.k-post-cat {
-  background: var(--k-black) !important;
-  color: var(--k-white) !important;
-  font-size: 11px !important;
-  font-weight: 700 !important;
-  text-transform: uppercase;
-  letter-spacing: .4px;
-  padding: 2px 8px !important;
-  border-radius: var(--k-radius-sm) !important;
-}
-/* Tarih — yardımcı meta bilgi, gri geçerli */
 .k-post-card__date {
-  font-size: 12px;
-  color: var(--k-gray-700) !important;
+  font-family: var(--f-ui) !important;
+  font-size: 11px;
+  letter-spacing: .08em;
+  color: var(--k-ink-4) !important;
 }
+
+/* Card title — yellow underline grows on card hover */
 .k-post-card__title {
-  font-size: 17px !important;
-  font-weight: 700 !important;
-  color: var(--k-black) !important;
-  line-height: 1.35 !important;
+  font-family: var(--f-display) !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  color: var(--k-ink) !important;
+  line-height: 1.1 !important;
   margin: 0 0 10px !important;
   flex: 1;
+  text-transform: uppercase;
 }
-.k-post-card--hero .k-post-card__title { font-size: 22px !important; }
+.k-post-card--hero .k-post-card__title { font-size: 26px !important; }
 .k-post-card__title a {
-  color: var(--k-black) !important;
+  color: var(--k-ink) !important;
   text-decoration: none !important;
-  background: none !important;
+  background-image: linear-gradient(var(--k-yellow), var(--k-yellow)) !important;
+  background-repeat: no-repeat !important;
+  background-position: 0 100% !important;
+  background-size: 0% 8px !important;
+  padding-bottom: 2px;
+  transition: background-size var(--dur) var(--ease) !important;
+  display: inline;
 }
-/* Özet — biraz daha açık ama siyah, gri değil */
+.k-post-card:hover .k-post-card__title a {
+  background-size: 100% 8px !important;
+  color: var(--k-ink) !important;
+}
+
 .k-post-card__excerpt {
+  font-family: var(--f-body) !important;
   font-size: 14px !important;
-  color: var(--k-gray-700) !important;
+  color: var(--k-ink-3) !important;
   line-height: 1.6 !important;
   margin: 0 0 16px !important;
 }
 .k-post-card__read {
-  font-size: 13px !important;
+  font-family: var(--f-ui) !important;
+  font-size: 11px !important;
   font-weight: 700 !important;
-  color: var(--k-black) !important;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--k-ink-3) !important;
   text-decoration: none !important;
   background: none !important;
   display: inline-flex;
   align-items: center;
   gap: 4px;
   margin-top: auto;
-  text-transform: uppercase;
-  letter-spacing: .3px;
-  border-bottom: 1.5px solid var(--k-black);
+  border-bottom: 1px solid var(--k-rule);
   padding-bottom: 1px;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease) !important;
+}
+.k-post-card:hover .k-post-card__read {
+  color: var(--k-ink) !important;
+  border-color: var(--k-ink-3) !important;
 }
 
-/* "Tüm Yazılara Git" butonu */
+/* "Tüm Yazılara Git" button */
 .k-posts-more { text-align: center; margin-top: 40px; }
 .k-btn-outline {
   display: inline-block;
-  border: 2px solid var(--k-black) !important;
-  color: var(--k-black) !important;
+  border: 1.5px solid var(--k-rule) !important;
+  color: var(--k-ink) !important;
   background: transparent !important;
   border-radius: var(--k-radius) !important;
-  padding: 12px 32px !important;
-  font-family: var(--k-font) !important;
-  font-size: 14px !important;
+  padding: 11px 32px !important;
+  font-family: var(--f-ui) !important;
+  font-size: 12px !important;
   font-weight: 700 !important;
+  letter-spacing: .18em;
   text-transform: uppercase;
-  letter-spacing: .5px;
   text-decoration: none !important;
-  transition: background .15s, color .15s;
+  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
 .k-btn-outline:hover {
-  background: var(--k-black) !important;
-  color: var(--k-white) !important;
+  border-color: var(--k-ink) !important;
+  background: transparent !important;
+  color: var(--k-ink) !important;
+  transform: translateY(-1px) !important;
 }
 
 .k-no-posts {
-  color: var(--k-black) !important;
+  font-family: var(--f-body) !important;
+  color: var(--k-ink-3) !important;
   text-align: center;
   padding: 40px 0;
   font-size: 16px !important;
@@ -1074,13 +1289,14 @@ button.k-subscribe-btn:disabled,
   text-align: center;
 }
 .k-unsub-page h1 {
+  font-family: var(--f-display) !important;
   font-size: 28px !important;
-  color: var(--k-black) !important;
+  color: var(--k-ink) !important;
   margin-bottom: 12px !important;
 }
-/* Açıklama metni — gri geçerli */
 .k-unsub-page > p {
-  color: var(--k-gray-700) !important;
+  font-family: var(--f-body) !important;
+  color: var(--k-ink-3) !important;
   margin-bottom: 28px !important;
 }
 .k-unsub-form {
@@ -1093,47 +1309,25 @@ button.k-subscribe-btn:disabled,
 .k-unsub-msg {
   padding: 12px 16px;
   border-radius: var(--k-radius);
-  font-size: 14px !important;
+  font-family: var(--f-ui) !important;
+  font-size: 13px !important;
   font-weight: 600;
 }
 .k-unsub-msg.success {
-  background: var(--k-black);
-  color: var(--k-white) !important;
-  border: 1.5px solid var(--k-black);
+  background: var(--k-ink);
+  color: var(--k-paper) !important;
+  border: 1.5px solid var(--k-ink);
 }
 .k-unsub-msg.error {
-  background: var(--k-red);
-  color: var(--k-white) !important;
-  border: 1.5px solid var(--k-red-dark);
+  background: var(--k-signal);
+  color: var(--k-paper) !important;
+  border: 1.5px solid var(--k-signal);
 }
 
 /* =============================================
-   FOOTER LOGO
+   TRENDING BLOCK — HIDE
    ============================================= */
 
-/* Dark logo injected via JS into footer bottom bar */
-.k-footer-logo-wrap {
-  display: inline-flex;
-  align-items: center;
-  flex-shrink: 0;
-  text-decoration: none !important;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  margin-right: 16px;
-}
-.k-footer-logo-wrap:hover {
-  background: transparent !important;
-  opacity: .8;
-}
-.k-footer-logo-wrap .k-logo-svg {
-  height: 24px !important;
-  width: auto !important;
-}
-
-/* =============================================
-   TRENDING BLOCK — HIDE (Blocksy page component)
-   ============================================= */
 .ct-trending-block {
   display: none !important;
 }

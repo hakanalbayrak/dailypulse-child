@@ -16,10 +16,10 @@ require_once DAILYPULSE_DIR . '/inc/widgets.php';
 require_once DAILYPULSE_DIR . '/inc/shortcodes.php';
 
 /**
- * Google Fonts yükle — Cabin (body) + Barlow Condensed (logo/wordmark)
+ * Google Fonts yükle — Newsreader (body) + Barlow (UI) + Barlow Condensed (display)
  */
 function dailypulse_google_fonts() {
-    $fonts_url = 'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=JetBrains+Mono:wght@400;500&display=swap';
+    $fonts_url = 'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&display=swap';
     wp_enqueue_style('dailypulse-google-fonts', $fonts_url, array(), null);
 }
 add_action('wp_enqueue_scripts', 'dailypulse_google_fonts');
