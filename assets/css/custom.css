@@ -59,6 +59,61 @@
 }
 
 /* =============================================
+   FLUENTFORM — Turkish field labels
+   ============================================= */
+
+.fluentform {
+  font-family: var(--f-ui) !important;
+}
+
+.ff-el-group label {
+  font-family: var(--f-ui) !important;
+  color: var(--k-ink) !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  margin-bottom: 8px !important;
+}
+
+.ff-el-form-control {
+  font-family: var(--f-ui) !important;
+  border: 1px solid var(--k-rule) !important;
+  border-radius: var(--k-radius) !important;
+  padding: 10px 12px !important;
+  color: var(--k-ink-2) !important;
+  background: var(--k-white) !important;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease) !important;
+}
+
+.ff-el-form-control:focus {
+  outline: none !important;
+  border-color: var(--k-ink) !important;
+  box-shadow: 0 0 0 3px rgba(255, 214, 0, 0.15) !important;
+}
+
+.ff-el-form-control::placeholder {
+  color: var(--k-ink-4) !important;
+}
+
+.ff-btn-submit {
+  background: var(--k-ink) !important;
+  color: var(--k-paper) !important;
+  border: none !important;
+  border-radius: var(--k-radius) !important;
+  padding: 11px 28px !important;
+  font-family: var(--f-ui) !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.8px !important;
+  cursor: pointer !important;
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease) !important;
+}
+
+.ff-btn-submit:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 0 -1px var(--k-yellow) !important;
+}
+
+/* =============================================
    LOGO — inline SVG lockup
    ============================================= */
 
@@ -222,7 +277,7 @@ header[data-id="type-1"],
   letter-spacing: 1px;
 }
 
-/* Nav links — Barlow, yellow underline-grow hover */
+/* Nav links — Barlow, yellow underline-grow hover + enhanced padding */
 .ct-header nav > ul > li > a,
 header .menu > li > a,
 .ct-header .ct-menu > li > a {
@@ -233,18 +288,18 @@ header .menu > li > a,
   text-transform: uppercase;
   letter-spacing: .8px;
   text-decoration: none !important;
-  padding: 4px 0 !important;
-  margin: 0 8px !important;
-  border-radius: 0 !important;
+  padding: 6px 18px !important;
+  margin: 0 4px !important;
+  border-radius: var(--k-radius) !important;
   background: transparent !important;
   position: relative;
-  transition: color var(--dur) var(--ease) !important;
+  transition: color var(--dur) var(--ease), background var(--dur) var(--ease) !important;
 }
 .ct-header nav > ul > li > a::after,
 .ct-header .ct-menu > li > a::after {
   content: "";
   position: absolute;
-  left: 0; bottom: -2px;
+  left: 18px; bottom: 0px;
   height: 2px; width: 0;
   background: var(--k-yellow);
   transition: width var(--dur) var(--ease);
@@ -252,11 +307,11 @@ header .menu > li > a,
 .ct-header nav > ul > li > a:hover,
 .ct-header .ct-menu > li > a:hover {
   color: var(--k-ink) !important;
-  background: transparent !important;
+  background: var(--k-yellow-wash) !important;
 }
 .ct-header nav > ul > li > a:hover::after,
 .ct-header .ct-menu > li > a:hover::after {
-  width: 100%;
+  width: calc(100% - 36px);
 }
 
 /* Header CTA button */
