@@ -203,6 +203,20 @@ add_action('rest_api_init', function () {
 });
 
 /* ============================================================
+   LİTESPEED GUEST VARY — disable reload for private browsers
+   The guest.vary.php reload misfires when iOS Private Relay is
+   active, causing Safari to navigate to the raw server IP.
+   Setting the vary cookie server-side prevents the JS from firing.
+   ============================================================ */
+
+add_action('wp_head', function() {
+    if (empty($_COOKIE['_lscache_vary'])) {
+        // Set the vary cookie via JS before LiteSpeed's inline script checks for it
+        echo '<script>if(!document.cookie.match(/_lscache_vary/)){document.cookie="_lscache_vary=dguest; path=/; max-age=172800; secure; samesite=lax";}</script>' . "\n";
+    }
+}, 1);
+
+/* ============================================================
    FAVİCON — SVG (yellow tag mark with K)
    ============================================================ */
 
