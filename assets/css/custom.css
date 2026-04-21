@@ -715,33 +715,236 @@ footer [class*="widget_"], .ct-footer [class*="widget_"] {
 #text-8, #text-9 { display: none !important; }
 
 /* =============================================
-   SINGLE POST
+   SINGLE POST — typography & layout
    ============================================= */
 
-.single-post .entry-content p {
+.single-post .entry-content p,
+.single-post .entry-content li {
   font-family: var(--f-body) !important;
   color: var(--k-ink-2) !important;
   font-size: 17px;
-  line-height: 1.75;
+  line-height: 1.8;
 }
+.single-post .entry-content h1,
 .single-post .entry-content h2,
-.single-post .entry-content h3 {
+.single-post .entry-content h3,
+.single-post .entry-content h4 {
   color: var(--k-ink) !important;
   margin-top: 2em;
+  margin-bottom: 0.5em;
 }
-.single-post .entry-content a {
+/* Links inside post content — underline, but NOT on buttons */
+.single-post .entry-content a:not(.wp-block-button__link) {
   color: var(--k-ink-2) !important;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
-.single-post .entry-content a:hover {
+.single-post .entry-content a:not(.wp-block-button__link):hover {
   color: var(--k-ink) !important;
 }
+/* Lists */
+.entry-content ul,
+.entry-content ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1.4rem;
+}
+.entry-content ul li,
+.entry-content ol li {
+  font-family: var(--f-body) !important;
+  color: var(--k-ink-2) !important;
+  font-size: 17px;
+  line-height: 1.75;
+  margin-bottom: 0.5rem;
+}
+
+/* =============================================
+   GUTENBERG BLOCKS — global post styling
+   ============================================= */
+
+/* ── Blockquote ── */
+.entry-content .wp-block-quote,
 .single-post .entry-content blockquote {
-  border-left: 3px solid var(--k-yellow);
-  padding-left: 20px;
+  border-left: 4px solid var(--k-yellow) !important;
+  background: var(--k-paper-2) !important;
+  padding: 1.2rem 1.5rem !important;
+  margin: 2rem 0 !important;
+  border-radius: 0 var(--k-radius) var(--k-radius) 0 !important;
+}
+.entry-content .wp-block-quote p {
+  font-size: 1.12rem !important;
+  font-style: italic !important;
+  color: var(--k-ink) !important;
+  margin: 0 0 0.4rem !important;
+}
+.entry-content .wp-block-quote cite,
+.entry-content .wp-block-quote .wp-block-quote__citation {
+  font-family: var(--f-ui) !important;
+  font-size: 0.82rem !important;
   color: var(--k-ink-3) !important;
+  font-style: normal !important;
+  letter-spacing: 0.3px;
+}
+
+/* ── Separator ── */
+.entry-content .wp-block-separator {
+  border: none !important;
+  background: var(--k-yellow) !important;
+  height: 3px !important;
+  margin: 2.5rem 0 !important;
+  border-radius: 2px !important;
+  opacity: 1 !important;
+}
+
+/* ── Columns ── */
+.entry-content .wp-block-columns {
+  gap: 1.2rem !important;
+}
+
+/* ── Buttons — always yellow bg, ink text, never underlined ── */
+.entry-content .wp-block-button__link,
+.wp-block-button__link {
+  background: var(--k-yellow) !important;
+  color: var(--k-ink) !important;
+  text-decoration: none !important;
+  border: none !important;
+  border-radius: var(--k-radius) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 800 !important;
+  font-size: 1rem !important;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 14px 30px !important;
+  display: inline-block;
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease) !important;
+}
+.entry-content .wp-block-button__link:hover,
+.wp-block-button__link:hover {
+  background: var(--k-yellow) !important;
+  color: var(--k-ink) !important;
+  text-decoration: none !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 0 -1px var(--k-ink) !important;
+}
+
+/* ── Dark group block (buy-box / CTA panels) ── */
+.entry-content .wp-block-group[style*="background:#17141A"],
+.entry-content .wp-block-group[style*="background: #17141A"],
+.k-buy-box {
+  background: var(--k-ink) !important;
+  border-radius: 8px !important;
+  padding: 2rem 2.4rem !important;
+  margin: 2.5rem 0 !important;
+}
+.entry-content .wp-block-group[style*="background:#17141A"] h1,
+.entry-content .wp-block-group[style*="background:#17141A"] h2,
+.entry-content .wp-block-group[style*="background:#17141A"] h3,
+.entry-content .wp-block-group[style*="background:#17141A"] h4,
+.k-buy-box h1, .k-buy-box h2, .k-buy-box h3, .k-buy-box h4 {
+  color: var(--k-white) !important;
+  text-decoration: none !important;
+  font-family: var(--f-display) !important;
+}
+.entry-content .wp-block-group[style*="background:#17141A"] p,
+.k-buy-box p {
+  color: rgba(255,255,255,0.75) !important;
+  font-family: var(--f-ui) !important;
+  font-size: 0.95rem !important;
+}
+.entry-content .wp-block-group[style*="background:#17141A"] a,
+.k-buy-box a {
+  text-decoration: none !important;
+}
+/* ensure label/badge text inside dark box is visible */
+.entry-content .wp-block-group[style*="background:#17141A"] p:first-child {
+  color: rgba(255,255,255,0.45) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-family: var(--f-display) !important;
+}
+/* affiliate disclaimer at bottom */
+.entry-content .wp-block-group[style*="background:#17141A"] p:last-child {
+  color: rgba(255,255,255,0.3) !important;
+  font-size: 0.75rem !important;
   font-style: italic;
+  margin-top: 1rem !important;
+}
+/* button inside dark box gets yellow */
+.entry-content .wp-block-group[style*="background:#17141A"] .wp-block-button__link,
+.k-buy-box .wp-block-button__link {
+  background: var(--k-yellow) !important;
+  color: var(--k-ink) !important;
+  text-decoration: none !important;
+  font-size: 1rem !important;
+  padding: 14px 32px !important;
+}
+.entry-content .wp-block-group[style*="background:#17141A"] .wp-block-button__link:hover,
+.k-buy-box .wp-block-button__link:hover {
+  box-shadow: 0 5px 0 -1px rgba(255,255,255,0.2) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* ── Yellow banner (book hero / editor pick) ── */
+.entry-content .wp-block-group[style*="background:#FFF6B8"],
+.entry-content .wp-block-group[style*="background: #FFF6B8"] {
+  background: var(--k-yellow-wash) !important;
+  border-left: 6px solid var(--k-yellow) !important;
+  border-radius: 0 var(--k-radius) var(--k-radius) 0 !important;
+  padding: 1.8rem 2rem !important;
+  margin-bottom: 2rem !important;
+}
+.entry-content .wp-block-group[style*="background:#FFF6B8"] h1,
+.entry-content .wp-block-group[style*="background:#FFF6B8"] h2 {
+  color: var(--k-ink) !important;
+  margin-top: 0.3em !important;
+  line-height: 1.05 !important;
+}
+.entry-content .wp-block-group[style*="background:#FFF6B8"] p {
+  color: var(--k-ink-3) !important;
+  font-size: 0.95rem !important;
+  margin: 0 !important;
+}
+
+/* ── Columns inside posts ── */
+.entry-content .wp-block-column {
+  border-radius: var(--k-radius) !important;
+}
+.entry-content .wp-block-column p {
+  font-family: var(--f-ui) !important;
+  font-size: 0.9rem !important;
+  margin: 0 !important;
+  color: var(--k-ink-3) !important;
+}
+.entry-content .wp-block-column p strong {
+  color: var(--k-ink) !important;
+  font-family: var(--f-ui) !important;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* ── Cover block (post hero banner) ── */
+.entry-content .wp-block-cover {
+  border-radius: var(--k-radius) !important;
+  margin-bottom: 2rem !important;
+}
+
+/* ── Post title meta (date, category) ── */
+.single-post .entry-header .entry-meta,
+.single-post .page-header .entry-meta {
+  font-family: var(--f-ui) !important;
+  font-size: 13px !important;
+  color: var(--k-ink-4) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.single-post .entry-meta a {
+  color: var(--k-ink-4) !important;
+  text-decoration: none !important;
+  font-weight: 600;
+}
+.single-post .entry-meta a:hover {
+  color: var(--k-ink) !important;
 }
 
 /* =============================================
