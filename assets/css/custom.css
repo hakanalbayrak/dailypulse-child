@@ -715,6 +715,59 @@ footer [class*="widget_"], .ct-footer [class*="widget_"] {
 #text-8, #text-9 { display: none !important; }
 
 /* =============================================
+   SINGLE POST — hide Blocksy hero (title already in content banner)
+   ============================================= */
+
+/* Hide the full-width dark hero that duplicates the post title */
+.single-post .hero-section,
+.single-post [data-hero],
+.single-post .ct-hero,
+.single-post .page-header,
+.single .hero-section,
+.single [data-hero],
+.single .ct-hero,
+[class*="single"] .hero-section {
+  display: none !important;
+}
+
+/* Remove excess top spacing when hero is hidden */
+.single-post .entry-content,
+.single .entry-content {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* Full-width content — no sidebar gap */
+.single-post .ct-container,
+.single .ct-container {
+  max-width: var(--k-max-w) !important;
+}
+
+.single-post article,
+.single article {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Content blocks: constrain readable width, centered */
+.single-post .entry-content > *,
+.single .entry-content > * {
+  max-width: 740px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* Wide blocks (buy-box, columns) can be wider */
+.single-post .entry-content > .wp-block-group,
+.single-post .entry-content > .wp-block-columns,
+.single-post .entry-content > .wp-block-cover,
+.single .entry-content > .wp-block-group,
+.single .entry-content > .wp-block-columns {
+  max-width: 860px !important;
+}
+
+/* =============================================
    SINGLE POST — typography & layout
    ============================================= */
 
@@ -854,7 +907,7 @@ footer [class*="widget_"], .ct-footer [class*="widget_"] {
 .k-buy-box a {
   text-decoration: none !important;
 }
-/* ensure label/badge text inside dark box is visible */
+/* label/badge text inside dark box */
 .entry-content .wp-block-group[style*="background:#17141A"] p:first-child {
   color: rgba(255,255,255,0.45) !important;
   font-size: 11px !important;
@@ -862,13 +915,6 @@ footer [class*="widget_"], .ct-footer [class*="widget_"] {
   letter-spacing: 3px;
   text-transform: uppercase;
   font-family: var(--f-display) !important;
-}
-/* affiliate disclaimer at bottom */
-.entry-content .wp-block-group[style*="background:#17141A"] p:last-child {
-  color: rgba(255,255,255,0.3) !important;
-  font-size: 0.75rem !important;
-  font-style: italic;
-  margin-top: 1rem !important;
 }
 /* button inside dark box gets yellow */
 .entry-content .wp-block-group[style*="background:#17141A"] .wp-block-button__link,
