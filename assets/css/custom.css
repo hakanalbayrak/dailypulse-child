@@ -795,6 +795,23 @@ footer [class*="widget_"], .ct-footer [class*="widget_"] {
 .single-post .entry-content a:not(.wp-block-button__link):hover {
   color: var(--k-ink) !important;
 }
+
+/* In-text affiliate trigger links — subtle yellow underline to stand out */
+.single-post .entry-content p a[rel~="noopener"],
+.single-post .entry-content li a[rel~="noopener"] {
+  color: var(--k-ink) !important;
+  font-weight: 600;
+  text-decoration-color: var(--k-yellow) !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 3px !important;
+}
+.single-post .entry-content p a[rel~="noopener"]:hover,
+.single-post .entry-content li a[rel~="noopener"]:hover {
+  color: var(--k-ink) !important;
+  background: var(--k-yellow-wash) !important;
+  padding: 0 2px;
+  border-radius: 2px;
+}
 /* Lists */
 .entry-content ul,
 .entry-content ol {
@@ -907,14 +924,15 @@ footer [class*="widget_"], .ct-footer [class*="widget_"] {
 .k-buy-box a {
   text-decoration: none !important;
 }
-/* label/badge text inside dark box */
+/* label/badge text inside dark box — fully visible, action-oriented */
 .entry-content .wp-block-group[style*="background:#17141A"] p:first-child {
-  color: rgba(255,255,255,0.45) !important;
-  font-size: 11px !important;
-  font-weight: 700 !important;
-  letter-spacing: 3px;
+  color: var(--k-yellow) !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
   font-family: var(--f-display) !important;
+  margin-bottom: 1rem !important;
 }
 /* button inside dark box gets yellow */
 .entry-content .wp-block-group[style*="background:#17141A"] .wp-block-button__link,
