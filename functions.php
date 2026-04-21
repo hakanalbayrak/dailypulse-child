@@ -217,6 +217,20 @@ add_action('wp_head', function() {
 }, 1);
 
 /* ============================================================
+   PREVENT LITESPEED REDIRECT LOOPS
+   Override LiteSpeed's guest.vary.php behavior that causes
+   redirects to raw server IPs on private networks
+   ============================================================ */
+
+if (!defined('LSCACHE_VARY_ACCEPT_QS') ) {
+    define('LSCACHE_VARY_ACCEPT_QS', 1);
+}
+
+// Prevent LiteSpeed from triggering reload checks
+add_filter('litespeed_is_mobile', '__return_false', 99);
+add_filter('litespeed_is_tablet', '__return_false', 99);
+
+/* ============================================================
    FAVİCON — SVG (yellow tag mark with K)
    ============================================================ */
 
