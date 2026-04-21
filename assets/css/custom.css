@@ -718,16 +718,27 @@ footer [class*="widget_"], .ct-footer [class*="widget_"] {
    SINGLE POST — hide Blocksy hero (title already in content banner)
    ============================================= */
 
-/* Hide the full-width dark hero that duplicates the post title */
-.single-post .hero-section,
+/* Hide Blocksy's auto-generated page/post title header — applies to ALL content types.
+   The content's own .hero-section block (inside .entry-content) is kept visible. */
+.single-post .page-header,
 .single-post [data-hero],
 .single-post .ct-hero,
-.single-post .page-header,
-.single .hero-section,
+.single .page-header,
 .single [data-hero],
 .single .ct-hero,
-[class*="single"] .hero-section {
+.page .page-header,
+.page [data-hero],
+.page .ct-hero,
+.page .entry-header,
+body.page > .site-main .page-header,
+body.single > .site-main .page-header {
   display: none !important;
+}
+
+/* Safety: always show hero-section when it is INSIDE the content editor area */
+.entry-content .hero-section,
+.entry-content [data-hero] {
+  display: block !important;
 }
 
 /* Remove excess top spacing when hero is hidden */
