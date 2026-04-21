@@ -820,7 +820,7 @@ footer [class*="widget_"], .ct-footer [class*="widget_"] {
   border-left: 4px solid var(--k-yellow) !important;
   background: var(--k-paper-2) !important;
   padding: 1.2rem 1.5rem !important;
-  margin: 2rem 0 !important;
+  margin: 2rem auto !important;
   border-radius: 0 var(--k-radius) var(--k-radius) 0 !important;
 }
 .entry-content .wp-block-quote p {
@@ -886,7 +886,7 @@ footer [class*="widget_"], .ct-footer [class*="widget_"] {
   background: var(--k-ink) !important;
   border-radius: 8px !important;
   padding: 2rem 2.4rem !important;
-  margin: 2.5rem 0 !important;
+  margin: 2.5rem auto !important;
 }
 .entry-content .wp-block-group[style*="background:#17141A"] h1,
 .entry-content .wp-block-group[style*="background:#17141A"] h2,
