@@ -741,6 +741,19 @@ body.single > .site-main .page-header {
   display: block !important;
 }
 
+/* Cap any remaining .hero-section inside page content — compact, no full-screen takeover */
+.page .entry-content .hero-section,
+.page .entry-content [class*="hero"] {
+  min-height: 0 !important;
+  padding: 2rem 1.5rem !important;
+  background: var(--k-ink) !important;
+}
+.page .entry-content .hero-section h1,
+.page .entry-content .hero-section h2 {
+  font-size: clamp(1.6rem, 4vw, 2.2rem) !important;
+  margin: 0 0 0.4rem !important;
+}
+
 /* Remove excess top spacing when hero is hidden */
 .single-post .entry-content,
 .single .entry-content {
