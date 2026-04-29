@@ -781,22 +781,13 @@ body.single > .site-main .page-header,
   max-width: 100% !important;
 }
 
-/* Content blocks: constrain readable width, centered */
+/* Content blocks: all constrained to same readable column width, centered */
 .single-post .entry-content > *,
 .single .entry-content > * {
   max-width: 740px !important;
   margin-left: auto !important;
   margin-right: auto !important;
   box-sizing: border-box !important;
-}
-
-/* Wide blocks (buy-box, columns) can be wider */
-.single-post .entry-content > .wp-block-group,
-.single-post .entry-content > .wp-block-columns,
-.single-post .entry-content > .wp-block-cover,
-.single .entry-content > .wp-block-group,
-.single .entry-content > .wp-block-columns {
-  max-width: 860px !important;
 }
 
 /* =============================================
@@ -938,6 +929,8 @@ body .entry-content .wp-block-button__link:hover {
   border-radius: 8px !important;
   padding: 2rem 2.4rem !important;
   margin: 2.5rem auto !important;
+  width: 100% !important;
+  max-width: 740px !important;
 }
 .entry-content .wp-block-group[style*="background:#17141A"] h1,
 .entry-content .wp-block-group[style*="background:#17141A"] h2,

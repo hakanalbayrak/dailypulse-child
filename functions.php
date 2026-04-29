@@ -231,6 +231,28 @@ add_filter('litespeed_is_mobile', '__return_false', 99);
 add_filter('litespeed_is_tablet', '__return_false', 99);
 
 /* ============================================================
+   BLOCKSY — Disable single post hero/cover entirely
+   Removes the full-screen featured image background and the
+   empty dark area it leaves above post content.
+   ============================================================ */
+
+// Disable Blocksy's hero section on all singular views
+add_filter('blocksy:hero:is-enabled', '__return_false', 99);
+add_filter('blocksy:header:hero:is-enabled', '__return_false', 99);
+
+// Override any Blocksy theme mod that enables the hero per post-type
+add_filter('theme_mod_single_has_hero_section', function() { return 'no'; }, 99);
+add_filter('theme_mod_page_has_hero_section',   function() { return 'no'; }, 99);
+add_filter('theme_mod_post_has_hero_section',   function() { return 'no'; }, 99);
+
+// Remove the hero output action if Blocksy fires it
+add_action('blocksy:hero:output', '__return_false', 1);
+
+// Remove featured image from single post display (image is inline in content instead)
+add_filter('blocksy:single:has_post_thumbnail', '__return_false', 99);
+remove_action('blocksy_single_after_title', 'blocksy_single_featured_image', 10);
+
+/* ============================================================
    FAVİCON — SVG (yellow tag mark with K)
    ============================================================ */
 
