@@ -231,26 +231,59 @@ add_filter('litespeed_is_mobile', '__return_false', 99);
 add_filter('litespeed_is_tablet', '__return_false', 99);
 
 /* ============================================================
-   BLOCKSY — Disable single post hero/cover entirely
-   Removes the full-screen featured image background and the
-   empty dark area it leaves above post content.
+   BLOCKSY — Disable single post hero/cover entirely.
+   Strategy: PHP filters (attempt) + JS DOM removal (guaranteed).
+   Live DOM confirmed: <main class="site-main"> > <div class="hero-section" data-type="type-2">
    ============================================================ */
 
-// Disable Blocksy's hero section on all singular views
-add_filter('blocksy:hero:is-enabled', '__return_false', 99);
-add_filter('blocksy:header:hero:is-enabled', '__return_false', 99);
-
-// Override any Blocksy theme mod that enables the hero per post-type
+// PHP filter attempts (Blocksy filter names vary by version)
+add_filter('blocksy:hero:is-enabled',           '__return_false', 99);
+add_filter('blocksy:header:hero:is-enabled',    '__return_false', 99);
 add_filter('theme_mod_single_has_hero_section', function() { return 'no'; }, 99);
 add_filter('theme_mod_page_has_hero_section',   function() { return 'no'; }, 99);
 add_filter('theme_mod_post_has_hero_section',   function() { return 'no'; }, 99);
 
-// Remove the hero output action if Blocksy fires it
-add_action('blocksy:hero:output', '__return_false', 1);
-
-// Remove featured image from single post display (image is inline in content instead)
-add_filter('blocksy:single:has_post_thumbnail', '__return_false', 99);
-remove_action('blocksy_single_after_title', 'blocksy_single_featured_image', 10);
+/**
+ * JS DOM removal — runs before first paint via inline <script> in <head>.
+ * Catches the element regardless of CSS cache or specificity wars.
+ * Uses MutationObserver so it works even if Blocksy injects the hero lazily.
+ */
+add_action('wp_head', function() {
+    if (!is_singular('post') && !is_page()) return;
+    ?>
+<script>
+(function(){
+  function removeHero() {
+    var heroes = document.querySelectorAll(
+      'main.site-main > .hero-section, ' +
+      'main.site-main > div[data-type], ' +
+      '#main > .hero-section'
+    );
+    heroes.forEach(function(el) {
+      if (!el.closest('.entry-content')) el.remove();
+    });
+  }
+  // Run immediately
+  removeHero();
+  // Also run on DOMContentLoaded in case Blocksy renders late
+  document.addEventListener('DOMContentLoaded', removeHero);
+  // MutationObserver safety net for any deferred injection
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      m.addedNodes.forEach(function(node) {
+        if (node.nodeType === 1 && node.classList && node.classList.contains('hero-section')) {
+          if (!node.closest('.entry-content')) node.remove();
+        }
+      });
+    });
+  });
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+  // Disconnect after page is fully loaded
+  window.addEventListener('load', function() { observer.disconnect(); });
+})();
+</script>
+    <?php
+}, 1);
 
 /* ============================================================
    FAVİCON — SVG (yellow tag mark with K)

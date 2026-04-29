@@ -718,40 +718,64 @@ footer [class*="widget_"], .ct-footer [class*="widget_"] {
    SINGLE POST — hide Blocksy hero (title already in content banner)
    ============================================= */
 
-/* Hide Blocksy's auto-generated page/post title header + featured image cover.
-   The content's own .hero-section block (inside .entry-content) is kept visible. */
-.single-post .page-header,
-.single-post [data-hero],
-.single-post .ct-hero,
-.single-post .entry-cover,
-.single-post .ct-single-post-cover,
-.single-post .has-post-thumbnail .entry-header,
-.single .page-header,
-.single [data-hero],
-.single .ct-hero,
-.single .entry-cover,
-.single .ct-single-post-cover,
+/* ── BLOCKSY HERO REMOVAL ──────────────────────────────────────
+   Exact selector confirmed from live DOM:
+   <main class="site-main"> > <div class="hero-section" data-type="type-2">
+   This sits OUTSIDE <article>, so article-scoped rules don't reach it.
+   ────────────────────────────────────────────────────────────── */
+
+/* Primary target — exact match */
+main.site-main > div.hero-section,
+main.site-main > .hero-section,
+#main > .hero-section,
+.site-main > div[class*="hero"],
+.site-main > div[data-type] {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: absolute !important;
+  pointer-events: none !important;
+}
+
+/* Belt-and-suspenders: body-class scoped versions */
+body.single .site-main > .hero-section,
+body.single-post .site-main > .hero-section,
+body.single .site-main > div[data-type="type-2"],
+body.single-post .site-main > div[data-type="type-2"],
+body.single main > div.hero-section,
+body.single-post main > div.hero-section {
+  display: none !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Pages: hide their auto page-header too */
 .page .page-header,
 .page [data-hero],
 .page .ct-hero,
 .page .entry-header,
-body.page > .site-main .page-header,
-body.single > .site-main .page-header,
-/* Blocksy hero with background image */
-.single [class*="hero"][style*="background"],
-.single-post [class*="hero"][style*="background"] {
+body.page > .site-main .page-header {
   display: none !important;
 }
 
-/* Safety: always show hero-section when it is INSIDE the content editor area */
+/* Safety: always show hero-section when inside the Gutenberg content area */
 .entry-content .hero-section,
 .entry-content [data-hero] {
   display: block !important;
+  height: auto !important;
+  visibility: visible !important;
+  position: static !important;
+  pointer-events: auto !important;
 }
 
-/* Cap any remaining .hero-section inside page content — compact, no full-screen takeover */
-.page .entry-content .hero-section,
-.page .entry-content [class*="hero"] {
+/* Cap any remaining .hero-section inside PAGE content — compact, no full-screen takeover */
+.page .entry-content .hero-section {
   min-height: 0 !important;
   padding: 2rem 1.5rem !important;
   background: var(--k-ink) !important;
