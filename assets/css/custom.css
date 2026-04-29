@@ -718,20 +718,28 @@ footer [class*="widget_"], .ct-footer [class*="widget_"] {
    SINGLE POST — hide Blocksy hero (title already in content banner)
    ============================================= */
 
-/* Hide Blocksy's auto-generated page/post title header — applies to ALL content types.
+/* Hide Blocksy's auto-generated page/post title header + featured image cover.
    The content's own .hero-section block (inside .entry-content) is kept visible. */
 .single-post .page-header,
 .single-post [data-hero],
 .single-post .ct-hero,
+.single-post .entry-cover,
+.single-post .ct-single-post-cover,
+.single-post .has-post-thumbnail .entry-header,
 .single .page-header,
 .single [data-hero],
 .single .ct-hero,
+.single .entry-cover,
+.single .ct-single-post-cover,
 .page .page-header,
 .page [data-hero],
 .page .ct-hero,
 .page .entry-header,
 body.page > .site-main .page-header,
-body.single > .site-main .page-header {
+body.single > .site-main .page-header,
+/* Blocksy hero with background image */
+.single [class*="hero"][style*="background"],
+.single-post [class*="hero"][style*="background"] {
   display: none !important;
 }
 
@@ -894,9 +902,11 @@ body.single > .site-main .page-header {
   gap: 1.2rem !important;
 }
 
-/* ── Buttons — always yellow bg, ink text, never underlined ── */
-.entry-content .wp-block-button__link,
-.wp-block-button__link {
+/* ── Buttons — yellow bg, ink text, never underlined.
+   Uses body prefix to beat the global a { color: !important } rule ── */
+body .wp-block-button__link,
+body .entry-content .wp-block-button__link,
+body .wp-block-button > .wp-block-button__link {
   background: var(--k-yellow) !important;
   color: var(--k-ink) !important;
   text-decoration: none !important;
@@ -911,8 +921,8 @@ body.single > .site-main .page-header {
   display: inline-block;
   transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease) !important;
 }
-.entry-content .wp-block-button__link:hover,
-.wp-block-button__link:hover {
+body .wp-block-button__link:hover,
+body .entry-content .wp-block-button__link:hover {
   background: var(--k-yellow) !important;
   color: var(--k-ink) !important;
   text-decoration: none !important;
