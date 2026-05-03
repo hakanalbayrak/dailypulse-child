@@ -485,3 +485,27 @@ function kampanya_rest_unsubscribe(WP_REST_Request $request) {
         'message' => 'Aboneliğiniz başarıyla iptal edildi. Artık e-posta almayacaksınız.',
     ]);
 }
+
+/* ============================================================
+   TEMP DEBUG — remove after diagnosing email error
+   ============================================================ */
+add_action('rest_api_init', function () {
+    register_rest_route('kampanya/v1', '/debug-last-error', [
+        'methods'             => 'GET',
+        'callback'            => function() {
+            $log_file = WP_CONTENT_DIR . '/debug.log';
+            $lines = [];
+            if (file_exists($log_file)) {
+                $all = file($log_file);
+                $lines = array_slice($all, -50);
+            }
+            return rest_ensure_response([
+                'last_error'  => error_get_last(),
+                'php_version' => PHP_VERSION,
+                'memory'      => memory_get_peak_usage(true),
+                'log_tail'    => implode('', $lines),
+            ]);
+        },
+        'permission_callback' => function() { return current_user_can('manage_options'); },
+    ]);
+});
