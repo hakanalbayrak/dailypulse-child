@@ -490,21 +490,44 @@ function kampanya_rest_unsubscribe(WP_REST_Request $request) {
    TEMP DEBUG — remove after diagnosing email error
    ============================================================ */
 add_action('rest_api_init', function () {
-    register_rest_route('kampanya/v1', '/debug-last-error', [
+    register_rest_route('kampanya/v1', '/debug-send-test', [
         'methods'             => 'GET',
         'callback'            => function() {
-            $log_file = WP_CONTENT_DIR . '/debug.log';
-            $lines = [];
-            if (file_exists($log_file)) {
-                $all = file($log_file);
-                $lines = array_slice($all, -50);
+            $result  = ['php_version' => PHP_VERSION, 'memory_mb' => round(memory_get_peak_usage(true)/1048576,1)];
+            $errors  = [];
+
+            // Capture all PHP errors during the send
+            set_error_handler(function($errno, $errstr, $errfile, $errline) use (&$errors) {
+                $errors[] = "[$errno] $errstr in $errfile:$errline";
+                return false;
+            });
+
+            try {
+                $sent = wp_mail(
+                    'hkn3958@gmail.com',
+                    'FluentCRM Test — Debug',
+                    '<p>Test email from debug endpoint</p>',
+                    ['Content-Type: text/html; charset=UTF-8']
+                );
+                $result['wp_mail_returned'] = $sent;
+            } catch (\Throwable $e) {
+                $result['exception'] = get_class($e) . ': ' . $e->getMessage();
+                $result['file']      = $e->getFile() . ':' . $e->getLine();
+                $result['trace']     = array_slice(
+                    array_map(fn($f) => ($f['file'] ?? '?') . ':' . ($f['line'] ?? '?') . ' ' . ($f['function'] ?? ''), $e->getTrace()),
+                    0, 10
+                );
             }
-            return rest_ensure_response([
-                'last_error'  => error_get_last(),
-                'php_version' => PHP_VERSION,
-                'memory'      => memory_get_peak_usage(true),
-                'log_tail'    => implode('', $lines),
-            ]);
+
+            restore_error_handler();
+            $result['php_errors'] = $errors;
+            $result['last_error'] = error_get_last();
+
+            // Check which mailer is hooked
+            global $wp_filter;
+            $result['phpmailer_hooks'] = isset($wp_filter['phpmailer_init']) ? array_keys((array)$wp_filter['phpmailer_init']->callbacks) : [];
+
+            return rest_ensure_response($result);
         },
         'permission_callback' => function() { return current_user_can('manage_options'); },
     ]);
