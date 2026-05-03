@@ -247,15 +247,51 @@ add_filter('litespeed_is_tablet', '__return_false', 99);
  */
 add_action('template_redirect', function() {
     if (!is_singular('post')) return;
-    ob_start(function($html) {
-        // Match the full hero-section block (featured image + entry-header)
-        return preg_replace(
-            '/<div[^>]+class="[^"]*\bhero-section\b[^"]*"[^>]*>.*?<\/header><\/div>/s',
-            '',
-            $html
-        );
-    });
+    ob_start('kampanya_strip_hero_section');
 }, 1);
+
+/**
+ * Strip the Blocksy hero-section div from single post HTML.
+ * Uses div-depth counting (not regex) — immune to PCRE limits on large pages.
+ */
+function kampanya_strip_hero_section($html) {
+    $marker = '<div class="hero-section"';
+    $start  = strpos($html, $marker);
+    if ($start === false) return $html;
+
+    $depth = 0;
+    $pos   = $start;
+    $len   = strlen($html);
+
+    while ($pos < $len) {
+        $next = strpos($html, '<', $pos);
+        if ($next === false) break;
+
+        if (substr($html, $next, 5) === '<div ') {
+            $depth++;
+            $pos = $next + 5;
+        } elseif (substr($html, $next, 4) === '<div' && in_array($html[$next + 4], [' ', '>'])) {
+            $depth++;
+            $pos = $next + 4;
+        } elseif (substr($html, $next, 6) === '</div>') {
+            if ($depth === 0) {
+                // We haven't entered the hero div yet — skip
+                $pos = $next + 6;
+            } else {
+                $depth--;
+                if ($depth === 0) {
+                    // This </div> closes the hero-section
+                    $end = $next + 6;
+                    return substr($html, 0, $start) . substr($html, $end);
+                }
+                $pos = $next + 6;
+            }
+        } else {
+            $pos = $next + 1;
+        }
+    }
+    return $html;
+}
 
 // PHP filter attempts (Blocksy filter names vary by version)
 add_filter('blocksy:hero:is-enabled',           '__return_false', 99);
