@@ -232,9 +232,30 @@ add_filter('litespeed_is_tablet', '__return_false', 99);
 
 /* ============================================================
    BLOCKSY — Disable single post hero/cover entirely.
-   Strategy: PHP filters (attempt) + JS DOM removal (guaranteed).
+   Strategy:
+   1. PHP output buffering (server-side strip — primary, cache-safe)
+   2. PHP filters (attempt)
+   3. JS DOM removal with data-no-optimize (prevents LiteSpeed deferral)
    Live DOM confirmed: <main class="site-main"> > <div class="hero-section" data-type="type-2">
+   The hero-section wraps both the featured image AND the entry-header.
    ============================================================ */
+
+/**
+ * Layer 1: Server-side strip via output buffering.
+ * Runs before LiteSpeed caches the page — no CSS/JS dependency.
+ * Matches: <div class="hero-section" ...> ... </header></div>
+ */
+add_action('template_redirect', function() {
+    if (!is_singular('post')) return;
+    ob_start(function($html) {
+        // Match the full hero-section block (featured image + entry-header)
+        return preg_replace(
+            '/<div[^>]+class="[^"]*\bhero-section\b[^"]*"[^>]*>.*?<\/header><\/div>/s',
+            '',
+            $html
+        );
+    });
+}, 1);
 
 // PHP filter attempts (Blocksy filter names vary by version)
 add_filter('blocksy:hero:is-enabled',           '__return_false', 99);
@@ -244,45 +265,21 @@ add_filter('theme_mod_page_has_hero_section',   function() { return 'no'; }, 99)
 add_filter('theme_mod_post_has_hero_section',   function() { return 'no'; }, 99);
 
 /**
- * JS DOM removal — runs before first paint via inline <script> in <head>.
- * Catches the element regardless of CSS cache or specificity wars.
- * Uses MutationObserver so it works even if Blocksy injects the hero lazily.
+ * Layer 3: JS DOM removal — data-no-optimize prevents LiteSpeed from
+ * converting this to type="litespeed/javascript" (deferred).
  */
 add_action('wp_head', function() {
     if (!is_singular('post') && !is_page()) return;
-    ?>
-<script>
-(function(){
-  function removeHero() {
-    var heroes = document.querySelectorAll(
-      'main.site-main > .hero-section, ' +
-      'main.site-main > div[data-type], ' +
-      '#main > .hero-section'
-    );
-    heroes.forEach(function(el) {
-      if (!el.closest('.entry-content')) el.remove();
-    });
-  }
-  // Run immediately
-  removeHero();
-  // Also run on DOMContentLoaded in case Blocksy renders late
-  document.addEventListener('DOMContentLoaded', removeHero);
-  // MutationObserver safety net for any deferred injection
-  var observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(m) {
-      m.addedNodes.forEach(function(node) {
-        if (node.nodeType === 1 && node.classList && node.classList.contains('hero-section')) {
-          if (!node.closest('.entry-content')) node.remove();
-        }
-      });
-    });
-  });
-  observer.observe(document.documentElement, { childList: true, subtree: true });
-  // Disconnect after page is fully loaded
-  window.addEventListener('load', function() { observer.disconnect(); });
-})();
-</script>
-    <?php
+    echo '<script data-no-optimize="1">';
+    echo '(function(){';
+    echo 'function removeHero(){';
+    echo 'var h=document.querySelectorAll("main.site-main>.hero-section,main.site-main>div[data-type],#main>.hero-section");';
+    echo 'h.forEach(function(el){if(!el.closest(".entry-content"))el.remove();});';
+    echo '}';
+    echo 'removeHero();';
+    echo 'document.addEventListener("DOMContentLoaded",removeHero);';
+    echo '})();';
+    echo '</script>' . "\n";
 }, 1);
 
 /* ============================================================
