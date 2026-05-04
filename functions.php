@@ -261,10 +261,20 @@ add_action('rest_api_init', function () {
     register_rest_route('kampanya/v1', '/debug-address', [
         'methods'             => 'GET',
         'callback'            => function () {
-            $settings = get_theme_mod('blocksy_header_settings', 'NOT FOUND');
+            global $wp_customize;
+            
+            // Get raw blocksy_header_settings
+            $settings_raw = get_option('theme_mods_dailypulse-child', '');
+            $settings_json = isset($settings_raw['blocksy_header_settings']) ? $settings_raw['blocksy_header_settings'] : get_theme_mod('blocksy_header_settings', 'NOT FOUND');
+            
+            // Try both get_theme_mod and get_option
+            $option_data = get_option('theme_mods_dailypulse-child', []);
+            
             return rest_ensure_response([
-                'blocksy_header_settings' => $settings,
-                'parsed' => json_decode($settings, true),
+                'theme_mod' => $settings_json,
+                'parsed_theme_mod' => json_decode($settings_json, true),
+                'option_data_keys' => array_keys((array)$option_data),
+                'has_blocksy_key' => isset($option_data['blocksy_header_settings']),
             ]);
         },
         'permission_callback' => function () { return current_user_can('manage_options'); },
