@@ -261,20 +261,28 @@ add_action('rest_api_init', function () {
     register_rest_route('kampanya/v1', '/debug-address', [
         'methods'             => 'GET',
         'callback'            => function () {
-            global $wp_customize;
-            
-            // Get raw blocksy_header_settings
-            $settings_raw = get_option('theme_mods_dailypulse-child', '');
-            $settings_json = isset($settings_raw['blocksy_header_settings']) ? $settings_raw['blocksy_header_settings'] : get_theme_mod('blocksy_header_settings', 'NOT FOUND');
-            
-            // Try both get_theme_mod and get_option
             $option_data = get_option('theme_mods_dailypulse-child', []);
             
+            // Search for any key containing address or contact info
+            $search_keys = [];
+            foreach ($option_data as $key => $value) {
+                if (is_string($value) && (strpos($value, '304') !== false || strpos($value, 'Cardinal') !== false || strpos($value, 'Dorchester') !== false)) {
+                    $search_keys[$key] = substr($value, 0, 200);
+                }
+            }
+            
             return rest_ensure_response([
-                'theme_mod' => $settings_json,
-                'parsed_theme_mod' => json_decode($settings_json, true),
-                'option_data_keys' => array_keys((array)$option_data),
-                'has_blocksy_key' => isset($option_data['blocksy_header_settings']),
+                'blocksy_header_settings' => $option_data['blocksy_header_settings'] ?? 'NOT FOUND',
+                'found_fake_address_in_keys' => $search_keys,
+                'all_keys_with_content' => array_filter(
+                    array_map(function($k) use ($option_data) {
+                        $v = $option_data[$k];
+                        if (is_string($v) && strlen($v) > 20 && strlen($v) < 500) {
+                            return $k . ': ' . substr($v, 0, 100);
+                        }
+                        return null;
+                    }, array_keys($option_data))
+                ),
             ]);
         },
         'permission_callback' => function () { return current_user_can('manage_options'); },
