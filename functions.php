@@ -217,6 +217,81 @@ add_action('wp_head', function() {
 }, 1);
 
 /* ============================================================
+   FIX FAKE US ADDRESS — Replace DailyPulse demo placeholder
+   with real İstanbul contact information
+   ============================================================ */
+
+add_action('init', function() {
+    // Only run once on first activation or via manual trigger
+    if (get_option('kampanya_address_fixed')) {
+        return;
+    }
+    
+    $header_settings = get_theme_mod('blocksy_header_settings', '[]');
+    $header_data = json_decode($header_settings, true) ?: [];
+    
+    // Update or create offcanvas section
+    if (!isset($header_data['offcanvas'])) {
+        $header_data['offcanvas'] = [];
+    }
+    
+    // Find and update the text element with old address
+    $updated = false;
+    if (is_array($header_data['offcanvas'])) {
+        foreach ($header_data['offcanvas'] as &$item) {
+            if (isset($item['content']) && strpos($item['content'], '304 North Cardinal') !== false) {
+                $item['content'] = '<p><strong>Konumuz</strong></p><p>📍 İstanbul, Türkiye<br>info@kampanya.website<br>Tel: +90 533 466 80 88</p>';
+                $updated = true;
+                break;
+            }
+        }
+    }
+    
+    if ($updated) {
+        set_theme_mod('blocksy_header_settings', json_encode($header_data));
+        update_option('kampanya_address_fixed', 1);
+    }
+}, 11);
+
+/* ============================================================
+   REST: kampanya/v1/fix-address — update fake address via API
+   ============================================================ */
+
+add_action('rest_api_init', function () {
+    register_rest_route('kampanya/v1', '/fix-address', [
+        'methods'             => 'POST',
+        'callback'            => function () {
+            $header_settings = get_theme_mod('blocksy_header_settings', '[]');
+            $header_data = json_decode($header_settings, true) ?: [];
+            
+            if (!isset($header_data['offcanvas'])) {
+                $header_data['offcanvas'] = [];
+            }
+            
+            $found = false;
+            if (is_array($header_data['offcanvas'])) {
+                foreach ($header_data['offcanvas'] as &$item) {
+                    if (isset($item['content']) && (strpos($item['content'], '304 North Cardinal') !== false || strpos($item['content'], 'Dorchester') !== false)) {
+                        $item['content'] = '<p><strong>Konumuz</strong></p><p>📍 İstanbul, Türkiye<br>info@kampanya.website<br>Tel: +90 533 466 80 88</p>';
+                        $found = true;
+                        break;
+                    }
+                }
+            }
+            
+            set_theme_mod('blocksy_header_settings', json_encode($header_data));
+            
+            return rest_ensure_response([
+                'success' => true,
+                'fixed'   => $found,
+                'message' => $found ? 'Fake address replaced with İstanbul contact info' : 'No fake address found, but settings updated anyway',
+            ]);
+        },
+        'permission_callback' => function () { return current_user_can('manage_options'); },
+    ]);
+});
+
+/* ============================================================
    PREVENT LITESPEED REDIRECT LOOPS
    Override LiteSpeed's guest.vary.php behavior that causes
    redirects to raw server IPs on private networks
