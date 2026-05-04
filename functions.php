@@ -254,6 +254,24 @@ add_action('init', function() {
 }, 11);
 
 /* ============================================================
+   REST: kampanya/v1/debug-address — debug header settings
+   ============================================================ */
+
+add_action('rest_api_init', function () {
+    register_rest_route('kampanya/v1', '/debug-address', [
+        'methods'             => 'GET',
+        'callback'            => function () {
+            $settings = get_theme_mod('blocksy_header_settings', 'NOT FOUND');
+            return rest_ensure_response([
+                'blocksy_header_settings' => $settings,
+                'parsed' => json_decode($settings, true),
+            ]);
+        },
+        'permission_callback' => function () { return current_user_can('manage_options'); },
+    ]);
+});
+
+/* ============================================================
    REST: kampanya/v1/fix-address — update fake address via API
    ============================================================ */
 
