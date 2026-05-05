@@ -269,51 +269,79 @@
   /* -------------------------------------------------- *
    *  NAV BAR SEARCH — Inject magnifier into main nav
    * -------------------------------------------------- */
+  function openSearchModal() {
+    var modal = document.getElementById('search-modal');
+    if (!modal) return;
+    // Close any already-open panels
+    document.querySelectorAll('.ct-panel.ct-active').forEach(function (p) {
+      p.classList.remove('ct-active');
+      p.setAttribute('inert', '');
+    });
+    // Open modal: Blocksy reads ct-active + inert removal
+    modal.removeAttribute('inert');
+    modal.classList.add('ct-active');
+    // Lock scroll (Blocksy adds this to <html>)
+    document.documentElement.classList.add('ct-panel-open');
+    // Focus input
+    setTimeout(function () {
+      var inp = modal.querySelector('input[type="search"]');
+      if (inp) inp.focus();
+    }, 120);
+  }
+
+  function closeSearchModal() {
+    var modal = document.getElementById('search-modal');
+    if (!modal) return;
+    modal.classList.remove('ct-active');
+    modal.setAttribute('inert', '');
+    document.documentElement.classList.remove('ct-panel-open');
+  }
+
   function initNavSearch() {
     var mainNavWrap = document.querySelector('[data-row="middle"] [data-column="end"] [data-items="primary"]');
     if (!mainNavWrap || mainNavWrap.querySelector('.k-nav-search-btn')) return;
 
-    // Build a plain button — no Blocksy classes.
-    // On click we programmatically click Blocksy's OWN toggle that was bound
-    // at init time, so its event handlers fire exactly as if the user clicked it.
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'k-nav-search-btn';
     btn.setAttribute('aria-label', 'Ara');
+    btn.setAttribute('aria-expanded', 'false');
     btn.innerHTML = '<svg viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="18" height="18"><path d="M14.8 13.7 12 11a6.8 6.8 0 1 0-1 1l2.8 2.8a.7.7 0 0 0 1-.1ZM1.5 6.8a5.3 5.3 0 1 1 5.3 5.2 5.3 5.3 0 0 1-5.3-5.2Z"/></svg>';
 
     mainNavWrap.appendChild(btn);
 
-    btn.addEventListener('click', function (e) {
-      e.stopPropagation();
-      // Delegate to Blocksy's already-bound search toggle in the top row
-      var orig = document.querySelector('.ct-header-search[data-toggle-panel="#search-modal"]');
-      if (orig) {
-        orig.click();
+    btn.addEventListener('click', function () {
+      var modal = document.getElementById('search-modal');
+      if (!modal) return;
+      if (modal.classList.contains('ct-active')) {
+        closeSearchModal();
+        btn.setAttribute('aria-expanded', 'false');
       } else {
-        // Fallback: manually toggle modal classes if original not found
+        openSearchModal();
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+
+    // Escape key closes
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
         var modal = document.getElementById('search-modal');
-        if (!modal) return;
-        var isOpen = !modal.hasAttribute('inert');
-        if (isOpen) {
-          modal.setAttribute('inert', '');
-          modal.classList.remove('ct-active');
-          document.documentElement.classList.remove('ct-panel-open');
-        } else {
-          document.querySelectorAll('.ct-panel:not([inert])').forEach(function(p) {
-            p.setAttribute('inert', ''); p.classList.remove('ct-active');
-          });
-          modal.removeAttribute('inert');
-          modal.classList.add('ct-active');
-          document.documentElement.classList.add('ct-panel-open');
+        if (modal && modal.classList.contains('ct-active')) {
+          closeSearchModal();
+          btn.setAttribute('aria-expanded', 'false');
+          btn.focus();
         }
       }
-      // Focus the search input after modal opens
-      setTimeout(function () {
-        var modal = document.getElementById('search-modal');
-        var inp = modal && modal.querySelector('input[type="search"]');
-        if (inp && !modal.hasAttribute('inert')) inp.focus();
-      }, 150);
+    });
+
+    // Clicking outside modal closes it
+    document.addEventListener('click', function (e) {
+      var modal = document.getElementById('search-modal');
+      if (!modal || !modal.classList.contains('ct-active')) return;
+      if (!modal.contains(e.target) && e.target !== btn) {
+        closeSearchModal();
+        btn.setAttribute('aria-expanded', 'false');
+      }
     });
   }
 
