@@ -312,6 +312,53 @@
   }
 
   /* -------------------------------------------------- *
+   *  PAGE-LEVEL TURKISH TRANSLATIONS
+   *  Blocksy outputs some headings/text directly in PHP
+   *  templates that bypass gettext — fix client-side.
+   * -------------------------------------------------- */
+  function initPageTranslations() {
+    var body = document.body;
+    var cls  = body.className;
+
+    // ── Search results page ──────────────────────────
+    if (cls.indexOf('search') !== -1 && cls.indexOf('search-results') !== -1) {
+      var h1 = document.querySelector('.page-title, h1.entry-title');
+      if (h1) {
+        var txt = h1.textContent || h1.innerText || '';
+        // Match "Search Results for X" or "Search Results for: X"
+        var m = txt.match(/^Search Results for:?\s*(.+)$/i);
+        if (m) {
+          h1.innerHTML = '“<span>' + m[1].trim() + '</span>” için arama sonuçları';
+        } else if (/^Search Results/i.test(txt)) {
+          h1.textContent = 'Arama Sonuçları';
+        }
+      }
+    }
+
+    // ── 404 page ─────────────────────────────────────
+    if (cls.indexOf('error404') !== -1) {
+      // h1
+      var h404 = document.querySelector('.page-title, h1.entry-title, .page-header .page-title');
+      if (h404) {
+        var t = h404.textContent || '';
+        if (/oops/i.test(t) || /can.t be found/i.test(t) || /not found/i.test(t)) {
+          h404.textContent = 'Ups! Sayfa Bulunamadı';
+        }
+      }
+      // Description / paragraph text
+      document.querySelectorAll('.page-description, .entry-content p, .error-404 p').forEach(function(p) {
+        var pt = p.innerHTML;
+        pt = pt.replace(/Oops! That page can[''`]?t be found\./gi, 'Ups! Bu sayfa bulunamadı.');
+        pt = pt.replace(/It looks like nothing was found at this location\./gi, 'Bu konumda hiçbir şey bulunamadı.');
+        pt = pt.replace(/Maybe try to search for something else\?/gi, 'Başka bir şey aramayı deneyin.');
+        pt = pt.replace(/It seems we can[''`]?t find what you[''`]?re looking for\./gi, 'Aradığınız içerik bulunamadı.');
+        pt = pt.replace(/Perhaps searching can help\./gi, 'Belki arama yaparak bulabilirsiniz.');
+        p.innerHTML = pt;
+      });
+    }
+  }
+
+  /* -------------------------------------------------- *
    *  BAŞLAT
    * -------------------------------------------------- */
   document.addEventListener('DOMContentLoaded', function () {
@@ -321,6 +368,7 @@
     initReveal();
     initSmoothScroll();
     initNavSearch();
+    initPageTranslations();
   });
 
 })();

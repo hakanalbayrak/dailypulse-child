@@ -585,7 +585,10 @@ function kampanya_tr_strings($translation, $text, $domain) {
             'It seems we can\'t find what you\'re looking for.'  => 'Aradığınız içerik bulunamadı.',
             'Perhaps searching can help.'               => 'Belki arama yaparak bulabilirsiniz.',
             // ── 404 page ──
-            'Oops! That page can\'t be found.'          => 'Ups! Sayfa bulunamadı.',
+            'Oops! That page can\'t be found.'             => 'Ups! Sayfa bulunamadı.',
+            "Oops! That page can’t be found."         => 'Ups! Sayfa bulunamadı.',
+            'Page not found'                               => 'Sayfa Bulunamadı',
+            'Error 404'                                    => 'Hata 404',
             'It looks like nothing was found at this location. Maybe try to search for something else?' => 'Bu sayfada hiçbir şey bulunamadı. Başka bir şey aramayı deneyin.',
             'It looks like nothing was found at this location.' => 'Bu sayfada hiçbir şey bulunamadı.',
             'Maybe try to search for something else?'   => 'Başka bir şey aramayı deneyin.',
