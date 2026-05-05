@@ -561,6 +561,83 @@ function kampanya_rest_unsubscribe(WP_REST_Request $request) {
 }
 
 /* ============================================================
+   TURKISH STRING TRANSLATIONS — Override Blocksy/WooCommerce English strings
+   ============================================================ */
+add_filter('gettext', 'kampanya_tr_strings', 20, 3);
+add_filter('gettext_with_context', 'kampanya_tr_strings_ctx', 20, 4);
+function kampanya_tr_strings($translation, $text, $domain) {
+    static $map = null;
+    if ($map === null) {
+        $map = [
+            'Search'                    => 'Ara',
+            'Search for...'             => 'Ara...',
+            'Search...'                 => 'Ara...',
+            'No results'                => 'Sonuç bulunamadı',
+            'No results found'          => 'Sonuç bulunamadı',
+            'Search Results'            => 'Arama Sonuçları',
+            'Categories'                => 'Kategoriler',
+            'Tags'                      => 'Etiketler',
+            'Archives'                  => 'Arşiv',
+            'Recent Posts'              => 'Son Yazılar',
+            'Recent Comments'           => 'Son Yorumlar',
+            'Read more'                 => 'Devamını oku',
+            'Read More'                 => 'Devamını oku',
+            'Leave a comment'           => 'Yorum yap',
+            'Leave a Reply'             => 'Yorum Yap',
+            'Comments are closed.'      => 'Yorumlar kapatılmıştır.',
+            'Post Comment'              => 'Yorumu Gönder',
+            'Submit'                    => 'Gönder',
+            'Name'                      => 'Ad',
+            'Email'                     => 'E-posta',
+            'Website'                   => 'Website',
+            'Comment'                   => 'Yorum',
+            'Your comment'              => 'Yorumunuz',
+            'Your name'                 => 'Adınız',
+            'Your email'                => 'E-posta adresiniz',
+            'Older posts'               => 'Daha eski yazılar',
+            'Newer posts'               => 'Daha yeni yazılar',
+            'Previous'                  => 'Önceki',
+            'Next'                      => 'Sonraki',
+            'Page %s of %s'             => '%s / %s sayfası',
+            'Nothing found'             => 'Sonuç bulunamadı',
+            'It seems we can\'t find what you\'re looking for.' => 'Aradığınız içerik bulunamadı.',
+            'Posted on'                 => 'Yayın tarihi',
+            'Posted in'                 => 'Kategori',
+            'by'                        => 'Yazar',
+            'Tagged'                    => 'Etiket',
+            'Published'                 => 'Yayınlandı',
+            'Cart'                      => 'Sepet',
+            'Checkout'                  => 'Ödeme',
+            'My account'                => 'Hesabım',
+            'My Account'                => 'Hesabım',
+            'Shop'                      => 'Mağaza',
+            'Add to cart'               => 'Sepete ekle',
+            'Product'                   => 'Ürün',
+            'Price'                     => 'Fiyat',
+            'Quantity'                  => 'Adet',
+            'Total'                     => 'Toplam',
+            'Continue shopping'         => 'Alışverişe devam et',
+            'Proceed to checkout'       => 'Ödemeye geç',
+            'Apply coupon'              => 'Kuponu uygula',
+            'Coupon code'               => 'Kupon kodu',
+            'Update cart'               => 'Sepeti güncelle',
+            'Your cart is currently empty.' => 'Sepetiniz şu an boş.',
+            'Search for...'             => 'Ara...',
+            'Popular'                   => 'Popüler',
+            'Social Icons'              => 'Sosyal Medya',
+            'Socials'                   => 'Sosyal Medya',
+            'Subscribe'                 => 'Abone Ol',
+            'First Name'                => 'Ad',
+            'Last Name'                 => 'Soyad',
+        ];
+    }
+    return isset($map[$text]) ? $map[$text] : $translation;
+}
+function kampanya_tr_strings_ctx($translation, $text, $context, $domain) {
+    return kampanya_tr_strings($translation, $text, $domain);
+}
+
+/* ============================================================
    TEMP — Form read/update + Widget read via DB
    ============================================================ */
 add_action('rest_api_init', function () {
