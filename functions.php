@@ -621,11 +621,15 @@ add_action('rest_api_init', function () {
             $mods = get_option($option_name, []);
             $log  = [];
 
-            // Fix 2: copyright_text inside footer_placements.items.copyright.values
-            if (isset($mods['footer_placements']['items']['copyright']['values']['copyright_text'])) {
-                $mods['footer_placements']['items']['copyright']['values']['copyright_text']
-                    = '© ' . date('Y') . ' Kampanya.website — Tüm hakları saklıdır.';
+            // Fix 2: copyright lives at footer_placements.copyright.values.copyright_text
+            $new_copyright = '© ' . date('Y') . ' Kampanya.website — Tüm hakları saklıdır.';
+            if (isset($mods['footer_placements']['copyright']['values']['copyright_text'])) {
+                $mods['footer_placements']['copyright']['values']['copyright_text'] = $new_copyright;
                 $log[] = 'copyright_text fixed';
+            } else {
+                // Force-create the path
+                $mods['footer_placements']['copyright']['values']['copyright_text'] = $new_copyright;
+                $log[] = 'copyright_text created';
             }
 
             // Fix 3: Disable all footer socials (no real URLs configured)
@@ -654,7 +658,7 @@ add_action('rest_api_init', function () {
             update_option($option_name, $mods);
 
             $verify = get_option($option_name);
-            $cp = $verify['footer_placements']['items']['copyright']['values']['copyright_text'] ?? 'NOT FOUND';
+            $cp = $verify['footer_placements']['copyright']['values']['copyright_text'] ?? 'NOT FOUND';
             $soc_enabled = array_filter(
                 $verify['footer_placements']['items']['socials']['values']['footer_socials'] ?? [],
                 fn($s) => $s['enabled']
