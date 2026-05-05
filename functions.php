@@ -637,4 +637,29 @@ function kampanya_tr_strings_ctx($translation, $text, $context, $domain) {
     return kampanya_tr_strings($translation, $text, $domain);
 }
 
+/* ============================================================
+   BLOCKSY JS LOCALIZATION — Override English front-end strings
+   ============================================================ */
+add_action('wp_footer', 'kampanya_override_blocksy_js_strings', 5);
+function kampanya_override_blocksy_js_strings() {
+    echo '<script>
+if (typeof ct_localizations !== "undefined") {
+    ct_localizations.show_more_text              = "Daha fazla göster";
+    ct_localizations.more_text                   = "Daha fazla";
+    ct_localizations.search_live_results         = "Arama sonuçları";
+    ct_localizations.search_live_no_results      = "Sonuç bulunamadı";
+    ct_localizations.search_live_no_result       = "Sonuç bulunamadı";
+    ct_localizations.search_live_one_result      = "%s sonuç bulundu. Seçmek için Tab tuşuna basın.";
+    ct_localizations.search_live_many_results    = "%s sonuç bulundu. Seçmek için Tab tuşuna basın.";
+    ct_localizations.clipboard_copied            = "Kopyalandı!";
+    ct_localizations.clipboard_failed            = "Kopyalanamadı";
+    ct_localizations.expand_submenu              = "Alt menüyü aç";
+    ct_localizations.collapse_submenu            = "Alt menüyü kapat";
+    if (ct_localizations.search_live_stock_status_texts) {
+        ct_localizations.search_live_stock_status_texts.instock    = "Stokta var";
+        ct_localizations.search_live_stock_status_texts.outofstock = "Stokta yok";
+    }
+}
+</script>' . "\n";
+}
 
