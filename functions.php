@@ -569,66 +569,120 @@ function kampanya_tr_strings($translation, $text, $domain) {
     static $map = null;
     if ($map === null) {
         $map = [
-            'Search'                    => 'Ara',
-            'Search for...'             => 'Ara...',
-            'Search...'                 => 'Ara...',
-            'No results'                => 'Sonuç bulunamadı',
-            'No results found'          => 'Sonuç bulunamadı',
-            'Search Results'            => 'Arama Sonuçları',
-            'Categories'                => 'Kategoriler',
-            'Tags'                      => 'Etiketler',
-            'Archives'                  => 'Arşiv',
-            'Recent Posts'              => 'Son Yazılar',
-            'Recent Comments'           => 'Son Yorumlar',
-            'Read more'                 => 'Devamını oku',
-            'Read More'                 => 'Devamını oku',
-            'Leave a comment'           => 'Yorum yap',
-            'Leave a Reply'             => 'Yorum Yap',
-            'Comments are closed.'      => 'Yorumlar kapatılmıştır.',
-            'Post Comment'              => 'Yorumu Gönder',
-            'Submit'                    => 'Gönder',
-            'Name'                      => 'Ad',
-            'Email'                     => 'E-posta',
-            'Website'                   => 'Website',
-            'Comment'                   => 'Yorum',
-            'Your comment'              => 'Yorumunuz',
-            'Your name'                 => 'Adınız',
-            'Your email'                => 'E-posta adresiniz',
-            'Older posts'               => 'Daha eski yazılar',
-            'Newer posts'               => 'Daha yeni yazılar',
-            'Previous'                  => 'Önceki',
-            'Next'                      => 'Sonraki',
-            'Page %s of %s'             => '%s / %s sayfası',
-            'Nothing found'             => 'Sonuç bulunamadı',
-            'It seems we can\'t find what you\'re looking for.' => 'Aradığınız içerik bulunamadı.',
-            'Posted on'                 => 'Yayın tarihi',
-            'Posted in'                 => 'Kategori',
-            'by'                        => 'Yazar',
-            'Tagged'                    => 'Etiket',
-            'Published'                 => 'Yayınlandı',
-            'Cart'                      => 'Sepet',
-            'Checkout'                  => 'Ödeme',
-            'My account'                => 'Hesabım',
-            'My Account'                => 'Hesabım',
-            'Shop'                      => 'Mağaza',
-            'Add to cart'               => 'Sepete ekle',
-            'Product'                   => 'Ürün',
-            'Price'                     => 'Fiyat',
-            'Quantity'                  => 'Adet',
-            'Total'                     => 'Toplam',
-            'Continue shopping'         => 'Alışverişe devam et',
-            'Proceed to checkout'       => 'Ödemeye geç',
-            'Apply coupon'              => 'Kuponu uygula',
-            'Coupon code'               => 'Kupon kodu',
-            'Update cart'               => 'Sepeti güncelle',
-            'Your cart is currently empty.' => 'Sepetiniz şu an boş.',
-            'Search for...'             => 'Ara...',
-            'Popular'                   => 'Popüler',
-            'Social Icons'              => 'Sosyal Medya',
-            'Socials'                   => 'Sosyal Medya',
-            'Subscribe'                 => 'Abone Ol',
-            'First Name'                => 'Ad',
-            'Last Name'                 => 'Soyad',
+            // ── Search & archive headings ──
+            'Search'                                    => 'Ara',
+            'Search for...'                             => 'Ara...',
+            'Search...'                                 => 'Ara...',
+            'No results'                                => 'Sonuç bulunamadı',
+            'No results found'                          => 'Sonuç bulunamadı',
+            'Search Results'                            => 'Arama Sonuçları',
+            'Search Results for: %s'                    => '"%s" için arama sonuçları',
+            'Search Results for %s'                     => '"%s" için arama sonuçları',
+            'Nothing Found'                             => 'Sonuç Bulunamadı',
+            'Nothing found'                             => 'Sonuç bulunamadı',
+            'Sorry, but nothing matched your search terms. Please try again with some different keywords.' => 'Üzgünüz, arama teriminizle eşleşen içerik bulunamadı. Lütfen farklı anahtar kelimelerle tekrar deneyin.',
+            'It seems we can\'t find what you\'re looking for. Perhaps searching can help.' => 'Aradığınız içerik bulunamadı. Belki arama yaparak bulabilirsiniz.',
+            'It seems we can\'t find what you\'re looking for.'  => 'Aradığınız içerik bulunamadı.',
+            'Perhaps searching can help.'               => 'Belki arama yaparak bulabilirsiniz.',
+            // ── 404 page ──
+            'Oops! That page can\'t be found.'          => 'Ups! Sayfa bulunamadı.',
+            'It looks like nothing was found at this location. Maybe try to search for something else?' => 'Bu sayfada hiçbir şey bulunamadı. Başka bir şey aramayı deneyin.',
+            'It looks like nothing was found at this location.' => 'Bu sayfada hiçbir şey bulunamadı.',
+            'Maybe try to search for something else?'   => 'Başka bir şey aramayı deneyin.',
+            'Go back'                                   => 'Geri dön',
+            'Go to homepage'                            => 'Ana sayfaya git',
+            'Return to homepage'                        => 'Ana sayfaya dön',
+            // ── Trending / archive ──
+            'Trending now'                              => 'Şu An Trend',
+            'Trending'                                  => 'Trend',
+            'Popular posts'                             => 'Popüler Yazılar',
+            // ── Categories / tags ──
+            'Categories'                                => 'Kategoriler',
+            'Tags'                                      => 'Etiketler',
+            'Archives'                                  => 'Arşiv',
+            'Category Archives: %s'                     => '%s Kategorisi',
+            'Tag Archives: %s'                          => '%s Etiketi',
+            'Author Archives: %s'                       => '%s Yazarı',
+            'Monthly Archives: %s'                      => '%s Arşivi',
+            'Yearly Archives: %s'                       => '%s Arşivi',
+            // ── Post meta ──
+            'Recent Posts'                              => 'Son Yazılar',
+            'Recent Comments'                           => 'Son Yorumlar',
+            'Read more'                                 => 'Devamını oku',
+            'Read More'                                 => 'Devamını oku',
+            'Continue reading'                          => 'Devamını oku',
+            'Continue reading %s'                       => '%s yazısının devamını oku',
+            'Posted on'                                 => 'Yayın tarihi',
+            'Posted in'                                 => 'Kategori',
+            'by'                                        => 'Yazar',
+            'Tagged'                                    => 'Etiket',
+            'Published'                                 => 'Yayınlandı',
+            'Updated'                                   => 'Güncellendi',
+            'Written by'                                => 'Yazan',
+            'Author'                                    => 'Yazar',
+            // ── Comments ──
+            'Leave a comment'                           => 'Yorum yap',
+            'Leave a Reply'                             => 'Yorum Yap',
+            'Comments are closed.'                      => 'Yorumlar kapatılmıştır.',
+            'Post Comment'                              => 'Yorumu Gönder',
+            'Comment'                                   => 'Yorum',
+            'Your comment'                              => 'Yorumunuz',
+            'Your name'                                 => 'Adınız',
+            'Your email'                                => 'E-posta adresiniz',
+            'Name'                                      => 'Ad',
+            'Email'                                     => 'E-posta',
+            'Website'                                   => 'Website',
+            '%s comment'                                => '%s yorum',
+            '%s comments'                               => '%s yorum',
+            'One comment'                               => '1 yorum',
+            'No comments'                               => 'Yorum yok',
+            // ── Pagination ──
+            'Older posts'                               => 'Daha eski yazılar',
+            'Newer posts'                               => 'Daha yeni yazılar',
+            'Previous'                                  => 'Önceki',
+            'Next'                                      => 'Sonraki',
+            'Page %s of %s'                             => '%s / %s sayfası',
+            'Older Entries'                             => 'Eski Yazılar',
+            'Newer Entries'                             => 'Yeni Yazılar',
+            // ── Forms / buttons ──
+            'Submit'                                    => 'Gönder',
+            'Subscribe'                                 => 'Abone Ol',
+            'First Name'                                => 'Ad',
+            'Last Name'                                 => 'Soyad',
+            // ── WooCommerce ──
+            'Cart'                                      => 'Sepet',
+            'Checkout'                                  => 'Ödeme',
+            'My account'                                => 'Hesabım',
+            'My Account'                                => 'Hesabım',
+            'Shop'                                      => 'Mağaza',
+            'Add to cart'                               => 'Sepete ekle',
+            'Product'                                   => 'Ürün',
+            'Price'                                     => 'Fiyat',
+            'Quantity'                                  => 'Adet',
+            'Total'                                     => 'Toplam',
+            'Continue shopping'                         => 'Alışverişe devam et',
+            'Proceed to checkout'                       => 'Ödemeye geç',
+            'Apply coupon'                              => 'Kuponu uygula',
+            'Coupon code'                               => 'Kupon kodu',
+            'Update cart'                               => 'Sepeti güncelle',
+            'Your cart is currently empty.'             => 'Sepetiniz şu an boş.',
+            // ── Misc Blocksy UI ──
+            'Popular'                                   => 'Popüler',
+            'Social Icons'                              => 'Sosyal Medya',
+            'Socials'                                   => 'Sosyal Medya',
+            'Skip to content'                           => 'İçeriğe geç',
+            'Back to top'                               => 'Yukarı çık',
+            'Load more'                                 => 'Daha fazla yükle',
+            'Show more'                                 => 'Daha fazla göster',
+            'Share'                                     => 'Paylaş',
+            'Share on Facebook'                         => 'Facebook\'ta paylaş',
+            'Share on Twitter'                          => 'Twitter\'da paylaş',
+            'Copy link'                                 => 'Bağlantıyı kopyala',
+            'Link copied'                               => 'Bağlantı kopyalandı',
+            'Table of Contents'                         => 'İçindekiler',
+            'By'                                        => 'Yazar:',
+            'Min read'                                  => 'dk okuma',
+            'min read'                                  => 'dk okuma',
         ];
     }
     return isset($map[$text]) ? $map[$text] : $translation;
@@ -662,4 +716,31 @@ if (typeof ct_localizations !== "undefined") {
 }
 </script>' . "\n";
 }
+
+/* ============================================================
+   SEARCH PAGE TITLE — translate archive heading
+   ============================================================ */
+add_filter('get_the_archive_title', function($title) {
+    if (is_search()) {
+        $q = get_search_query();
+        return $q
+            ? sprintf('"<span>%s</span>" için arama sonuçları', esc_html($q))
+            : 'Arama Sonuçları';
+    }
+    return $title;
+});
+
+/* ============================================================
+   404 PAGE — translate Blocksy's hardcoded English strings
+   ============================================================ */
+add_filter('the_content', function($content) {
+    if (is_404()) {
+        $content = str_replace(
+            ["Oops! That page can't be found.", "It looks like nothing was found at this location.", "Maybe try to search for something else?"],
+            ["Ups! Bu sayfa bulunamadı.", "Bu konumda hiçbir şey bulunamadı.", "Başka bir şey aramayı deneyin."],
+            $content
+        );
+    }
+    return $content;
+});
 
