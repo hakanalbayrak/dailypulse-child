@@ -561,6 +561,37 @@ function kampanya_rest_unsubscribe(WP_REST_Request $request) {
 }
 
 /* ============================================================
+   TEMP — Form read/update + Widget read via DB
+   ============================================================ */
+add_action('rest_api_init', function () {
+    // Read raw widget_block instances
+    register_rest_route('kampanya/v1', '/widget-blocks', [
+        'methods'  => 'GET',
+        'callback' => function() {
+            $raw = get_option('widget_block', []);
+            return rest_ensure_response($raw);
+        },
+        'permission_callback' => function() { return current_user_can('manage_options'); },
+    ]);
+    // Update a specific widget_block instance
+    register_rest_route('kampanya/v1', '/widget-blocks/(?P<num>\d+)', [
+        'methods'  => 'POST',
+        'callback' => function($req) {
+            $num  = (int)$req['num'];
+            $body = $req->get_json_params();
+            $raw  = get_option('widget_block', []);
+            if (isset($raw[$num])) {
+                $raw[$num]['content'] = $body['content'];
+                update_option('widget_block', $raw);
+                return rest_ensure_response(['updated' => $num, 'content' => $raw[$num]['content']]);
+            }
+            return new WP_Error('not_found', 'Instance not found', ['status' => 404]);
+        },
+        'permission_callback' => function() { return current_user_can('manage_options'); },
+    ]);
+});
+
+/* ============================================================
    TEMP — Form read/update via DB
    ============================================================ */
 add_action('rest_api_init', function () {
