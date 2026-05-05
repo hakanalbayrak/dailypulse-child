@@ -1,6 +1,6 @@
 <?php
 /**
- * The Daily Pulse — Blocksy Child Theme Functions
+ * Kampanya.website — Blocksy Child Theme Functions
  */
 
 if (!defined('ABSPATH')) exit;
@@ -596,4 +596,65 @@ function kampanya_rest_unsubscribe(WP_REST_Request $request) {
         'message' => 'Aboneliğiniz başarıyla iptal edildi. Artık e-posta almayacaksınız.',
     ]);
 }
+
+/* ============================================================
+   TEMP — Fix copyright text + remove placeholder socials in DB
+   ============================================================ */
+add_action('rest_api_init', function () {
+    register_rest_route('kampanya/v1', '/fix-ses', [
+        'methods'             => 'POST',
+        'callback'            => function() {
+            $option_name = 'theme_mods_' . get_option('stylesheet');
+            $mods = get_option($option_name, []);
+            $log  = [];
+
+            // --- Fix copyright in footer_placements ---
+            if (!empty($mods['footer_placements'])) {
+                $fp_json = json_encode($mods['footer_placements'], JSON_UNESCAPED_UNICODE);
+                // Replace any copyright_text value referencing Daily Pulse / thedailypulse
+                $fp_json = preg_replace(
+                    '/"copyright_text":"[^"]*(?:Daily Pulse|thedailypulse)[^"]*"/',
+                    '"copyright_text":"© 2026 Kampanya.website — Tüm hakları saklıdır."',
+                    $fp_json
+                );
+                $mods['footer_placements'] = json_decode($fp_json, true);
+                $log[] = 'footer_placements patched';
+            }
+
+            // --- Remove socials from header_placements offcanvas items ---
+            if (!empty($mods['header_placements']['sections'])) {
+                foreach ($mods['header_placements']['sections'] as &$section) {
+                    if (!empty($section['items'])) {
+                        $section['items'] = array_values(array_filter(
+                            $section['items'],
+                            fn($item) => ($item['id'] ?? '') !== 'socials'
+                        ));
+                    }
+                }
+                unset($section);
+                $log[] = 'socials removed from header_placements';
+            }
+
+            // Also scrub any offcanvas array in blocksy_header_settings
+            if (!empty($mods['blocksy_header_settings'])) {
+                $bhs = json_encode($mods['blocksy_header_settings'], JSON_UNESCAPED_UNICODE);
+                $bhs = preg_replace('/"socials"[^}]*}/', '', $bhs);
+                $decoded = json_decode($bhs, true);
+                if ($decoded) { $mods['blocksy_header_settings'] = $decoded; $log[] = 'blocksy_header_settings socials cleared'; }
+            }
+
+            update_option($option_name, $mods);
+
+            // Verify
+            $verify = json_encode(get_option($option_name), JSON_UNESCAPED_UNICODE);
+            return rest_ensure_response([
+                'log'             => $log,
+                'dailypulse_gone' => strpos($verify, 'Daily Pulse') === false && strpos($verify, 'thedailypulse') === false,
+                'socials_gone'    => strpos($verify, '"id":"socials"') === false,
+                'copyright_has'   => strpos($verify, 'Kampanya.website') !== false,
+            ]);
+        },
+        'permission_callback' => function() { return current_user_can('manage_options'); },
+    ]);
+});
 

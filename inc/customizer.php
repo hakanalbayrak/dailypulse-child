@@ -4,7 +4,7 @@
  */
 function dailypulse_customizer($wp_customize) {
     $wp_customize->add_section('dailypulse_settings', array(
-        'title'    => 'Daily Pulse Ayarları',
+        'title'    => 'Kampanya Ayarları',
         'priority' => 30,
     ));
 
