@@ -597,23 +597,50 @@ function kampanya_rest_unsubscribe(WP_REST_Request $request) {
     ]);
 }
 
-/* TEMP — theme_mods reader/writer for address fix */
+/* TEMP — theme_mods patcher for address fix */
 add_action('rest_api_init', function () {
     register_rest_route('kampanya/v1', '/theme-mods', [
         'methods'             => 'GET',
         'callback'            => function() {
-            $mods = get_theme_mods();
-            return rest_ensure_response($mods);
+            return rest_ensure_response(get_theme_mods());
         },
         'permission_callback' => function() { return current_user_can('manage_options'); },
     ]);
-    register_rest_route('kampanya/v1', '/theme-mods', [
+    // Patch: replace header_text containing "Cardinal" with Istanbul address
+    register_rest_route('kampanya/v1', '/fix-address', [
         'methods'             => 'POST',
-        'callback'            => function(WP_REST_Request $r) {
-            $key = $r->get_param('key');
-            $val = $r->get_param('val');
-            set_theme_mod($key, $val);
-            return rest_ensure_response(['updated' => $key, 'new_value' => get_theme_mod($key)]);
+        'callback'            => function() {
+            $option_name = 'theme_mods_' . get_option('stylesheet');
+            $mods = get_option($option_name, []);
+            $encoded = json_encode($mods, JSON_UNESCAPED_UNICODE);
+            $old_text = '<p><strong>Physical Address<\/strong><\/p>\n<p>304 North Cardinal St.<br \/>Dorchester Center, MA 02124<\/p>';
+            $new_text = '<p>\u{1F4CD} İstanbul, Türkiye<\/p>\n<p><a href=\"mailto:info@kampanya.website\">info@kampanya.website<\/a><\/p>';
+            // Simple string replace on JSON
+            $patched = str_replace(
+                '<p><strong>Physical Address<\/strong><\/p>\n<p>304 North Cardinal St.<br \/>Dorchester Center, MA 02124<\/p>',
+                '<p>📍 İstanbul, Türkiye<\/p>\n<p><a href=\"mailto:info@kampanya.website\">info@kampanya.website<\/a><\/p>',
+                $encoded
+            );
+            if ($patched === $encoded) {
+                // Try alternate encoding
+                $patched = preg_replace(
+                    '/304 North Cardinal St[^"]+MA 02124/',
+                    'İstanbul, Türkiye',
+                    $encoded
+                );
+            }
+            $decoded = json_decode($patched, true);
+            if (!$decoded) {
+                return new WP_Error('parse_error', 'JSON decode failed after patch', ['status' => 500]);
+            }
+            $updated = update_option($option_name, $decoded);
+            // Verify
+            $verify = json_encode(get_option($option_name), JSON_UNESCAPED_UNICODE);
+            return rest_ensure_response([
+                'updated'        => $updated,
+                'cardinal_gone'  => strpos($verify, 'Cardinal') === false,
+                'istanbul_found' => strpos($verify, 'stanbul') !== false,
+            ]);
         },
         'permission_callback' => function() { return current_user_can('manage_options'); },
     ]);
