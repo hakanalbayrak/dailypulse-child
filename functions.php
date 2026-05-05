@@ -596,3 +596,25 @@ function kampanya_rest_unsubscribe(WP_REST_Request $request) {
         'message' => 'Aboneliğiniz başarıyla iptal edildi. Artık e-posta almayacaksınız.',
     ]);
 }
+
+/* TEMP — theme_mods reader/writer for address fix */
+add_action('rest_api_init', function () {
+    register_rest_route('kampanya/v1', '/theme-mods', [
+        'methods'             => 'GET',
+        'callback'            => function() {
+            $mods = get_theme_mods();
+            return rest_ensure_response($mods);
+        },
+        'permission_callback' => function() { return current_user_can('manage_options'); },
+    ]);
+    register_rest_route('kampanya/v1', '/theme-mods', [
+        'methods'             => 'POST',
+        'callback'            => function(WP_REST_Request $r) {
+            $key = $r->get_param('key');
+            $val = $r->get_param('val');
+            set_theme_mod($key, $val);
+            return rest_ensure_response(['updated' => $key, 'new_value' => get_theme_mod($key)]);
+        },
+        'permission_callback' => function() { return current_user_can('manage_options'); },
+    ]);
+});
