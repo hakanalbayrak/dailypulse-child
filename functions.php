@@ -601,6 +601,19 @@ function kampanya_rest_unsubscribe(WP_REST_Request $request) {
    TEMP — Fix copyright text + remove placeholder socials in DB
    ============================================================ */
 add_action('rest_api_init', function () {
+    register_rest_route('kampanya/v1', '/read-mods', [
+        'methods'             => 'GET',
+        'callback'            => function() {
+            $mods = get_option('theme_mods_' . get_option('stylesheet'), []);
+            // Return targeted sections only
+            return rest_ensure_response([
+                'footer_placements' => $mods['footer_placements'] ?? null,
+                'header_placements' => $mods['header_placements'] ?? null,
+                'blocksy_header'    => $mods['blocksy_header_settings'] ?? null,
+            ]);
+        },
+        'permission_callback' => function() { return current_user_can('manage_options'); },
+    ]);
     register_rest_route('kampanya/v1', '/fix-ses', [
         'methods'             => 'POST',
         'callback'            => function() {
