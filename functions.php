@@ -560,4 +560,33 @@ function kampanya_rest_unsubscribe(WP_REST_Request $request) {
     ]);
 }
 
+/* ============================================================
+   TEMP — Form read/update via DB
+   ============================================================ */
+add_action('rest_api_init', function () {
+    register_rest_route('kampanya/v1', '/forms-raw', [
+        'methods'  => 'GET',
+        'callback' => function() {
+            global $wpdb;
+            $rows = $wpdb->get_results("SELECT id, title, form_fields FROM {$wpdb->prefix}fluentform_forms ORDER BY id ASC");
+            return rest_ensure_response($rows);
+        },
+        'permission_callback' => function() { return current_user_can('manage_options'); },
+    ]);
+    register_rest_route('kampanya/v1', '/forms-raw/(?P<id>\d+)', [
+        'methods'  => 'POST',
+        'callback' => function($req) {
+            global $wpdb;
+            $id = (int)$req['id'];
+            $body = $req->get_json_params();
+            $updated = $wpdb->update(
+                $wpdb->prefix . 'fluentform_forms',
+                ['form_fields' => $body['form_fields'], 'title' => $body['title'] ?? null],
+                ['id' => $id]
+            );
+            return rest_ensure_response(['updated' => $updated]);
+        },
+        'permission_callback' => function() { return current_user_can('manage_options'); },
+    ]);
+});
 
