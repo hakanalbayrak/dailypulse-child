@@ -462,7 +462,7 @@ header .ct-button:hover,
    ============================================= */
 
 .wp-block-button__link,
-button[type="submit"],
+button[type="submit"]:not(.ct-toggle-close):not([data-button]):not(.wp-element-button),
 input[type="submit"] {
   background: var(--k-ink) !important;
   color: var(--k-paper) !important;
@@ -479,12 +479,106 @@ input[type="submit"] {
   text-decoration: none !important;
 }
 .wp-block-button__link:hover,
-button[type="submit"]:hover,
+button[type="submit"]:not(.ct-toggle-close):not([data-button]):not(.wp-element-button):hover,
 input[type="submit"]:hover {
   background: var(--k-ink) !important;
   color: var(--k-paper) !important;
   transform: translateY(-2px) !important;
   box-shadow: 0 5px 0 -1px var(--k-yellow) !important;
+}
+
+/* =============================================
+   SEARCH — icon button, transparent bg
+   ============================================= */
+
+/* All search submit buttons — icon-only, no fill */
+.ct-search-form .wp-element-button,
+.ct-search-form button[type="submit"],
+.ct-search-box button[type="submit"] {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 6px 10px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transform: none !important;
+  box-shadow: none !important;
+  transition: opacity .15s ease !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: inherit !important;
+  color: var(--k-ink) !important;
+}
+.ct-search-form .wp-element-button:hover,
+.ct-search-form button[type="submit"]:hover,
+.ct-search-box button[type="submit"]:hover {
+  background: transparent !important;
+  transform: none !important;
+  box-shadow: none !important;
+  opacity: .65 !important;
+  color: var(--k-ink) !important;
+}
+
+/* SVG inside search submit — ink color, proper size */
+.ct-search-form .wp-element-button svg,
+.ct-search-box button[type="submit"] svg {
+  width: 16px !important;
+  height: 16px !important;
+  fill: currentColor !important;
+}
+
+/* Search modal is dark overlay — icon must be white */
+#search-modal .ct-search-form .wp-element-button,
+#search-modal .ct-search-form button[type="submit"] {
+  color: #fff !important;
+}
+#search-modal .ct-search-form .wp-element-button svg,
+#search-modal .ct-search-form button[type="submit"] svg {
+  fill: #fff !important;
+}
+
+/* Search modal close button — not a submit, leave alone */
+#search-modal .ct-toggle-close {
+  background: transparent !important;
+  color: #fff !important;
+  padding: 8px !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+#search-modal .ct-toggle-close:hover {
+  background: rgba(255,255,255,.1) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* ── Nav bar search toggle (injected via JS) ── */
+.k-nav-search-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 6px 8px;
+  cursor: pointer;
+  color: var(--k-ink);
+  border-radius: var(--k-radius);
+  transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+.k-nav-search-btn:hover {
+  color: var(--k-ink-3);
+  background: rgba(23,20,26,.06);
+}
+.k-nav-search-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  display: block;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 /* =============================================

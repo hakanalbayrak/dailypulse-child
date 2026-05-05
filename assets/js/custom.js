@@ -267,6 +267,78 @@
   }
 
   /* -------------------------------------------------- *
+   *  NAV BAR SEARCH — Inject magnifier into main nav
+   * -------------------------------------------------- */
+  function initNavSearch() {
+    // Blocksy already has a search modal (#search-modal) and a toggle trigger.
+    // We inject a clean icon button into the main nav row so users can open it
+    // from there. The modal already handles live results with no page redirect.
+    var mainNavWrap = document.querySelector('[data-row="middle"] [data-column="end"] [data-items="primary"]');
+    if (!mainNavWrap) return;
+
+    // Don't inject twice
+    if (mainNavWrap.querySelector('.k-nav-search-btn')) return;
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'k-nav-search-btn';
+    btn.setAttribute('aria-label', 'Ara');
+    btn.setAttribute('data-toggle-panel', '#search-modal');
+    btn.setAttribute('aria-controls', 'search-modal');
+    btn.setAttribute('aria-expanded', 'false');
+    btn.innerHTML = '<svg viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M14.8 13.7 12 11a6.8 6.8 0 1 0-1 1l2.8 2.8a.7.7 0 0 0 1-.1ZM1.5 6.8a5.3 5.3 0 1 1 5.3 5.2 5.3 5.3 0 0 1-5.3-5.2Z"/></svg>';
+
+    mainNavWrap.appendChild(btn);
+
+    // Trigger Blocksy's toggle system (it uses ctEvents or plain click delegation)
+    btn.addEventListener('click', function () {
+      // Try Blocksy's built-in toggle panel open
+      var modal = document.getElementById('search-modal');
+      if (!modal) return;
+
+      // Blocksy marks panels with [inert] when closed; toggling uses ct-active class
+      var isOpen = modal.classList.contains('ct-active');
+
+      if (isOpen) {
+        modal.classList.remove('ct-active');
+        modal.setAttribute('inert', '');
+        btn.setAttribute('aria-expanded', 'false');
+        document.documentElement.classList.remove('ct-panel-open');
+      } else {
+        // Close any other open panels first
+        document.querySelectorAll('.ct-panel.ct-active').forEach(function (p) {
+          p.classList.remove('ct-active');
+          p.setAttribute('inert', '');
+        });
+        modal.classList.add('ct-active');
+        modal.removeAttribute('inert');
+        btn.setAttribute('aria-expanded', 'true');
+        document.documentElement.classList.add('ct-panel-open');
+
+        // Focus the search input
+        var searchInput = modal.querySelector('input[type="search"]');
+        if (searchInput) {
+          setTimeout(function () { searchInput.focus(); }, 80);
+        }
+      }
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        var modal = document.getElementById('search-modal');
+        if (modal && modal.classList.contains('ct-active')) {
+          modal.classList.remove('ct-active');
+          modal.setAttribute('inert', '');
+          btn.setAttribute('aria-expanded', 'false');
+          document.documentElement.classList.remove('ct-panel-open');
+          btn.focus();
+        }
+      }
+    });
+  }
+
+  /* -------------------------------------------------- *
    *  BAŞLAT
    * -------------------------------------------------- */
   document.addEventListener('DOMContentLoaded', function () {
@@ -275,6 +347,7 @@
     initUnsubscribeForm();
     initReveal();
     initSmoothScroll();
+    initNavSearch();
   });
 
 })();
