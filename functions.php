@@ -621,20 +621,23 @@ add_action('rest_api_init', function () {
             $mods = get_option($option_name, []);
             $log  = [];
 
-            // --- Fix copyright in footer_placements ---
-            if (!empty($mods['footer_placements'])) {
-                $fp_json = json_encode($mods['footer_placements'], JSON_UNESCAPED_UNICODE);
-                // Replace any copyright_text value referencing Daily Pulse / thedailypulse
-                $fp_json = preg_replace(
-                    '/"copyright_text":"[^"]*(?:Daily Pulse|thedailypulse)[^"]*"/',
-                    '"copyright_text":"© 2026 Kampanya.website — Tüm hakları saklıdır."',
-                    $fp_json
-                );
-                $mods['footer_placements'] = json_decode($fp_json, true);
-                $log[] = 'footer_placements patched';
+            // Fix 2: copyright_text inside footer_placements.items.copyright.values
+            if (isset($mods['footer_placements']['items']['copyright']['values']['copyright_text'])) {
+                $mods['footer_placements']['items']['copyright']['values']['copyright_text']
+                    = '© ' . date('Y') . ' Kampanya.website — Tüm hakları saklıdır.';
+                $log[] = 'copyright_text fixed';
             }
 
-            // --- Remove socials from header_placements offcanvas items ---
+            // Fix 3: Disable all footer socials (no real URLs configured)
+            if (isset($mods['footer_placements']['items']['socials']['values']['footer_socials'])) {
+                foreach ($mods['footer_placements']['items']['socials']['values']['footer_socials'] as &$soc) {
+                    $soc['enabled'] = false;
+                }
+                unset($soc);
+                $log[] = 'footer socials disabled';
+            }
+
+            // Fix 3b: Remove socials from header_placements sections items arrays
             if (!empty($mods['header_placements']['sections'])) {
                 foreach ($mods['header_placements']['sections'] as &$section) {
                     if (!empty($section['items'])) {
@@ -645,26 +648,21 @@ add_action('rest_api_init', function () {
                     }
                 }
                 unset($section);
-                $log[] = 'socials removed from header_placements';
-            }
-
-            // Also scrub any offcanvas array in blocksy_header_settings
-            if (!empty($mods['blocksy_header_settings'])) {
-                $bhs = json_encode($mods['blocksy_header_settings'], JSON_UNESCAPED_UNICODE);
-                $bhs = preg_replace('/"socials"[^}]*}/', '', $bhs);
-                $decoded = json_decode($bhs, true);
-                if ($decoded) { $mods['blocksy_header_settings'] = $decoded; $log[] = 'blocksy_header_settings socials cleared'; }
+                $log[] = 'socials removed from header sections';
             }
 
             update_option($option_name, $mods);
 
-            // Verify
-            $verify = json_encode(get_option($option_name), JSON_UNESCAPED_UNICODE);
+            $verify = get_option($option_name);
+            $cp = $verify['footer_placements']['items']['copyright']['values']['copyright_text'] ?? 'NOT FOUND';
+            $soc_enabled = array_filter(
+                $verify['footer_placements']['items']['socials']['values']['footer_socials'] ?? [],
+                fn($s) => $s['enabled']
+            );
             return rest_ensure_response([
-                'log'             => $log,
-                'dailypulse_gone' => strpos($verify, 'Daily Pulse') === false && strpos($verify, 'thedailypulse') === false,
-                'socials_gone'    => strpos($verify, '"id":"socials"') === false,
-                'copyright_has'   => strpos($verify, 'Kampanya.website') !== false,
+                'log'            => $log,
+                'copyright_text' => $cp,
+                'socials_enabled_count' => count($soc_enabled),
             ]);
         },
         'permission_callback' => function() { return current_user_can('manage_options'); },
