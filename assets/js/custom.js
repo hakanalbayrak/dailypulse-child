@@ -273,41 +273,47 @@
     var mainNavWrap = document.querySelector('[data-row="middle"] [data-column="end"] [data-items="primary"]');
     if (!mainNavWrap || mainNavWrap.querySelector('.k-nav-search-btn')) return;
 
-    // Clone Blocksy's own search toggle so its event system picks it up natively.
-    // The original is in the top utility row; we clone it, strip utility-specific
-    // classes, and restyle it as our clean magnifier icon.
-    var original = document.querySelector('.ct-header-search.ct-toggle[data-toggle-panel="#search-modal"]');
-
-    var btn;
-    if (original) {
-      btn = original.cloneNode(true);
-      // Strip classes that duplicate/conflict; keep ct-toggle so Blocksy handles clicks
-      btn.className = 'k-nav-search-btn ct-toggle';
-      btn.removeAttribute('data-label');
-      btn.removeAttribute('data-id');
-      // Replace inner content with a clean SVG only
-      btn.innerHTML = '<svg viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="18" height="18"><path d="M14.8 13.7 12 11a6.8 6.8 0 1 0-1 1l2.8 2.8a.7.7 0 0 0 1-.1ZM1.5 6.8a5.3 5.3 0 1 1 5.3 5.2 5.3 5.3 0 0 1-5.3-5.2Z"/></svg>';
-    } else {
-      // Fallback: build manually with Blocksy's required attributes
-      btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'k-nav-search-btn ct-toggle';
-      btn.setAttribute('data-toggle-panel', '#search-modal');
-      btn.setAttribute('aria-controls', 'search-modal');
-      btn.setAttribute('aria-label', 'Ara');
-      btn.innerHTML = '<svg viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="18" height="18"><path d="M14.8 13.7 12 11a6.8 6.8 0 1 0-1 1l2.8 2.8a.7.7 0 0 0 1-.1ZM1.5 6.8a5.3 5.3 0 1 1 5.3 5.2 5.3 5.3 0 0 1-5.3-5.2Z"/></svg>';
-    }
+    // Build a plain button — no Blocksy classes.
+    // On click we programmatically click Blocksy's OWN toggle that was bound
+    // at init time, so its event handlers fire exactly as if the user clicked it.
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'k-nav-search-btn';
+    btn.setAttribute('aria-label', 'Ara');
+    btn.innerHTML = '<svg viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="18" height="18"><path d="M14.8 13.7 12 11a6.8 6.8 0 1 0-1 1l2.8 2.8a.7.7 0 0 0 1-.1ZM1.5 6.8a5.3 5.3 0 1 1 5.3 5.2 5.3 5.3 0 0 1-5.3-5.2Z"/></svg>';
 
     mainNavWrap.appendChild(btn);
 
-    // After Blocksy opens the modal, focus the input
-    btn.addEventListener('click', function () {
-      var modal = document.getElementById('search-modal');
-      if (!modal) return;
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      // Delegate to Blocksy's already-bound search toggle in the top row
+      var orig = document.querySelector('.ct-header-search[data-toggle-panel="#search-modal"]');
+      if (orig) {
+        orig.click();
+      } else {
+        // Fallback: manually toggle modal classes if original not found
+        var modal = document.getElementById('search-modal');
+        if (!modal) return;
+        var isOpen = !modal.hasAttribute('inert');
+        if (isOpen) {
+          modal.setAttribute('inert', '');
+          modal.classList.remove('ct-active');
+          document.documentElement.classList.remove('ct-panel-open');
+        } else {
+          document.querySelectorAll('.ct-panel:not([inert])').forEach(function(p) {
+            p.setAttribute('inert', ''); p.classList.remove('ct-active');
+          });
+          modal.removeAttribute('inert');
+          modal.classList.add('ct-active');
+          document.documentElement.classList.add('ct-panel-open');
+        }
+      }
+      // Focus the search input after modal opens
       setTimeout(function () {
-        var inp = modal.querySelector('input[type="search"]');
+        var modal = document.getElementById('search-modal');
+        var inp = modal && modal.querySelector('input[type="search"]');
         if (inp && !modal.hasAttribute('inert')) inp.focus();
-      }, 120);
+      }, 150);
     });
   }
 
