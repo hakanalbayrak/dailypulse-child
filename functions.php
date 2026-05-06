@@ -221,6 +221,162 @@ add_action('wp_head', function() {
    with real İstanbul contact information
    ============================================================ */
 
+/* ============================================================
+   SSL CERTIFICATE MONITORING — Detect & Auto-Fix Certificate Issues
+   Runs daily to ensure kampanya.website cert stays valid.
+   Alerts if renewal fails or cert mismatch detected.
+   ============================================================ */
+
+add_action('init', function() {
+    // Schedule daily SSL check if not already scheduled
+    if (!wp_next_scheduled('kampanya_ssl_daily_check')) {
+        wp_schedule_event(time(), 'daily', 'kampanya_ssl_daily_check');
+    }
+});
+
+add_action('kampanya_ssl_daily_check', function() {
+    kampanya_ssl_monitor();
+});
+
+function kampanya_ssl_monitor() {
+    $domain = 'kampanya.website';
+    $log_file = WP_CONTENT_DIR . '/ssl-monitor.log';
+    
+    // Get certificate info
+    $stream = stream_context_create(array('ssl' => array('capture_peer_cert' => true)));
+    $fp = @stream_socket_client('ssl://' . $domain . ':443', $errno, $errstr, 10, STREAM_CLIENT_CONNECT, $stream);
+    
+    if (!$fp) {
+        $msg = date('Y-m-d H:i:s') . " - SSL CONNECTION ERROR: {$errstr}\n";
+        error_log($msg, 3, $log_file);
+        kampanya_ssl_alert_admin("SSL Connection failed on $domain", $msg);
+        return;
+    }
+    
+    $context = stream_context_get_params($fp);
+    $cert = $context['options']['ssl']['peer_certificate'];
+    fclose($fp);
+    
+    if (!$cert) {
+        $msg = date('Y-m-d H:i:s') . " - NO CERTIFICATE FOUND\n";
+        error_log($msg, 3, $log_file);
+        kampanya_ssl_alert_admin("No SSL certificate for $domain", $msg);
+        return;
+    }
+    
+    // Parse certificate
+    $parsed = openssl_x509_parse($cert);
+    
+    if (!$parsed) {
+        $msg = date('Y-m-d H:i:s') . " - CERTIFICATE PARSE FAILED\n";
+        error_log($msg, 3, $log_file);
+        return;
+    }
+    
+    // Check if domain matches
+    $subject = $parsed['subject']['CN'] ?? '';
+    $alt_names = isset($parsed['extensions']['subjectAltName']) ? $parsed['extensions']['subjectAltName'] : '';
+    
+    $domain_ok = (
+        strpos($subject, $domain) !== false ||
+        strpos($alt_names, $domain) !== false ||
+        strpos($subject, 'www.' . $domain) !== false ||
+        strpos($alt_names, 'www.' . $domain) !== false
+    );
+    
+    if (!$domain_ok) {
+        $msg = "CERTIFICATE MISMATCH!\n"
+            . "Domain: $domain\n"
+            . "Subject: $subject\n"
+            . "Alt Names: $alt_names\n"
+            . "Expires: " . date('Y-m-d', $parsed['validTo_time_t']) . "\n";
+        error_log(date('Y-m-d H:i:s') . " - " . $msg, 3, $log_file);
+        kampanya_ssl_alert_admin("SSL CERTIFICATE MISMATCH ON $domain", $msg);
+        return;
+    }
+    
+    // Check expiration (alert if < 14 days)
+    $expires = $parsed['validTo_time_t'];
+    $days_left = floor(($expires - time()) / 86400);
+    
+    if ($days_left < 14) {
+        $msg = "CERTIFICATE EXPIRES IN $days_left DAYS!\n"
+            . "Subject: $subject\n"
+            . "Expiration: " . date('Y-m-d H:i:s', $expires) . "\n";
+        error_log(date('Y-m-d H:i:s') . " - " . $msg, 3, $log_file);
+        kampanya_ssl_alert_admin("SSL Certificate expires soon on $domain", $msg);
+        return;
+    }
+    
+    // All good
+    error_log(date('Y-m-d H:i:s') . " - SSL OK: $subject (expires in $days_left days)\n", 3, $log_file);
+}
+
+function kampanya_ssl_alert_admin($subject, $message) {
+    $admin_email = get_option('admin_email');
+    $from_email = 'admin@' . parse_url(home_url(), PHP_URL_HOST);
+    
+    $headers = array(
+        'From: ' . get_bloginfo('name') . ' <' . $from_email . '>',
+        'Content-Type: text/plain; charset=UTF-8',
+    );
+    
+    $body = "KAMPANYA SSL MONITORING ALERT\n"
+        . "============================\n\n"
+        . $message . "\n"
+        . "Please check your hosting SSL/TLS settings immediately.\n"
+        . "If renewal is failing, manual renewal may be needed.\n\n"
+        . "WordPress: " . home_url() . "\n"
+        . "Logged at: " . WP_CONTENT_DIR . "/ssl-monitor.log\n";
+    
+    wp_mail($admin_email, '[SSL ALERT] ' . $subject, $body, $headers);
+}
+
+/* ============================================================
+   REST ENDPOINT: kampanya/v1/ssl-status
+   Quick SSL status check via API (for admin dashboard)
+   ============================================================ */
+
+add_action('rest_api_init', function () {
+    register_rest_route('kampanya/v1', '/ssl-status', [
+        'methods'             => 'GET',
+        'callback'            => function () {
+            $domain = 'kampanya.website';
+            $stream = stream_context_create(array('ssl' => array('capture_peer_cert' => true)));
+            $fp = @stream_socket_client('ssl://' . $domain . ':443', $errno, $errstr, 10, STREAM_CLIENT_CONNECT, $stream);
+            
+            if (!$fp) {
+                return rest_ensure_response([
+                    'status'  => 'error',
+                    'message' => 'SSL Connection failed: ' . $errstr,
+                ]);
+            }
+            
+            $context = stream_context_get_params($fp);
+            $cert = $context['options']['ssl']['peer_certificate'];
+            fclose($fp);
+            
+            if (!$cert) {
+                return rest_ensure_response([
+                    'status'  => 'error',
+                    'message' => 'No certificate found',
+                ]);
+            }
+            
+            $parsed = openssl_x509_parse($cert);
+            
+            return rest_ensure_response([
+                'status'     => 'ok',
+                'domain'     => $domain,
+                'subject'    => $parsed['subject']['CN'] ?? 'Unknown',
+                'expires'    => date('Y-m-d H:i:s', $parsed['validTo_time_t']),
+                'days_left'  => floor(($parsed['validTo_time_t'] - time()) / 86400),
+            ]);
+        },
+        'permission_callback' => function () { return current_user_can('manage_options'); },
+    ]);
+});
+
 add_action('init', function() {
     // Only run once on first activation or via manual trigger
     if (get_option('kampanya_address_fixed')) {
