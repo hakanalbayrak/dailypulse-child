@@ -634,19 +634,23 @@ function kampanya_purge_cache() {
 }
 
 /* ============================================================
-   KAMPANYA REST API — Abone ol / Abonelikten çık
+   KAMPANYA REST API — Abone ol / Abonelikten çık (double opt-in)
    ============================================================ */
 
 add_action('rest_api_init', function () {
 
-    // Abone ol
     register_rest_route('kampanya/v1', '/subscribe', [
         'methods'             => 'POST',
         'callback'            => 'kampanya_rest_subscribe',
         'permission_callback' => '__return_true',
     ]);
 
-    // Abonelikten çık
+    register_rest_route('kampanya/v1', '/confirm-email', [
+        'methods'             => 'GET',
+        'callback'            => 'kampanya_rest_confirm_email',
+        'permission_callback' => '__return_true',
+    ]);
+
     register_rest_route('kampanya/v1', '/unsubscribe', [
         'methods'             => 'POST',
         'callback'            => 'kampanya_rest_unsubscribe',
@@ -666,23 +670,67 @@ function kampanya_rest_subscribe(WP_REST_Request $request) {
     }
 
     $contact_api = FluentCrmApi('contacts');
+    $existing    = $contact_api->getContact($email);
 
-    $data = [
-        'email'  => $email,
-        'status' => 'subscribed',
-        'lists'  => [3], // Genel Aboneler listesi
-    ];
-
-    $result = $contact_api->createOrUpdate($data);
-
-    if (is_wp_error($result)) {
-        return new WP_Error('subscribe_failed', 'Kayıt sırasında bir hata oluştu, lütfen tekrar deneyin.', ['status' => 500]);
+    if ($existing && $existing->status === 'subscribed') {
+        return rest_ensure_response([
+            'success' => true,
+            'message' => 'Bu e-posta adresi zaten bültenimize kayıtlı. 👍',
+        ]);
     }
+
+    // Add as pending until email is confirmed
+    $contact_api->createOrUpdate([
+        'email'  => $email,
+        'status' => 'pending',
+        'lists'  => [3],
+    ]);
+
+    // Generate token, store for 24h
+    $token = bin2hex(random_bytes(32));
+    set_transient('k_confirm_' . $token, $email, DAY_IN_SECONDS);
+
+    $confirm_url = home_url('/wp-json/kampanya/v1/confirm-email?token=' . $token);
+    kampanya_send_confirmation_email($email, $confirm_url);
 
     return rest_ensure_response([
         'success' => true,
-        'message' => 'Abone oldunuz! En güncel fırsatlar yakında e-postanızda. 🎉',
+        'message' => 'Teşekkürler! Gelen kutunuza bir onay e-postası gönderdik. Lütfen e-postayı onaylayın. 📬',
     ]);
+}
+
+function kampanya_rest_confirm_email(WP_REST_Request $request) {
+    $token = sanitize_text_field($request->get_param('token'));
+
+    if (!$token) {
+        wp_redirect(home_url('/?k_status=invalid'));
+        exit;
+    }
+
+    $email = get_transient('k_confirm_' . $token);
+
+    if (!$email) {
+        wp_redirect(home_url('/?k_status=expired'));
+        exit;
+    }
+
+    if (!function_exists('FluentCrmApi')) {
+        wp_redirect(home_url('/?k_status=error'));
+        exit;
+    }
+
+    FluentCrmApi('contacts')->createOrUpdate([
+        'email'  => $email,
+        'status' => 'subscribed',
+        'lists'  => [3],
+    ]);
+
+    delete_transient('k_confirm_' . $token);
+
+    kampanya_send_welcome_email($email);
+
+    wp_redirect(home_url('/?k_status=confirmed'));
+    exit;
 }
 
 function kampanya_rest_unsubscribe(WP_REST_Request $request) {
@@ -699,21 +747,105 @@ function kampanya_rest_unsubscribe(WP_REST_Request $request) {
     $contact_api = FluentCrmApi('contacts');
     $contact     = $contact_api->getContact($email);
 
-    if (!$contact) {
-        // Sessizce başarı dön — kullanıcıya "zaten abone değilsin" demek yerine
-        return rest_ensure_response([
-            'success' => true,
-            'message' => 'Aboneliğiniz iptal edildi.',
-        ]);
+    if ($contact && in_array($contact->status, ['subscribed', 'pending'])) {
+        $contact->status = 'unsubscribed';
+        $contact->save();
     }
 
-    $contact->status = 'unsubscribed';
-    $contact->save();
+    kampanya_send_unsubscribe_confirmation($email);
 
     return rest_ensure_response([
         'success' => true,
-        'message' => 'Aboneliğiniz başarıyla iptal edildi. Artık e-posta almayacaksınız.',
+        'message' => 'Aboneliğiniz iptal edildi. Bir onay e-postası gönderdik.',
     ]);
+}
+
+/* ---- Email helpers ---- */
+
+function kampanya_email_base($title, $content) {
+    return '<!DOCTYPE html>
+<html lang="tr">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>' . esc_html($title) . '</title></head>
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:Arial,Helvetica,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:40px 16px;">
+  <tr><td align="center">
+    <table width="100%" cellpadding="0" cellspacing="0" style="max-width:580px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);">
+      <tr><td style="background:#17141A;padding:28px 40px;">
+        <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;letter-spacing:-.3px;">Kampanya.Website</h1>
+        <p style="margin:4px 0 0;color:#aaa;font-size:13px;">Haftalık fırsatlar ve kampanyalar</p>
+      </td></tr>
+      ' . $content . '
+      <tr><td style="background:#f8f9fa;padding:20px 40px;border-top:1px solid #eee;">
+        <p style="margin:0;color:#aaa;font-size:12px;text-align:center;line-height:1.6;">
+          Kampanya.Website &nbsp;·&nbsp;
+          <a href="' . home_url('/abonelikten-cik') . '" style="color:#aaa;text-decoration:underline;">Abonelikten çık</a> &nbsp;·&nbsp;
+          <a href="' . home_url('/gizlilik-politikasi') . '" style="color:#aaa;text-decoration:underline;">Gizlilik Politikası</a>
+        </p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body></html>';
+}
+
+function kampanya_email_btn($url, $label, $bg = '#FF6B35') {
+    return '<table cellpadding="0" cellspacing="0" style="margin:0 auto 28px;">
+      <tr><td style="background:' . $bg . ';border-radius:8px;">
+        <a href="' . esc_url($url) . '" style="display:inline-block;padding:15px 40px;color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;letter-spacing:-.1px;">' . esc_html($label) . '</a>
+      </td></tr>
+    </table>';
+}
+
+function kampanya_send_confirmation_email($email, $confirm_url) {
+    $content = '
+      <tr><td style="padding:36px 40px 28px;">
+        <h2 style="margin:0 0 14px;font-size:20px;color:#17141A;font-weight:700;">E-posta adresinizi onaylayın</h2>
+        <p style="color:#555;font-size:15px;line-height:1.7;margin:0 0 24px;">Bültenimize abone olmak için aşağıdaki butona tıklayarak e-posta adresinizi onaylayın. Her hafta en iyi fırsat ve kampanyalar doğrudan gelen kutunuza gelecek.</p>
+        ' . kampanya_email_btn($confirm_url, 'Aboneliğimi Onayla') . '
+        <p style="color:#bbb;font-size:12px;line-height:1.6;margin:0;">Bu bağlantı 24 saat geçerlidir. Bu isteği siz yapmadıysanız bu e-postayı görmezden gelebilirsiniz.</p>
+      </td></tr>';
+
+    wp_mail(
+        $email,
+        'Aboneliğinizi onaylayın — Kampanya.Website',
+        kampanya_email_base('Aboneliğinizi Onaylayın', $content),
+        ['Content-Type: text/html; charset=UTF-8', 'From: Kampanya.Website <newsletter@kampanya.website>']
+    );
+}
+
+function kampanya_send_welcome_email($email) {
+    $content = '
+      <tr><td style="padding:36px 40px 28px;">
+        <h2 style="margin:0 0 14px;font-size:20px;color:#17141A;font-weight:700;">Aramıza hoş geldiniz! 🎉</h2>
+        <p style="color:#555;font-size:15px;line-height:1.7;margin:0 0 12px;">Aboneliğiniz onaylandı. Artık Kampanya.Website bülteninin bir parçasısınız.</p>
+        <p style="color:#555;font-size:15px;line-height:1.7;margin:0 0 24px;">Her hafta en güncel indirimler, fırsatlar ve kampanyalar doğrudan gelen kutunuza gelecek. Bir şey kaçırmayacaksınız!</p>
+        ' . kampanya_email_btn(home_url('/firsatlar'), 'Fırsatları Keşfet') . '
+      </td></tr>';
+
+    wp_mail(
+        $email,
+        'Hoş geldiniz! Kampanya bültenine katıldınız 🎉',
+        kampanya_email_base('Hoş Geldiniz', $content),
+        ['Content-Type: text/html; charset=UTF-8', 'From: Kampanya.Website <newsletter@kampanya.website>']
+    );
+}
+
+function kampanya_send_unsubscribe_confirmation($email) {
+    $content = '
+      <tr><td style="padding:36px 40px 28px;">
+        <h2 style="margin:0 0 14px;font-size:20px;color:#17141A;font-weight:700;">Aboneliğiniz İptal Edildi</h2>
+        <p style="color:#555;font-size:15px;line-height:1.7;margin:0 0 12px;"><strong>' . esc_html($email) . '</strong> adresi bülten listemizden çıkarıldı.</p>
+        <p style="color:#555;font-size:15px;line-height:1.7;margin:0 0 24px;">Artık Kampanya.Website bülteninden e-posta almayacaksınız. Fikrinizi değiştirirseniz istediğiniz zaman tekrar abone olabilirsiniz.</p>
+        ' . kampanya_email_btn(home_url(), 'Ana Sayfaya Dön', '#17141A') . '
+      </td></tr>';
+
+    wp_mail(
+        $email,
+        'Aboneliğiniz iptal edildi — Kampanya.Website',
+        kampanya_email_base('Abonelik İptal', $content),
+        ['Content-Type: text/html; charset=UTF-8', 'From: Kampanya.Website <newsletter@kampanya.website>']
+    );
 }
 
 /* ============================================================

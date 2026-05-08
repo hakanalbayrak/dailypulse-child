@@ -393,6 +393,43 @@
   }
 
   /* -------------------------------------------------- *
+   *  SUBSCRIPTION STATUS TOAST
+   *  Shown after email confirmation redirect (?k_status=...)
+   * -------------------------------------------------- */
+  function initStatusToast() {
+    var params = new URLSearchParams(window.location.search);
+    var status = params.get('k_status');
+    if (!status) return;
+
+    var messages = {
+      confirmed: { text: 'E-postanız onaylandı! Bültenimize hoş geldiniz. 🎉', type: 'success' },
+      expired:   { text: 'Onay bağlantısının süresi dolmuş. Lütfen tekrar abone olun.', type: 'error' },
+      invalid:   { text: 'Geçersiz onay bağlantısı.', type: 'error' },
+      error:     { text: 'Bir hata oluştu. Lütfen tekrar deneyin.', type: 'error' },
+    };
+
+    var msg = messages[status];
+    if (!msg) return;
+
+    // Remove param from URL without reload
+    var url = new URL(window.location.href);
+    url.searchParams.delete('k_status');
+    window.history.replaceState({}, '', url.toString());
+
+    // Build toast
+    var toast = document.createElement('div');
+    toast.className = 'k-toast k-toast--' + msg.type;
+    toast.textContent = msg.text;
+    document.body.appendChild(toast);
+
+    setTimeout(function () { toast.classList.add('k-toast--visible'); }, 50);
+    setTimeout(function () {
+      toast.classList.remove('k-toast--visible');
+      setTimeout(function () { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 400);
+    }, 5000);
+  }
+
+  /* -------------------------------------------------- *
    *  BAŞLAT
    * -------------------------------------------------- */
   document.addEventListener('DOMContentLoaded', function () {
@@ -403,6 +440,7 @@
     initSmoothScroll();
     initNavSearch();
     initPageTranslations();
+    initStatusToast();
   });
 
 })();

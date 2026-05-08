@@ -1798,3 +1798,45 @@ button.k-subscribe-btn:disabled,
 .ct-trending-block {
   display: none !important;
 }
+
+/* =============================================
+   STATUS TOAST — subscription confirmation
+   ============================================= */
+
+.k-toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  opacity: 0;
+  z-index: 99999;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-family: var(--k-font-ui, 'Barlow', sans-serif);
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity .3s ease, transform .3s ease;
+  box-shadow: 0 4px 24px rgba(0,0,0,.18);
+}
+.k-toast--visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.k-toast--success {
+  background: var(--k-ink);
+  color: var(--k-yellow);
+}
+.k-toast--error {
+  background: var(--k-signal);
+  color: #fff;
+}
+@media (max-width: 480px) {
+  .k-toast {
+    white-space: normal;
+    text-align: center;
+    width: calc(100% - 40px);
+    bottom: 20px;
+  }
+}
