@@ -634,6 +634,59 @@ function kampanya_purge_cache() {
 }
 
 /* ============================================================
+   TEMP — Deep SMTP diagnostic (remove after fix)
+   ============================================================ */
+add_action('rest_api_init', function () {
+    register_rest_route('kampanya/v1', '/smtp-diag', [
+        'methods'             => 'POST',
+        'callback'            => function (WP_REST_Request $req) {
+            $to     = sanitize_email($req->get_param('to') ?: 'hkn3958@gmail.com');
+            $log    = [];
+
+            // Check FluentSMTP plugin active
+            $log['fluentsmtp_active'] = function_exists('FluentMail\App\Application::getInstance') || class_exists('\FluentMail\App\Services\Mailer\Manager');
+            $log['plugins_active']    = array_keys(get_option('active_plugins', []));
+
+            // Check stored settings
+            $settings = get_option('fluentmail-settings', []);
+            $log['settings_connections'] = array_keys($settings['connections'] ?? []);
+            $log['settings_misc']        = $settings['misc'] ?? [];
+
+            // Capture phpmailer state via hook
+            $mailer_info = [];
+            add_action('phpmailer_init', function ($phpmailer) use (&$mailer_info) {
+                $mailer_info['mailer_class'] = get_class($phpmailer);
+                $mailer_info['host']         = $phpmailer->Host ?? '';
+                $mailer_info['port']         = $phpmailer->Port ?? '';
+                $mailer_info['username']     = $phpmailer->Username ?? '';
+                $mailer_info['smtp_auth']    = $phpmailer->SMTPAuth ?? '';
+                $mailer_info['smtp_secure']  = $phpmailer->SMTPSecure ?? '';
+            }, 99);
+
+            // Capture any wp_mail error
+            $mail_error = '';
+            add_action('wp_mail_failed', function ($err) use (&$mail_error) {
+                $mail_error = $err->get_error_message();
+            });
+
+            $result = wp_mail(
+                $to,
+                'SMTP Diag Test — ' . date('H:i:s'),
+                '<p>Diagnostic test email.</p>',
+                ['Content-Type: text/html; charset=UTF-8', 'From: Kampanya.Website <newsletter@kampanya.website>']
+            );
+
+            $log['wp_mail_result'] = $result;
+            $log['wp_mail_error']  = $mail_error;
+            $log['mailer_info']    = $mailer_info;
+
+            return rest_ensure_response($log);
+        },
+        'permission_callback' => function () { return current_user_can('manage_options'); },
+    ]);
+});
+
+/* ============================================================
    KAMPANYA REST API — Abone ol / Abonelikten çık (double opt-in)
    ============================================================ */
 
