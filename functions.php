@@ -815,6 +815,35 @@ function kampanya_rest_unsubscribe(WP_REST_Request $request) {
 
 /* ---- Email helpers ---- */
 
+function kampanya_smtp_send($to, $subject, $body) {
+    // Drive PHPMailer directly — bypasses wp_mail/FluentSMTP routing issues
+    require_once ABSPATH . WPINC . '/PHPMailer/PHPMailer.php';
+    require_once ABSPATH . WPINC . '/PHPMailer/SMTP.php';
+    require_once ABSPATH . WPINC . '/PHPMailer/Exception.php';
+
+    $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+    try {
+        $mail->isSMTP();
+        $mail->Host       = 'mail.kampanya.website';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'newsletter@kampanya.website';
+        $mail->Password   = get_option('k_smtp_pass', '');
+        $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = 587;
+        $mail->CharSet    = 'UTF-8';
+        $mail->setFrom('newsletter@kampanya.website', 'Kampanya.Website');
+        $mail->addAddress($to);
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body    = $body;
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log('kampanya_smtp_send error: ' . $e->getMessage());
+        return false;
+    }
+}
+
 function kampanya_email_base($title, $content) {
     return '<!DOCTYPE html>
 <html lang="tr">
@@ -859,12 +888,7 @@ function kampanya_send_confirmation_email($email, $confirm_url) {
         <p style="color:#bbb;font-size:12px;line-height:1.6;margin:0;">Bu bağlantı 24 saat geçerlidir. Bu isteği siz yapmadıysanız bu e-postayı görmezden gelebilirsiniz.</p>
       </td></tr>';
 
-    wp_mail(
-        $email,
-        'Aboneliğinizi onaylayın — Kampanya.Website',
-        kampanya_email_base('Aboneliğinizi Onaylayın', $content),
-        ['Content-Type: text/html; charset=UTF-8', 'From: Kampanya.Website <newsletter@kampanya.website>']
-    );
+    kampanya_smtp_send($email, 'Aboneliğinizi onaylayın — Kampanya.Website', kampanya_email_base('Aboneliğinizi Onaylayın', $content));
 }
 
 function kampanya_send_welcome_email($email) {
@@ -876,12 +900,7 @@ function kampanya_send_welcome_email($email) {
         ' . kampanya_email_btn(home_url('/firsatlar'), 'Fırsatları Keşfet') . '
       </td></tr>';
 
-    wp_mail(
-        $email,
-        'Hoş geldiniz! Kampanya bültenine katıldınız 🎉',
-        kampanya_email_base('Hoş Geldiniz', $content),
-        ['Content-Type: text/html; charset=UTF-8', 'From: Kampanya.Website <newsletter@kampanya.website>']
-    );
+    kampanya_smtp_send($email, 'Hoş geldiniz! Kampanya bültenine katıldınız 🎉', kampanya_email_base('Hoş Geldiniz', $content));
 }
 
 function kampanya_send_unsubscribe_confirmation($email) {
@@ -893,12 +912,7 @@ function kampanya_send_unsubscribe_confirmation($email) {
         ' . kampanya_email_btn(home_url(), 'Ana Sayfaya Dön', '#17141A') . '
       </td></tr>';
 
-    wp_mail(
-        $email,
-        'Aboneliğiniz iptal edildi — Kampanya.Website',
-        kampanya_email_base('Abonelik İptal', $content),
-        ['Content-Type: text/html; charset=UTF-8', 'From: Kampanya.Website <newsletter@kampanya.website>']
-    );
+    kampanya_smtp_send($email, 'Aboneliğiniz iptal edildi — Kampanya.Website', kampanya_email_base('Abonelik İptal', $content));
 }
 
 /* ============================================================
