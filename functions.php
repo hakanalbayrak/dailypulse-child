@@ -634,6 +634,45 @@ function kampanya_purge_cache() {
 }
 
 /* ============================================================
+   TEMP — FluentSMTP cPanel setup (remove after first run)
+   ============================================================ */
+add_action('rest_api_init', function () {
+    register_rest_route('kampanya/v1', '/setup-smtp', [
+        'methods'             => 'POST',
+        'callback'            => function () {
+            $conn_id  = 'cpanel_transactional';
+            $settings = [
+                'connections' => [
+                    $conn_id => [
+                        'provider'     => 'smtp',
+                        'title'        => 'cPanel SMTP — Transactional',
+                        'sender_name'  => 'Kampanya.Website',
+                        'sender_email' => 'newsletter@kampanya.website',
+                        'host'         => 'mail.kampanya.website',
+                        'port'         => 587,
+                        'encryption'   => 'tls',
+                        'auth'         => true,
+                        'username'     => 'newsletter@kampanya.website',
+                        'password'     => 'pxj!q&Jfc%9opK-j',
+                    ],
+                ],
+                'mappings' => [],
+                'misc'     => [
+                    'log_emails'         => 'yes',
+                    'is_inactive'        => '',
+                    'default_connection' => $conn_id,
+                ],
+            ];
+            update_option('fluentmail-settings', $settings);
+            return ['success' => true, 'connection' => $conn_id];
+        },
+        'permission_callback' => function () {
+            return current_user_can('manage_options');
+        },
+    ]);
+});
+
+/* ============================================================
    KAMPANYA REST API — Abone ol / Abonelikten çık (double opt-in)
    ============================================================ */
 
