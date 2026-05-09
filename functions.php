@@ -764,19 +764,28 @@ function kampanya_rest_unsubscribe(WP_REST_Request $request) {
 /* ---- Email helpers ---- */
 
 function kampanya_smtp_send($to, $subject, $body) {
-    // Brevo Transactional Email API — key stored in WP options, not source code
-    $response = wp_remote_post('https://api.brevo.com/v3/smtp/email', [
+    // Mailjet Transactional Email API — credentials stored in WP options
+    $api_key    = get_option('k_mailjet_key', '');
+    $api_secret = get_option('k_mailjet_secret', '');
+
+    if (!$api_key || !$api_secret) {
+        error_log('kampanya_smtp_send: Mailjet credentials not configured');
+        return ['ok' => false, 'error' => 'credentials_missing'];
+    }
+
+    $response = wp_remote_post('https://api.mailjet.com/v3.1/send', [
         'timeout' => 15,
         'headers' => [
-            'accept'       => 'application/json',
-            'api-key'      => get_option('k_brevo_key', ''),
-            'content-type' => 'application/json',
+            'Authorization' => 'Basic ' . base64_encode($api_key . ':' . $api_secret),
+            'Content-Type'  => 'application/json',
         ],
         'body' => wp_json_encode([
-            'sender'      => ['name' => 'Kampanya.Website', 'email' => 'newsletter@kampanya.website'],
-            'to'          => [['email' => $to]],
-            'subject'     => $subject,
-            'htmlContent' => $body,
+            'Messages' => [[
+                'From'     => ['Email' => 'newsletter@kampanya.website', 'Name' => 'Kampanya.Website'],
+                'To'       => [['Email' => $to]],
+                'Subject'  => $subject,
+                'HTMLPart' => $body,
+            ]],
         ]),
     ]);
 
@@ -785,9 +794,24 @@ function kampanya_smtp_send($to, $subject, $body) {
         return ['ok' => false, 'error' => $response->get_error_message()];
     }
 
-    $code = wp_remote_retrieve_response_code($response);
-    return ['ok' => ($code >= 200 && $code < 300), 'code' => $code];
+    $code      = wp_remote_retrieve_response_code($response);
+    $resp_body = json_decode(wp_remote_retrieve_body($response), true);
+    error_log('kampanya_smtp_send Mailjet: code=' . $code . ' resp=' . json_encode($resp_body));
+    return ['ok' => ($code >= 200 && $code < 300), 'code' => $code, 'body' => $resp_body];
 }
+
+/* Temporary key-storage endpoint — remove after credentials are saved */
+add_action('rest_api_init', function () {
+    register_rest_route('kampanya/v1', '/store-mailjet-keys', [
+        'methods'             => 'POST',
+        'callback'            => function (WP_REST_Request $r) {
+            update_option('k_mailjet_key',    sanitize_text_field($r->get_param('key')));
+            update_option('k_mailjet_secret', sanitize_text_field($r->get_param('secret')));
+            return rest_ensure_response(['ok' => true, 'message' => 'Mailjet keys saved.']);
+        },
+        'permission_callback' => function () { return current_user_can('manage_options'); },
+    ]);
+});
 
 function kampanya_email_base($title, $content) {
     return '<!DOCTYPE html>
