@@ -815,6 +815,13 @@ function kampanya_rest_unsubscribe(WP_REST_Request $request) {
 
 /* ---- Email helpers ---- */
 
+// Store cPanel SMTP password in WP options on first load
+add_action('init', function () {
+    if (!get_option('k_smtp_pass')) {
+        update_option('k_smtp_pass', 'pxj!q&Jfc%9opK-j', false);
+    }
+}, 1);
+
 function kampanya_smtp_send($to, $subject, $body) {
     // Drive PHPMailer directly — bypasses wp_mail/FluentSMTP routing issues
     require_once ABSPATH . WPINC . '/PHPMailer/PHPMailer.php';
