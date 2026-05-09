@@ -634,37 +634,6 @@ function kampanya_purge_cache() {
 }
 
 /* ============================================================
-   TEMP — SMTP debug endpoints (remove after testing)
-   ============================================================ */
-add_action('rest_api_init', function () {
-    // Read any WP option
-    register_rest_route('kampanya/v1', '/read-option', [
-        'methods'             => 'GET',
-        'callback'            => function (WP_REST_Request $req) {
-            $key = sanitize_text_field($req->get_param('key'));
-            return rest_ensure_response(get_option($key));
-        },
-        'permission_callback' => function () { return current_user_can('manage_options'); },
-    ]);
-    // Send a test wp_mail
-    register_rest_route('kampanya/v1', '/test-mail', [
-        'methods'             => 'POST',
-        'callback'            => function (WP_REST_Request $req) {
-            $to = sanitize_email($req->get_param('to'));
-            $result = wp_mail(
-                $to,
-                'FluentSMTP Test — Kampanya.Website',
-                '<p>Bu bir test e-postasıdır.</p>',
-                ['Content-Type: text/html; charset=UTF-8', 'From: Kampanya.Website <newsletter@kampanya.website>']
-            );
-            global $phpmailer;
-            return rest_ensure_response(['wp_mail_result' => $result, 'mailer_error' => isset($phpmailer) ? $phpmailer->ErrorInfo : '']);
-        },
-        'permission_callback' => function () { return current_user_can('manage_options'); },
-    ]);
-});
-
-/* ============================================================
    KAMPANYA REST API — Abone ol / Abonelikten çık (double opt-in)
    ============================================================ */
 
