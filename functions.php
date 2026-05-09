@@ -634,53 +634,15 @@ function kampanya_purge_cache() {
 }
 
 /* ============================================================
-   TEMP — Deep SMTP diagnostic (remove after fix)
+   TEMP — Store Brevo key in WP options (remove after first run)
    ============================================================ */
 add_action('rest_api_init', function () {
-    register_rest_route('kampanya/v1', '/smtp-diag', [
+    register_rest_route('kampanya/v1', '/store-brevo-key', [
         'methods'             => 'POST',
         'callback'            => function (WP_REST_Request $req) {
-            $to     = sanitize_email($req->get_param('to') ?: 'hkn3958@gmail.com');
-            $log    = [];
-
-            // Check FluentSMTP plugin active
-            $log['fluentsmtp_active'] = function_exists('FluentMail\App\Application::getInstance') || class_exists('\FluentMail\App\Services\Mailer\Manager');
-            $log['plugins_active']    = array_keys(get_option('active_plugins', []));
-
-            // Check stored settings
-            $settings = get_option('fluentmail-settings', []);
-            $log['settings_connections'] = array_keys($settings['connections'] ?? []);
-            $log['settings_misc']        = $settings['misc'] ?? [];
-
-            // Capture phpmailer state via hook
-            $mailer_info = [];
-            add_action('phpmailer_init', function ($phpmailer) use (&$mailer_info) {
-                $mailer_info['mailer_class'] = get_class($phpmailer);
-                $mailer_info['host']         = $phpmailer->Host ?? '';
-                $mailer_info['port']         = $phpmailer->Port ?? '';
-                $mailer_info['username']     = $phpmailer->Username ?? '';
-                $mailer_info['smtp_auth']    = $phpmailer->SMTPAuth ?? '';
-                $mailer_info['smtp_secure']  = $phpmailer->SMTPSecure ?? '';
-            }, 99);
-
-            // Capture any wp_mail error
-            $mail_error = '';
-            add_action('wp_mail_failed', function ($err) use (&$mail_error) {
-                $mail_error = $err->get_error_message();
-            });
-
-            $result = wp_mail(
-                $to,
-                'SMTP Diag Test — ' . date('H:i:s'),
-                '<p>Diagnostic test email.</p>',
-                ['Content-Type: text/html; charset=UTF-8', 'From: Kampanya.Website <newsletter@kampanya.website>']
-            );
-
-            $log['wp_mail_result'] = $result;
-            $log['wp_mail_error']  = $mail_error;
-            $log['mailer_info']    = $mailer_info;
-
-            return rest_ensure_response($log);
+            $key = sanitize_text_field($req->get_param('key'));
+            update_option('k_brevo_key', $key, false);
+            return ['success' => true];
         },
         'permission_callback' => function () { return current_user_can('manage_options'); },
     ]);
@@ -817,31 +779,29 @@ function kampanya_rest_unsubscribe(WP_REST_Request $request) {
 /* ---- Email helpers ---- */
 
 function kampanya_smtp_send($to, $subject, $body) {
-    require_once ABSPATH . WPINC . '/PHPMailer/PHPMailer.php';
-    require_once ABSPATH . WPINC . '/PHPMailer/SMTP.php';
-    require_once ABSPATH . WPINC . '/PHPMailer/Exception.php';
+    // Brevo Transactional Email API — key stored in WP options, not source code
+    $response = wp_remote_post('https://api.brevo.com/v3/smtp/email', [
+        'timeout' => 15,
+        'headers' => [
+            'accept'       => 'application/json',
+            'api-key'      => get_option('k_brevo_key', ''),
+            'content-type' => 'application/json',
+        ],
+        'body' => wp_json_encode([
+            'sender'      => ['name' => 'Kampanya.Website', 'email' => 'newsletter@kampanya.website'],
+            'to'          => [['email' => $to]],
+            'subject'     => $subject,
+            'htmlContent' => $body,
+        ]),
+    ]);
 
-    $mail = new PHPMailer\PHPMailer\PHPMailer(true);
-    try {
-        $mail->isSMTP();
-        $mail->Host       = 'mail.kampanya.website';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = 'newsletter@kampanya.website';
-        $mail->Password   = 'pxj!q&Jfc%9opK-j';
-        $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587;
-        $mail->CharSet    = 'UTF-8';
-        $mail->setFrom('newsletter@kampanya.website', 'Kampanya.Website');
-        $mail->addAddress($to);
-        $mail->isHTML(true);
-        $mail->Subject = $subject;
-        $mail->Body    = $body;
-        $mail->send();
-        return ['ok' => true];
-    } catch (\Exception $e) {
-        error_log('kampanya_smtp_send error: ' . $e->getMessage());
-        return ['ok' => false, 'error' => $e->getMessage()];
+    if (is_wp_error($response)) {
+        error_log('kampanya_smtp_send error: ' . $response->get_error_message());
+        return ['ok' => false, 'error' => $response->get_error_message()];
     }
+
+    $code = wp_remote_retrieve_response_code($response);
+    return ['ok' => ($code >= 200 && $code < 300), 'code' => $code];
 }
 
 function kampanya_email_base($title, $content) {
