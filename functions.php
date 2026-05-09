@@ -634,21 +634,6 @@ function kampanya_purge_cache() {
 }
 
 /* ============================================================
-   TEMP — Store Brevo key in WP options (remove after first run)
-   ============================================================ */
-add_action('rest_api_init', function () {
-    register_rest_route('kampanya/v1', '/store-brevo-key', [
-        'methods'             => 'POST',
-        'callback'            => function (WP_REST_Request $req) {
-            $key = sanitize_text_field($req->get_param('key'));
-            update_option('k_brevo_key', $key, false);
-            return ['success' => true];
-        },
-        'permission_callback' => function () { return current_user_can('manage_options'); },
-    ]);
-});
-
-/* ============================================================
    KAMPANYA REST API — Abone ol / Abonelikten çık (double opt-in)
    ============================================================ */
 
