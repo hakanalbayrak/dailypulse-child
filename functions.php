@@ -744,11 +744,12 @@ function kampanya_rest_subscribe(WP_REST_Request $request) {
     set_transient('k_confirm_' . $token, $email, DAY_IN_SECONDS);
 
     $confirm_url = home_url('/wp-json/kampanya/v1/confirm-email?token=' . $token);
-    kampanya_send_confirmation_email($email, $confirm_url);
+    $mail_result = kampanya_send_confirmation_email($email, $confirm_url);
 
     return rest_ensure_response([
-        'success' => true,
-        'message' => 'Teşekkürler! Gelen kutunuza bir onay e-postası gönderdik. Lütfen e-postayı onaylayın. 📬',
+        'success'     => true,
+        'message'     => 'Teşekkürler! Gelen kutunuza bir onay e-postası gönderdik. Lütfen e-postayı onaylayın. 📬',
+        '_mail_debug' => $mail_result,
     ]);
 }
 
@@ -815,15 +816,7 @@ function kampanya_rest_unsubscribe(WP_REST_Request $request) {
 
 /* ---- Email helpers ---- */
 
-// Store cPanel SMTP password in WP options on first load
-add_action('init', function () {
-    if (!get_option('k_smtp_pass')) {
-        update_option('k_smtp_pass', 'pxj!q&Jfc%9opK-j', false);
-    }
-}, 1);
-
 function kampanya_smtp_send($to, $subject, $body) {
-    // Drive PHPMailer directly — bypasses wp_mail/FluentSMTP routing issues
     require_once ABSPATH . WPINC . '/PHPMailer/PHPMailer.php';
     require_once ABSPATH . WPINC . '/PHPMailer/SMTP.php';
     require_once ABSPATH . WPINC . '/PHPMailer/Exception.php';
@@ -834,7 +827,7 @@ function kampanya_smtp_send($to, $subject, $body) {
         $mail->Host       = 'mail.kampanya.website';
         $mail->SMTPAuth   = true;
         $mail->Username   = 'newsletter@kampanya.website';
-        $mail->Password   = get_option('k_smtp_pass', '');
+        $mail->Password   = 'pxj!q&Jfc%9opK-j';
         $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
         $mail->CharSet    = 'UTF-8';
@@ -844,10 +837,10 @@ function kampanya_smtp_send($to, $subject, $body) {
         $mail->Subject = $subject;
         $mail->Body    = $body;
         $mail->send();
-        return true;
-    } catch (Exception $e) {
+        return ['ok' => true];
+    } catch (\Exception $e) {
         error_log('kampanya_smtp_send error: ' . $e->getMessage());
-        return false;
+        return ['ok' => false, 'error' => $e->getMessage()];
     }
 }
 
@@ -895,7 +888,7 @@ function kampanya_send_confirmation_email($email, $confirm_url) {
         <p style="color:#bbb;font-size:12px;line-height:1.6;margin:0;">Bu bağlantı 24 saat geçerlidir. Bu isteği siz yapmadıysanız bu e-postayı görmezden gelebilirsiniz.</p>
       </td></tr>';
 
-    kampanya_smtp_send($email, 'Aboneliğinizi onaylayın — Kampanya.Website', kampanya_email_base('Aboneliğinizi Onaylayın', $content));
+    return kampanya_smtp_send($email, 'Aboneliğinizi onaylayın — Kampanya.Website', kampanya_email_base('Aboneliğinizi Onaylayın', $content));
 }
 
 function kampanya_send_welcome_email($email) {
