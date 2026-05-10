@@ -1841,15 +1841,67 @@ button.k-subscribe-btn:disabled,
   }
 }
 
-/* ── Subscription status pages — override Blocksy color !important rules ── */
-/* abonelik-iptal (3365): dark card, white text */
-.page-id-3365 .entry-content h1,
-.page-id-3365 .entry-content h2,
-.page-id-3365 .entry-content h3 { color: #ffffff !important; }
-.page-id-3365 .entry-content p   { color: #9CA3AF !important; }
+/* =============================================
+   K-CARD SYSTEM — reusable status/info cards
+   Use this for ANY informational card with a colored background.
+   Don't use inline styles for text color on cards — Blocksy's
+   `h1,h2,...{color:...!important}` and `p,li,...{color:...!important}`
+   rules will override them. Use these classes instead.
+   Selectors below use html+body+class chain for max specificity
+   (0,0,3,2) which beats every Blocksy color rule.
+   ============================================= */
+.k-card-wrap {
+  max-width: 600px;
+  margin: 80px auto;
+  padding: 0 20px;
+}
+.k-card {
+  border-radius: 16px;
+  padding: 52px 44px;
+  text-align: center;
+}
+.k-card__icon {
+  font-size: 54px;
+  line-height: 1;
+  margin: 0 0 20px;
+}
+.k-card__title {
+  font-family: 'Barlow Condensed', 'Arial Black', Impact, sans-serif;
+  font-size: 32px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  margin: 0 0 18px;
+  line-height: 1.05;
+}
+.k-card__text {
+  font-size: 15px;
+  line-height: 1.75;
+  margin: 0 0 12px;
+}
+.k-card__text:last-of-type {
+  margin-bottom: 36px;
+}
+.k-card__btn {
+  display: inline-block;
+  padding: 15px 36px;
+  border-radius: 6px;
+  font-family: 'Barlow Condensed', 'Arial Black', Impact, sans-serif;
+  font-size: 14px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-decoration: none;
+}
 
-/* abone-olundu (3364): light card, dark green heading, gray text */
-.page-id-3364 .entry-content h1,
-.page-id-3364 .entry-content h2,
-.page-id-3364 .entry-content h3 { color: #15803d !important; }
-.page-id-3364 .entry-content p   { color: #374151 !important; }
+/* Dark variant (background #1E1B22) */
+html body .k-card--dark { background-color: #1E1B22; }
+html body .entry-content .k-card--dark .k-card__title { color: #ffffff !important; }
+html body .entry-content .k-card--dark .k-card__text  { color: #9CA3AF !important; }
+html body .entry-content .k-card--dark .k-card__btn   { background-color: #FFD600 !important; color: #17141A !important; }
+
+/* Light/success variant (background #f0fdf4) */
+html body .k-card--light { background-color: #f0fdf4; }
+html body .entry-content .k-card--light .k-card__title { color: #15803d !important; }
+html body .entry-content .k-card--light .k-card__text  { color: #374151 !important; }
+html body .entry-content .k-card--light .k-card__btn   { background-color: #17141A !important; color: #FFD600 !important; }
