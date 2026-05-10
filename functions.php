@@ -485,7 +485,7 @@ add_action('template_redirect', function() {
  * Uses div-depth counting (not regex) — immune to PCRE limits on large pages.
  */
 function kampanya_strip_hero_section($html) {
-    $marker = '<div class="hero-section"';
+    $marker = '<div class="hero-section';
     $start  = strpos($html, $marker);
     if ($start === false) return $html;
 
