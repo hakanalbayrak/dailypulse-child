@@ -764,28 +764,25 @@ function kampanya_rest_unsubscribe(WP_REST_Request $request) {
 /* ---- Email helpers ---- */
 
 function kampanya_smtp_send($to, $subject, $body) {
-    // Mailjet Transactional Email API — credentials stored in WP options
-    $api_key    = get_option('k_mailjet_key', '');
-    $api_secret = get_option('k_mailjet_secret', '');
+    // Resend Transactional Email API — key stored in WP options
+    $api_key = get_option('k_resend_key', '');
 
-    if (!$api_key || !$api_secret) {
-        error_log('kampanya_smtp_send: Mailjet credentials not configured');
+    if (!$api_key) {
+        error_log('kampanya_smtp_send: Resend API key not configured');
         return ['ok' => false, 'error' => 'credentials_missing'];
     }
 
-    $response = wp_remote_post('https://api.mailjet.com/v3.1/send', [
+    $response = wp_remote_post('https://api.resend.com/emails', [
         'timeout' => 15,
         'headers' => [
-            'Authorization' => 'Basic ' . base64_encode($api_key . ':' . $api_secret),
+            'Authorization' => 'Bearer ' . $api_key,
             'Content-Type'  => 'application/json',
         ],
         'body' => wp_json_encode([
-            'Messages' => [[
-                'From'     => ['Email' => 'newsletter@kampanya.website', 'Name' => 'Kampanya.Website'],
-                'To'       => [['Email' => $to]],
-                'Subject'  => $subject,
-                'HTMLPart' => $body,
-            ]],
+            'from'    => 'Kampanya.Website <bildirim@kampanya.website>',
+            'to'      => [$to],
+            'subject' => $subject,
+            'html'    => $body,
         ]),
     ]);
 
@@ -796,9 +793,21 @@ function kampanya_smtp_send($to, $subject, $body) {
 
     $code      = wp_remote_retrieve_response_code($response);
     $resp_body = json_decode(wp_remote_retrieve_body($response), true);
-    error_log('kampanya_smtp_send Mailjet: code=' . $code . ' resp=' . json_encode($resp_body));
+    error_log('kampanya_smtp_send Resend: code=' . $code . ' resp=' . json_encode($resp_body));
     return ['ok' => ($code >= 200 && $code < 300), 'code' => $code, 'body' => $resp_body];
 }
+
+/* Temporary — remove after key is saved */
+add_action('rest_api_init', function () {
+    register_rest_route('kampanya/v1', '/store-resend-key', [
+        'methods'             => 'POST',
+        'callback'            => function (WP_REST_Request $r) {
+            update_option('k_resend_key', sanitize_text_field($r->get_param('key')));
+            return rest_ensure_response(['ok' => true]);
+        },
+        'permission_callback' => function () { return current_user_can('manage_options'); },
+    ]);
+});
 
 function kampanya_email_base($title, $content) {
     return '<!DOCTYPE html>
