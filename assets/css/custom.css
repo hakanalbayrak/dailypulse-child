@@ -1840,3 +1840,9 @@ button.k-subscribe-btn:disabled,
     bottom: 20px;
   }
 }
+
+/* ── Subscription status pages — override Blocksy color !important rules ── */
+.page-id-3364 .entry-content *,
+.page-id-3365 .entry-content * {
+  color: inherit !important;
+}
