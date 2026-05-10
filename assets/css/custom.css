@@ -1842,7 +1842,14 @@ button.k-subscribe-btn:disabled,
 }
 
 /* ── Subscription status pages — override Blocksy color !important rules ── */
-.page-id-3364 .entry-content *,
-.page-id-3365 .entry-content * {
-  color: inherit !important;
-}
+/* abonelik-iptal (3365): dark card, white text */
+.page-id-3365 .entry-content h1,
+.page-id-3365 .entry-content h2,
+.page-id-3365 .entry-content h3 { color: #ffffff !important; }
+.page-id-3365 .entry-content p   { color: #9CA3AF !important; }
+
+/* abone-olundu (3364): light card, dark green heading, gray text */
+.page-id-3364 .entry-content h1,
+.page-id-3364 .entry-content h2,
+.page-id-3364 .entry-content h3 { color: #15803d !important; }
+.page-id-3364 .entry-content p   { color: #374151 !important; }
