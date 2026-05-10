@@ -476,7 +476,7 @@ add_filter('litespeed_is_tablet', '__return_false', 99);
  * Matches: <div class="hero-section" ...> ... </header></div>
  */
 add_action('template_redirect', function() {
-    if (!is_singular('post')) return;
+    if (!is_singular('post') && !is_page()) return;
     ob_start('kampanya_strip_hero_section');
 }, 1);
 
