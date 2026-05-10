@@ -589,6 +589,47 @@ add_action('wp_footer', 'kampanya_footer_copyright_buffer_start', 1);
 add_action('wp_footer', 'kampanya_footer_copyright_buffer_end', 999);
 
 /* ============================================================
+   KAMPANYA REST API — Set Rank Math SEO meta on any post/page
+   Usage: POST /wp-json/kampanya/v1/seo-meta
+     body: { "id": 123, "title": "...", "description": "...", "focus": "..." }
+   ============================================================ */
+add_action('rest_api_init', function () {
+    register_rest_route('kampanya/v1', '/seo-meta', [
+        'methods'             => 'POST',
+        'callback'            => function (WP_REST_Request $r) {
+            $id = intval($r->get_param('id'));
+            if (!$id || !get_post($id)) {
+                return new WP_Error('invalid_id', 'Valid post/page ID required.', ['status' => 400]);
+            }
+            $set = [];
+            if ($t = $r->get_param('title')) {
+                update_post_meta($id, 'rank_math_title', sanitize_text_field($t));
+                $set[] = 'title';
+            }
+            if ($d = $r->get_param('description')) {
+                update_post_meta($id, 'rank_math_description', sanitize_text_field($d));
+                $set[] = 'description';
+            }
+            if ($f = $r->get_param('focus')) {
+                update_post_meta($id, 'rank_math_focus_keyword', sanitize_text_field($f));
+                $set[] = 'focus';
+            }
+            return rest_ensure_response([
+                'ok'      => true,
+                'post_id' => $id,
+                'set'     => $set,
+                'current' => [
+                    'title'       => get_post_meta($id, 'rank_math_title', true),
+                    'description' => get_post_meta($id, 'rank_math_description', true),
+                    'focus'       => get_post_meta($id, 'rank_math_focus_keyword', true),
+                ],
+            ]);
+        },
+        'permission_callback' => function () { return current_user_can('manage_options'); },
+    ]);
+});
+
+/* ============================================================
    KAMPANYA REST API — Cache Purge
    ============================================================ */
 
