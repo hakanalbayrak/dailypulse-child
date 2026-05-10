@@ -852,7 +852,7 @@ function kampanya_email_base($title, $content, $accent = '#FFD600') {
               <p style="margin:0;color:#3D3A42;font-size:11px;text-align:center;line-height:1.8;font-family:Arial,Helvetica,sans-serif;letter-spacing:0.3px;">
                 <a href="' . home_url() . '" style="color:' . $accent . ';text-decoration:none;font-weight:700;font-size:11px;">KAMPANYA.WEBSITE</a>
                 &nbsp;&nbsp;·&nbsp;&nbsp;
-                <a href="' . home_url('/abonelikten-cik') . '" style="color:#3D3A42;text-decoration:underline;">Abonelikten çık</a>
+                <a href="' . home_url('/abonelik-iptal') . '" style="color:#3D3A42;text-decoration:underline;">Abonelikten çık</a>
                 &nbsp;&nbsp;·&nbsp;&nbsp;
                 <a href="' . home_url('/gizlilik-politikasi') . '" style="color:#3D3A42;text-decoration:underline;">Gizlilik</a>
               </p>

@@ -214,16 +214,14 @@
       .then(function (r) { return r.json(); })
       .then(function (data) {
         if (data.success) {
-          msgEl.className   = 'k-unsub-msg success';
-          msgEl.textContent = data.message || 'Aboneliğiniz iptal edildi.';
-          emailEl.value     = '';
+          window.location.href = '/abonelik-iptal/';
         } else {
           msgEl.className   = 'k-unsub-msg error';
           msgEl.textContent = (data.message || data.data && data.data.message) || 'Bir hata oluştu.';
+          msgEl.hidden      = false;
           btnEl.disabled    = false;
           btnEl.textContent = 'Aboneliği İptal Et';
         }
-        msgEl.hidden = false;
       })
       .catch(function () {
         msgEl.className   = 'k-unsub-msg error';
