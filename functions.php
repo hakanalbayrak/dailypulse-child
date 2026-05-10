@@ -800,19 +800,6 @@ function kampanya_smtp_send($to, $subject, $body) {
     return ['ok' => ($code >= 200 && $code < 300), 'code' => $code, 'body' => $resp_body];
 }
 
-/* Temporary key-storage endpoint — remove after credentials are saved */
-add_action('rest_api_init', function () {
-    register_rest_route('kampanya/v1', '/store-mailjet-keys', [
-        'methods'             => 'POST',
-        'callback'            => function (WP_REST_Request $r) {
-            update_option('k_mailjet_key',    sanitize_text_field($r->get_param('key')));
-            update_option('k_mailjet_secret', sanitize_text_field($r->get_param('secret')));
-            return rest_ensure_response(['ok' => true, 'message' => 'Mailjet keys saved.']);
-        },
-        'permission_callback' => function () { return current_user_can('manage_options'); },
-    ]);
-});
-
 function kampanya_email_base($title, $content) {
     return '<!DOCTYPE html>
 <html lang="tr">
