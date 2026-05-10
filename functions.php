@@ -797,75 +797,147 @@ function kampanya_smtp_send($to, $subject, $body) {
     return ['ok' => ($code >= 200 && $code < 300), 'code' => $code, 'body' => $resp_body];
 }
 
-function kampanya_email_base($title, $content) {
+function kampanya_email_base($title, $content, $accent = '#FFD600') {
     return '<!DOCTYPE html>
-<html lang="tr">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>' . esc_html($title) . '</title></head>
-<body style="margin:0;padding:0;background:#f4f4f5;font-family:Arial,Helvetica,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:40px 16px;">
-  <tr><td align="center">
-    <table width="100%" cellpadding="0" cellspacing="0" style="max-width:580px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);">
-      <tr><td style="background:#17141A;padding:28px 40px;">
-        <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;letter-spacing:-.3px;">Kampanya.Website</h1>
-        <p style="margin:4px 0 0;color:#aaa;font-size:13px;">Haftalık fırsatlar ve kampanyalar</p>
-      </td></tr>
-      ' . $content . '
-      <tr><td style="background:#f8f9fa;padding:20px 40px;border-top:1px solid #eee;">
-        <p style="margin:0;color:#aaa;font-size:12px;text-align:center;line-height:1.6;">
-          Kampanya.Website &nbsp;·&nbsp;
-          <a href="' . home_url('/abonelikten-cik') . '" style="color:#aaa;text-decoration:underline;">Abonelikten çık</a> &nbsp;·&nbsp;
-          <a href="' . home_url('/gizlilik-politikasi') . '" style="color:#aaa;text-decoration:underline;">Gizlilik Politikası</a>
-        </p>
-      </td></tr>
-    </table>
-  </td></tr>
+<html lang="tr" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>' . esc_html($title) . '</title>
+<style>
+@media only screen and (max-width:600px){
+  .ew{width:100%!important}
+  .ep{padding:28px 20px!important}
+  .ef{padding:20px!important}
+}
+</style>
+</head>
+<body style="margin:0;padding:0;background-color:#0F0D11;font-family:Arial,Helvetica,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0F0D11;padding:40px 16px;">
+<tr><td align="center">
+  <table class="ew" width="560" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;">
+
+    <!-- LOGO ROW -->
+    <tr>
+      <td style="padding:0 0 20px 0;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="vertical-align:middle;">
+              <span style="font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:20px;font-weight:900;color:' . $accent . ';letter-spacing:-0.5px;text-transform:uppercase;">KAMPANYA</span><span style="font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:400;color:rgba(255,255,255,0.35);letter-spacing:3px;text-transform:uppercase;">.WEBSITE</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding-top:6px;">
+              <div style="height:2px;width:32px;background-color:' . $accent . ';"></div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- CARD -->
+    <tr>
+      <td style="background-color:#17141A;border-radius:12px;overflow:hidden;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+
+          <!-- TOP ACCENT LINE -->
+          <tr><td style="height:3px;background-color:' . $accent . ';font-size:0;line-height:0;">&nbsp;</td></tr>
+
+          ' . $content . '
+
+          <!-- FOOTER -->
+          <tr>
+            <td class="ef" style="padding:20px 40px;border-top:1px solid #2A2730;">
+              <p style="margin:0;color:#3D3A42;font-size:11px;text-align:center;line-height:1.8;font-family:Arial,Helvetica,sans-serif;letter-spacing:0.3px;">
+                <a href="' . home_url() . '" style="color:' . $accent . ';text-decoration:none;font-weight:700;font-size:11px;">KAMPANYA.WEBSITE</a>
+                &nbsp;&nbsp;·&nbsp;&nbsp;
+                <a href="' . home_url('/abonelikten-cik') . '" style="color:#3D3A42;text-decoration:underline;">Abonelikten çık</a>
+                &nbsp;&nbsp;·&nbsp;&nbsp;
+                <a href="' . home_url('/gizlilik-politikasi') . '" style="color:#3D3A42;text-decoration:underline;">Gizlilik</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+
+    <!-- BOTTOM TAGLINE -->
+    <tr>
+      <td style="padding:16px 0 0;text-align:center;">
+        <p style="margin:0;color:#2A2730;font-size:10px;font-family:Arial,Helvetica,sans-serif;letter-spacing:2px;text-transform:uppercase;">Haftalık fırsatlar &nbsp;·&nbsp; indirimler &nbsp;·&nbsp; kampanyalar</p>
+      </td>
+    </tr>
+
+  </table>
+</td></tr>
 </table>
 </body></html>';
 }
 
-function kampanya_email_btn($url, $label, $bg = '#FF6B35') {
-    return '<table cellpadding="0" cellspacing="0" style="margin:0 auto 28px;">
-      <tr><td style="background:' . $bg . ';border-radius:8px;">
-        <a href="' . esc_url($url) . '" style="display:inline-block;padding:15px 40px;color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;letter-spacing:-.1px;">' . esc_html($label) . '</a>
-      </td></tr>
+function kampanya_email_btn($url, $label, $style = 'primary') {
+    if ($style === 'ghost') {
+        return '<table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 32px;">
+          <tr>
+            <td style="border:2px solid #2A2730;border-radius:6px;">
+              <a href="' . esc_url($url) . '" style="display:inline-block;padding:14px 36px;color:#555;font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:12px;font-weight:900;text-decoration:none;letter-spacing:1.5px;text-transform:uppercase;">' . esc_html($label) . '</a>
+            </td>
+          </tr>
+        </table>';
+    }
+    return '<table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 32px;">
+      <tr>
+        <td style="background-color:#FFD600;border-radius:6px;">
+          <a href="' . esc_url($url) . '" style="display:inline-block;padding:16px 44px;color:#17141A;font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:13px;font-weight:900;text-decoration:none;letter-spacing:1.5px;text-transform:uppercase;">' . esc_html($label) . '</a>
+        </td>
+      </tr>
     </table>';
 }
 
 function kampanya_send_confirmation_email($email, $confirm_url) {
     $content = '
-      <tr><td style="padding:36px 40px 28px;">
-        <h2 style="margin:0 0 14px;font-size:20px;color:#17141A;font-weight:700;">E-posta adresinizi onaylayın</h2>
-        <p style="color:#555;font-size:15px;line-height:1.7;margin:0 0 24px;">Bültenimize abone olmak için aşağıdaki butona tıklayarak e-posta adresinizi onaylayın. Her hafta en iyi fırsat ve kampanyalar doğrudan gelen kutunuza gelecek.</p>
-        ' . kampanya_email_btn($confirm_url, 'Aboneliğimi Onayla') . '
-        <p style="color:#bbb;font-size:12px;line-height:1.6;margin:0;">Bu bağlantı 24 saat geçerlidir. Bu isteği siz yapmadıysanız bu e-postayı görmezden gelebilirsiniz.</p>
-      </td></tr>';
+      <tr>
+        <td class="ep" style="padding:44px 40px 36px;">
+          <p style="margin:0 0 6px;font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:11px;font-weight:900;color:#FFD600;letter-spacing:3px;text-transform:uppercase;">Adım 1 / 2</p>
+          <h1 style="margin:0 0 20px;font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:30px;font-weight:900;color:#FFFFFF;letter-spacing:-0.5px;text-transform:uppercase;line-height:1.05;">E-postanızı<br>onaylayın</h1>
+          <p style="color:#6B6875;font-size:15px;line-height:1.75;margin:0 0 36px;font-family:Arial,Helvetica,sans-serif;">Bültenimize abone olmak için aşağıdaki butona tıklayın. Her hafta en iyi fırsatlar ve kampanyalar doğrudan gelen kutunuza gelecek.</p>
+          ' . kampanya_email_btn($confirm_url, 'Aboneliğimi Onayla') . '
+          <p style="color:#3D3A42;font-size:12px;line-height:1.7;margin:0;font-family:Arial,Helvetica,sans-serif;">Bu bağlantı 24 saat geçerlidir. Bu isteği siz yapmadıysanız e-postayı silebilirsiniz.</p>
+        </td>
+      </tr>';
 
     return kampanya_smtp_send($email, 'Aboneliğinizi onaylayın — Kampanya.Website', kampanya_email_base('Aboneliğinizi Onaylayın', $content));
 }
 
 function kampanya_send_welcome_email($email) {
     $content = '
-      <tr><td style="padding:36px 40px 28px;">
-        <h2 style="margin:0 0 14px;font-size:20px;color:#17141A;font-weight:700;">Aramıza hoş geldiniz! 🎉</h2>
-        <p style="color:#555;font-size:15px;line-height:1.7;margin:0 0 12px;">Aboneliğiniz onaylandı. Artık Kampanya.Website bülteninin bir parçasısınız.</p>
-        <p style="color:#555;font-size:15px;line-height:1.7;margin:0 0 24px;">Her hafta en güncel indirimler, fırsatlar ve kampanyalar doğrudan gelen kutunuza gelecek. Bir şey kaçırmayacaksınız!</p>
-        ' . kampanya_email_btn(home_url('/firsatlar'), 'Fırsatları Keşfet') . '
-      </td></tr>';
+      <tr>
+        <td class="ep" style="padding:44px 40px 36px;">
+          <p style="margin:0 0 6px;font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:11px;font-weight:900;color:#FFD600;letter-spacing:3px;text-transform:uppercase;">Hoş geldiniz</p>
+          <h1 style="margin:0 0 20px;font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:30px;font-weight:900;color:#FFD600;letter-spacing:-0.5px;text-transform:uppercase;line-height:1.05;">Aboneliğiniz<br>onaylandı!</h1>
+          <p style="color:#6B6875;font-size:15px;line-height:1.75;margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;">Artık Kampanya.Website bülteninin bir parçasısınız.</p>
+          <p style="color:#6B6875;font-size:15px;line-height:1.75;margin:0 0 36px;font-family:Arial,Helvetica,sans-serif;">Her hafta en güncel indirimler, fırsatlar ve kampanyalar — doğrudan gelen kutunuza. Bir şey kaçırmayacaksınız.</p>
+          ' . kampanya_email_btn(home_url('/firsatlar'), 'Fırsatları Keşfet') . '
+        </td>
+      </tr>';
 
-    kampanya_smtp_send($email, 'Hoş geldiniz! Kampanya bültenine katıldınız 🎉', kampanya_email_base('Hoş Geldiniz', $content));
+    kampanya_smtp_send($email, 'Bültenimize hoş geldiniz — Kampanya.Website', kampanya_email_base('Hoş Geldiniz', $content));
 }
 
 function kampanya_send_unsubscribe_confirmation($email) {
     $content = '
-      <tr><td style="padding:36px 40px 28px;">
-        <h2 style="margin:0 0 14px;font-size:20px;color:#17141A;font-weight:700;">Aboneliğiniz İptal Edildi</h2>
-        <p style="color:#555;font-size:15px;line-height:1.7;margin:0 0 12px;"><strong>' . esc_html($email) . '</strong> adresi bülten listemizden çıkarıldı.</p>
-        <p style="color:#555;font-size:15px;line-height:1.7;margin:0 0 24px;">Artık Kampanya.Website bülteninden e-posta almayacaksınız. Fikrinizi değiştirirseniz istediğiniz zaman tekrar abone olabilirsiniz.</p>
-        ' . kampanya_email_btn(home_url(), 'Ana Sayfaya Dön', '#17141A') . '
-      </td></tr>';
+      <tr>
+        <td class="ep" style="padding:44px 40px 36px;">
+          <p style="margin:0 0 6px;font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:11px;font-weight:900;color:#3D3A42;letter-spacing:3px;text-transform:uppercase;">Bildirim</p>
+          <h1 style="margin:0 0 20px;font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:30px;font-weight:900;color:#FFFFFF;letter-spacing:-0.5px;text-transform:uppercase;line-height:1.05;">Aboneliğiniz<br>iptal edildi</h1>
+          <p style="color:#6B6875;font-size:15px;line-height:1.75;margin:0 0 12px;font-family:Arial,Helvetica,sans-serif;"><span style="color:#3D3A42;font-size:13px;">' . esc_html($email) . '</span><br>adresi bülten listemizden çıkarıldı.</p>
+          <p style="color:#6B6875;font-size:15px;line-height:1.75;margin:0 0 36px;font-family:Arial,Helvetica,sans-serif;">Fikrinizi değiştirirseniz istediğiniz zaman tekrar abone olabilirsiniz.</p>
+          ' . kampanya_email_btn(home_url(), 'Ana Sayfaya Dön', 'ghost') . '
+        </td>
+      </tr>';
 
-    kampanya_smtp_send($email, 'Aboneliğiniz iptal edildi — Kampanya.Website', kampanya_email_base('Abonelik İptal', $content));
+    kampanya_smtp_send($email, 'Aboneliğiniz iptal edildi — Kampanya.Website', kampanya_email_base('Abonelik İptal', $content, '#2A2730'));
 }
 
 /* ============================================================
