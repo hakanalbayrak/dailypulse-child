@@ -730,7 +730,7 @@ function kampanya_rest_confirm_email(WP_REST_Request $request) {
 
     kampanya_send_welcome_email($email);
 
-    wp_redirect(home_url('/?k_status=confirmed'));
+    wp_redirect(home_url('/abone-olundu/'));
     exit;
 }
 
