@@ -630,6 +630,40 @@ add_action('rest_api_init', function () {
 });
 
 /* ============================================================
+   KAMPANYA REST API — Bulk status update by subscriber IDs (TEMPORARY)
+   Remove after the one-time status change is complete.
+   ============================================================ */
+add_action('rest_api_init', function () {
+    register_rest_route('kampanya/v1', '/bulk-status-update', [
+        'methods'             => 'POST',
+        'callback'            => function (WP_REST_Request $r) {
+            @set_time_limit(0);
+            if (!class_exists('FluentCrm\App\Models\Subscriber')) {
+                return new WP_Error('no_fc', 'FluentCRM not available.', ['status' => 503]);
+            }
+            $ids    = $r->get_param('ids');
+            $status = $r->get_param('status');
+            if (!is_array($ids) || empty($ids)) {
+                return new WP_Error('no_ids', 'ids array required.', ['status' => 400]);
+            }
+            if (!in_array($status, ['subscribed', 'unsubscribed', 'pending'], true)) {
+                return new WP_Error('bad_status', 'Invalid status.', ['status' => 400]);
+            }
+            $ids = array_map('intval', $ids);
+            $cls = 'FluentCrm\App\Models\Subscriber';
+            $updated = $cls::whereIn('id', $ids)->update(['status' => $status]);
+            return rest_ensure_response([
+                'ok'        => true,
+                'requested' => count($ids),
+                'updated'   => $updated,
+                'status'    => $status,
+            ]);
+        },
+        'permission_callback' => function () { return current_user_can('manage_options'); },
+    ]);
+});
+
+/* ============================================================
    KAMPANYA REST API — Cache Purge
    ============================================================ */
 
