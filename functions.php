@@ -630,6 +630,84 @@ add_action('rest_api_init', function () {
 });
 
 /* ============================================================
+   KAMPANYA REST API — Bulk contact import (TEMPORARY)
+   One-time import of cleaned contact lists into FluentCRM.
+   Accepts batches; idempotent (createOrUpdate keyed on email).
+   Remove this endpoint after the import is complete.
+   ============================================================ */
+add_action('rest_api_init', function () {
+    register_rest_route('kampanya/v1', '/bulk-import-contacts', [
+        'methods'             => 'POST',
+        'callback'            => 'kampanya_bulk_import_contacts',
+        'permission_callback' => function () { return current_user_can('manage_options'); },
+    ]);
+});
+
+function kampanya_bulk_import_contacts(WP_REST_Request $request) {
+    @set_time_limit(0);
+    @ini_set('memory_limit', '512M');
+
+    if (!function_exists('FluentCrmApi')) {
+        return new WP_Error('no_fluentcrm', 'FluentCRM is not active.', ['status' => 503]);
+    }
+
+    $contacts = $request->get_param('contacts');
+    $tags     = $request->get_param('tags');
+    $lists    = $request->get_param('lists');
+    $status   = $request->get_param('status') ?: 'subscribed';
+
+    if (!is_array($contacts) || empty($contacts)) {
+        return new WP_Error('no_contacts', 'No contacts provided.', ['status' => 400]);
+    }
+    if (!in_array($status, ['subscribed', 'pending', 'unsubscribed'], true)) {
+        $status = 'subscribed';
+    }
+
+    $tag_ids  = is_array($tags)  ? array_map('intval', $tags)  : [];
+    $list_ids = is_array($lists) ? array_map('intval', $lists) : [];
+
+    $api     = FluentCrmApi('contacts');
+    $ok      = 0;
+    $skipped = 0;
+    $errors  = [];
+
+    foreach ($contacts as $c) {
+        $email = sanitize_email(trim($c['email'] ?? ''));
+        if (!is_email($email)) { $skipped++; continue; }
+
+        $data = [
+            'email'      => $email,
+            'first_name' => sanitize_text_field($c['first_name'] ?? ''),
+            'last_name'  => sanitize_text_field($c['last_name'] ?? ''),
+            'status'     => $status,
+        ];
+        if (!empty($c['phone']))          $data['phone']          = sanitize_text_field($c['phone']);
+        if (!empty($c['city']))           $data['city']           = sanitize_text_field($c['city']);
+        if (!empty($c['country']))        $data['country']        = sanitize_text_field($c['country']);
+        if (!empty($c['postal_code']))    $data['postal_code']    = sanitize_text_field($c['postal_code']);
+        if (!empty($c['address_line_1'])) $data['address_line_1'] = sanitize_text_field($c['address_line_1']);
+        if ($tag_ids)  $data['tags']  = $tag_ids;
+        if ($list_ids) $data['lists'] = $list_ids;
+
+        try {
+            $contact = $api->createOrUpdate($data);
+            if ($contact) { $ok++; }
+            else { $errors[] = $email . ': empty result'; }
+        } catch (\Throwable $e) {
+            $errors[] = $email . ': ' . $e->getMessage();
+        }
+    }
+
+    return rest_ensure_response([
+        'ok'        => true,
+        'processed' => count($contacts),
+        'imported'  => $ok,
+        'skipped'   => $skipped,
+        'errors'    => array_slice($errors, 0, 5),
+    ]);
+}
+
+/* ============================================================
    KAMPANYA REST API — Cache Purge
    ============================================================ */
 
