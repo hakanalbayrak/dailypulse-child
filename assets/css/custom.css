@@ -1,10 +1,10 @@
 /* =============================================
    KAMPANYA.WEBSITE — VISUAL IDENTITY v02
-   Barlow Condensed (display) · Newsreader (body) · Barlow (UI)
+   Barlow Condensed (display) · Quicksand (body) · Barlow (UI)
    Warm paper · Ink · Yellow · Signal vermillion
    ============================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@500;600;700&family=Quicksand:wght@400;500;600;700&display=swap');
 
 :root {
   /* ── Primary palette ── */
@@ -41,7 +41,7 @@
 
   /* ── Font stacks ── */
   --f-display:      'Barlow Condensed', 'Arial Narrow', sans-serif;
-  --f-body:         'Newsreader', Georgia, 'Times New Roman', serif;
+  --f-body:         'Quicksand', 'Segoe UI', Arial, sans-serif;
   --f-ui:           'Barlow', 'Helvetica Neue', Arial, sans-serif;
 
   /* Legacy font aliases */
