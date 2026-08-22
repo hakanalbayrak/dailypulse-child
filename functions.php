@@ -1218,7 +1218,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins'],
             ],
         ],
     ]);
@@ -1299,6 +1299,89 @@ function kampanya_maintenance(WP_REST_Request $request) {
             'before'  => $before,
             'after'   => get_option('litespeed.conf.optm-qs_rm', 'unset'),
         ];
+    }
+
+    if ($action === 'list_updates') {
+        require_once ABSPATH . 'wp-admin/includes/update.php';
+        require_once ABSPATH . 'wp-admin/includes/plugin.php';
+
+        wp_update_plugins();
+        $plugin_updates = get_site_transient('update_plugins');
+        $pending = [];
+        if (!empty($plugin_updates->response)) {
+            foreach ($plugin_updates->response as $file => $data) {
+                $installed = get_plugin_data(WP_PLUGIN_DIR . '/' . $file, false, false);
+                $pending[] = [
+                    'file'    => $file,
+                    'name'    => $installed['Name'] ?? $file,
+                    'from'    => $installed['Version'] ?? '?',
+                    'to'      => $data->new_version ?? '?',
+                ];
+            }
+        }
+
+        wp_version_check();
+        $core = get_site_transient('update_core');
+        $core_update = null;
+        if (!empty($core->updates) && isset($core->updates[0]) && $core->updates[0]->response === 'upgrade') {
+            $core_update = $core->updates[0]->current;
+        }
+
+        return [
+            'core_current'   => get_bloginfo('version'),
+            'core_update_to' => $core_update,
+            'plugins'        => $pending,
+        ];
+    }
+
+    if ($action === 'update_plugins') {
+        require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+        require_once ABSPATH . 'wp-admin/includes/update.php';
+        require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+        require_once ABSPATH . 'wp-admin/includes/misc.php';
+
+        wp_update_plugins();
+        $updates = get_site_transient('update_plugins');
+        if (empty($updates->response)) {
+            return ['updated' => [], 'note' => 'Güncellenecek eklenti yok'];
+        }
+
+        // Hangi eklentiler aktifti? Upgrader bazen deaktive edebiliyor;
+        // sonda aynı durumu geri yüklüyoruz.
+        $was_active = [];
+        foreach (array_keys($updates->response) as $file) {
+            $was_active[$file] = is_plugin_active($file);
+        }
+
+        $skin     = new Automatic_Upgrader_Skin();
+        $upgrader = new Plugin_Upgrader($skin);
+        $results  = $upgrader->bulk_upgrade(array_keys($updates->response));
+
+        $report = [];
+        foreach ((array) $results as $file => $result) {
+            $ok = ($result && !is_wp_error($result));
+            if ($ok && !empty($was_active[$file]) && !is_plugin_active($file)) {
+                activate_plugin($file);
+            }
+            $data = file_exists(WP_PLUGIN_DIR . '/' . $file)
+                ? get_plugin_data(WP_PLUGIN_DIR . '/' . $file, false, false)
+                : [];
+            $report[] = [
+                'file'        => $file,
+                'name'        => $data['Name'] ?? $file,
+                'new_version' => $data['Version'] ?? '?',
+                'success'     => $ok,
+                'error'       => is_wp_error($result) ? $result->get_error_message() : null,
+                'reactivated' => !empty($was_active[$file]) && is_plugin_active($file),
+            ];
+        }
+
+        if (class_exists('\LiteSpeed\Purge')) {
+            \LiteSpeed\Purge::purge_all();
+        }
+
+        return ['updated' => $report, 'messages' => $skin->get_upgrade_messages()];
     }
 
     return new WP_Error('unknown_action', 'Bilinmeyen işlem', ['status' => 400]);
