@@ -16,10 +16,14 @@ require_once DAILYPULSE_DIR . '/inc/widgets.php';
 require_once DAILYPULSE_DIR . '/inc/shortcodes.php';
 
 /**
- * Google Fonts yükle — Newsreader (body) + Barlow (UI) + Barlow Condensed (display)
+ * Google Fonts yükle — Barlow (UI) + Barlow Condensed (display)
+ *
+ * Body fontu (Roboto) Google CDN'den değil, temanın kendi
+ * assets/fonts/roboto/ klasöründen self-hosted olarak yükleniyor
+ * (bkz. custom.css içindeki @font-face tanımları).
  */
 function dailypulse_google_fonts() {
-    $fonts_url = 'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&display=swap';
+    $fonts_url = 'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@500;600;700&display=swap';
     wp_enqueue_style('dailypulse-google-fonts', $fonts_url, array(), null);
 }
 add_action('wp_enqueue_scripts', 'dailypulse_google_fonts');
