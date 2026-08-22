@@ -953,11 +953,15 @@ body.page > .site-main .page-header {
   font-size: 18px;
   line-height: 1.8;
 }
-/* Weight 350 for plain reading copy only — skip paragraphs that already carry
-   their own inline font-weight (eyebrow labels, etc.) so those keep their
-   intentional emphasis instead of being flattened. */
-.single-post .entry-content p:not([style*="font-weight"]),
-.single-post .entry-content li:not([style*="font-weight"]) {
+/* Body weight applies to plain reading copy AND the large lead paragraph
+   (which carries its own inline font-weight:500 and was previously — wrongly
+   — excluded by a blanket "any inline font-weight" check, so it never moved
+   through any of the weight changes). Only genuinely decorative bits stay
+   excluded: uppercase eyebrow/label tags (EDİTÖRÜN SEÇİMİ, DOĞRUDAN CEVAP,
+   etc.) and the couple of old-style oversized Barlow Condensed title
+   paragraphs (font-weight:900). */
+.single-post .entry-content p:not([style*="text-transform:uppercase"]):not([style*="font-weight:900"]),
+.single-post .entry-content li:not([style*="text-transform:uppercase"]):not([style*="font-weight:900"]) {
   font-weight: 500 !important;
 }
 /* Article headings read better in Quicksand than the site's condensed
