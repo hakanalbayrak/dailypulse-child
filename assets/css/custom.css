@@ -722,6 +722,19 @@ footer li, footer a, footer td, footer th,
   background-color: transparent !important;
 }
 
+/* Social icons (header, mobile drawer, footer) — Blocksy's default fill is a navy
+   blue (#3A4F66) that clashes with the site's black/yellow palette. Force it to
+   inherit the surrounding text color instead, so it's ink on light backgrounds
+   and paper on dark ones automatically. */
+a[data-network] svg,
+a[data-network] svg * {
+  fill: currentColor !important;
+}
+a[data-network]:hover svg,
+a[data-network]:hover svg * {
+  fill: var(--k-yellow) !important;
+}
+
 footer h4, .ct-footer h4, footer .widget-title, .ct-footer .widget-title {
   font-family: var(--f-display) !important;
   color: rgba(247,244,236,.7) !important;
@@ -771,8 +784,8 @@ footer [class*="widget_"], .ct-footer [class*="widget_"] {
 [data-footer*="type-1"] .ct-footer [data-row*="bottom"] [data-column="widget-area-4"] a {
   font-family: var(--f-ui) !important;
   font-size: 11px !important;
-  letter-spacing: .14em !important;
-  text-transform: uppercase !important;
+  letter-spacing: .06em !important;
+  text-transform: capitalize !important;
   color: rgba(247,244,236,.5) !important;
   text-decoration: none !important;
   white-space: nowrap;
