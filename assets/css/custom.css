@@ -950,7 +950,7 @@ body.page > .site-main .page-header {
 .single-post .entry-content li {
   font-family: var(--f-body) !important;
   color: var(--k-ink-2) !important;
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1.8;
 }
 /* Weight 350 for plain reading copy only — skip paragraphs that already carry
@@ -1009,7 +1009,7 @@ body.page > .site-main .page-header {
 .entry-content ol li {
   font-family: var(--f-body) !important;
   color: var(--k-ink-2) !important;
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1.75;
   margin-bottom: 0.5rem;
 }
