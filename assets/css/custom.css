@@ -1918,3 +1918,9 @@ html body .k-card--light { background-color: #f0fdf4; }
 html body .entry-content .k-card--light .k-card__title { color: #15803d !important; }
 html body .entry-content .k-card--light .k-card__text  { color: #374151 !important; }
 html body .entry-content .k-card--light .k-card__btn   { background-color: #17141A !important; color: #FFD600 !important; }
+
+/* Some article images carry an inline style="max-width:1200px" (a fixed px cap
+   meant to bound desktop size), which beats WP core's unqualified `img{max-width:100%}`
+   rule via specificity and stops the image shrinking below 1200px on mobile/tablet,
+   causing horizontal overflow. Force it back to responsive. */
+html body .entry-content img { max-width: 100% !important; }
