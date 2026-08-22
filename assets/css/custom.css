@@ -958,7 +958,7 @@ body.page > .site-main .page-header {
    intentional emphasis instead of being flattened. */
 .single-post .entry-content p:not([style*="font-weight"]),
 .single-post .entry-content li:not([style*="font-weight"]) {
-  font-weight: 400 !important;
+  font-weight: 450 !important;
 }
 /* Article headings read better in Quicksand than the site's condensed
    display face at body-copy sizes — overrides both the global h1-h6 rule
