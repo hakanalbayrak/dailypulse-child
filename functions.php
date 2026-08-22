@@ -1172,3 +1172,134 @@ add_filter('the_content', function($content) {
     return $content;
 });
 
+
+/* ============================================================
+   GÜNCELLEME / DOSYA SİSTEMİ — FTP sorma sorununu çöz
+
+   Sorun: WordPress eklenti/tema/çekirdek güncellemesi yaparken FTP
+   bilgisi soruyor ve girilen bilgiler kabul edilmiyor. Site Health'in
+   teşhisi: "Dosya sahipliği nedeniyle siteniz güncellemeleri FTP
+   üzerinden yapıyor."
+
+   Sebep: get_filesystem_method() geçici bir dosya oluşturup sahibini
+   hedef dizinin sahibiyle karşılaştırıyor. cPanel/LiteSpeed kurulumunda
+   bu kontrol yanlış negatif verebiliyor ve WP "ftpext" yöntemine
+   düşüyor. Oysa PHP kullanıcısı dizine gerçekten yazabiliyor — WP
+   Pusher'ın tema dosyalarını başarıyla yazabilmesi bunun kanıtı.
+
+   Çözüm: filesystem_method filtresiyle 'direct' yöntemini zorlamak.
+   Bu, WordPress'in dosyaları doğrudan PHP ile yazmasını sağlar.
+
+   Güvenlik notu: 'direct' yöntemi tek başına bir güvenlik zafiyeti
+   değildir; paylaşımlı sunucularda kullanıcı ayrımı için var olan FTP
+   fallback'i devre dışı bırakır. Yazma gerçekten mümkün değilse
+   güncelleme FTP formu yerine düz bir hata verir (veri kaybı olmaz).
+   ============================================================ */
+function kampanya_force_direct_filesystem($method) {
+    return 'direct';
+}
+add_filter('filesystem_method', 'kampanya_force_direct_filesystem', 10, 1);
+
+/* ============================================================
+   KAMPANYA REST API — Bakım / teşhis
+
+   Sadece manage_options yetkisi olan (yönetici) kullanıcılar
+   çağırabilir. Yapabildiği işlemler sabit bir allowlist ile
+   sınırlıdır — rastgele kod/komut çalıştırmaz.
+   ============================================================ */
+add_action('rest_api_init', function () {
+    register_rest_route('kampanya/v1', '/maintenance', [
+        'methods'             => 'POST',
+        'callback'            => 'kampanya_maintenance',
+        'permission_callback' => function (WP_REST_Request $r) {
+            return current_user_can('manage_options');
+        },
+        'args' => [
+            'action' => [
+                'required' => true,
+                'type'     => 'string',
+                'enum'     => ['diagnose', 'fix_litespeed_qs'],
+            ],
+        ],
+    ]);
+});
+
+/**
+ * Bir UID'yi kullanıcı adına çevirir. posix_* yoksa ya da arama
+ * başarısızsa güvenli bir metin döndürür (PHP 8'de false['name']
+ * uyarısına düşmemek için).
+ */
+function kampanya_uid_name($uid) {
+    if (!function_exists('posix_getpwuid') || $uid === false || $uid === null) {
+        return 'unknown';
+    }
+    $info = @posix_getpwuid($uid);
+    return (is_array($info) && isset($info['name'])) ? $info['name'] : (string) $uid;
+}
+
+function kampanya_maintenance(WP_REST_Request $request) {
+    $action = $request->get_param('action');
+
+    if ($action === 'diagnose') {
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+
+        $plugins_dir = WP_PLUGIN_DIR;
+        $probe       = trailingslashit($plugins_dir) . '.kampanya-write-probe';
+        $can_write   = false;
+        if (@file_put_contents($probe, 'x') !== false) {
+            $can_write = true;
+            @unlink($probe);
+        }
+
+        // Kendi filtremizi geçici olarak kaldırıp WordPress'in filtresiz
+        // olarak hangi yöntemi seçeceğini de ölçüyoruz — yoksa teşhis
+        // her zaman 'direct' der ve hiçbir şey öğrenemeyiz.
+        remove_filter('filesystem_method', 'kampanya_force_direct_filesystem', 10);
+        $raw_method = get_filesystem_method();
+        add_filter('filesystem_method', 'kampanya_force_direct_filesystem', 10, 1);
+
+        return [
+            'filesystem' => [
+                'method_without_our_filter' => $raw_method,
+                'method_with_our_filter'    => get_filesystem_method(),
+                'plugins_dir'               => $plugins_dir,
+                'plugins_writable'          => $can_write,
+                'php_user'                  => function_exists('posix_geteuid')
+                    ? kampanya_uid_name(posix_geteuid())
+                    : 'posix_unavailable',
+                'plugins_dir_owner'         => file_exists($plugins_dir)
+                    ? kampanya_uid_name(@fileowner($plugins_dir))
+                    : 'unknown',
+                'fs_method_const'           => defined('FS_METHOD') ? FS_METHOD : null,
+            ],
+            'litespeed' => [
+                'remove_query_strings' => get_option('litespeed.conf.optm-qs_rm', 'unset'),
+                'css_combine'          => get_option('litespeed.conf.optm-css_comb', 'unset'),
+            ],
+            'core' => [
+                'current_version' => get_bloginfo('version'),
+            ],
+        ];
+    }
+
+    if ($action === 'fix_litespeed_qs') {
+        // LiteSpeed'in "Remove Query Strings" ayarı asset URL'lerindeki
+        // ?ver=... kısmını siliyor. Bu da filemtime tabanlı cache
+        // busting'i etkisiz bırakıp Cloudflare'in 1 yıllık önbelleğinde
+        // takılı kalmamıza sebep oluyor. Kapatıyoruz.
+        $before = get_option('litespeed.conf.optm-qs_rm', 'unset');
+        update_option('litespeed.conf.optm-qs_rm', 0);
+
+        if (class_exists('\LiteSpeed\Purge')) {
+            \LiteSpeed\Purge::purge_all();
+        }
+
+        return [
+            'setting' => 'litespeed.conf.optm-qs_rm',
+            'before'  => $before,
+            'after'   => get_option('litespeed.conf.optm-qs_rm', 'unset'),
+        ];
+    }
+
+    return new WP_Error('unknown_action', 'Bilinmeyen işlem', ['status' => 400]);
+}
