@@ -1386,3 +1386,36 @@ function kampanya_maintenance(WP_REST_Request $request) {
 
     return new WP_Error('unknown_action', 'Bilinmeyen işlem', ['status' => 400]);
 }
+
+/* ============================================================
+   ADMIN BAR İKONLARI — inline garanti
+
+   custom.css içindeki dashicons düzeltmesi doğru çalışıyor, ancak
+   LiteSpeed giriş yapmış kullanıcılar için AYRI bir birleştirilmiş CSS
+   paketi üretiyor ve bu paket bayatlayabiliyor (Cloudflare de üstüne
+   önbelleğe alıyor). Sonuç: yönetici çubuğundaki ikonlar bazı
+   kullanıcılarda hâlâ bozuk görünüyor.
+
+   Bu kuralı doğrudan <head> içine basarak paketlemeden/CDN'den tamamen
+   bağımsız hale getiriyoruz. Sadece yönetici çubuğu görünürken çıkar,
+   yani normal ziyaretçiye hiçbir maliyeti yok.
+   ============================================================ */
+add_action('wp_head', 'kampanya_adminbar_dashicons_inline', 99);
+function kampanya_adminbar_dashicons_inline() {
+    if (!is_admin_bar_showing()) {
+        return;
+    }
+    echo '<style id="kampanya-adminbar-dashicons">'
+       . '#wpadminbar .ab-icon,'
+       . '#wpadminbar .ab-icon:before,'
+       . '#wpadminbar .ab-item:before,'
+       . '#wpadminbar .ab-item:after,'
+       . '#wpadminbar #adminbarsearch:before,'
+       . '#wpadminbar .wp-admin-bar-arrow,'
+       . '#wpadminbar [class^="dashicons"],'
+       . '#wpadminbar [class*=" dashicons"],'
+       . '#wpadminbar [class^="dashicons"]:before,'
+       . '#wpadminbar [class*=" dashicons"]:before'
+       . '{font-family:dashicons!important}'
+       . '</style>';
+}
