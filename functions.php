@@ -1218,7 +1218,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'head_probe_arm', 'head_probe_read'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose'],
             ],
         ],
     ]);
@@ -1246,23 +1246,6 @@ function kampanya_maintenance(WP_REST_Request $request) {
      * schema çikiyor; rankmath/v1 REST namespace'i de yok. Buradaki
      * sinyaller sorunun yükleme mi yoksa ayar mi oldugunu ayirir.
      */
-    /**
-     * wp_head'e gercek bir ön yüz isteginde neyin bagli oldugunu kaydeder.
-     * REST icinde bakmak yaniltici: Rank Math ön yüz kancalarini yalnizca
-     * ön yüz isteklerinde kaydeder. arm -> sayfayi ziyaret et -> read.
-     */
-    if ($action === 'head_probe_arm') {
-        update_option('kampanya_head_probe_arm', '1', false);
-        delete_option('kampanya_head_probe_data');
-        return new WP_REST_Response(['armed' => true], 200);
-    }
-    if ($action === 'head_probe_read') {
-        return new WP_REST_Response([
-            'armed' => get_option('kampanya_head_probe_arm'),
-            'data'  => get_option('kampanya_head_probe_data'),
-        ], 200);
-    }
-
     if ($action === 'seo_diagnose') {
         $active = (array) get_option('active_plugins', []);
         $rm_files = array_values(array_filter($active, function ($f) {
@@ -1490,43 +1473,4 @@ function kampanya_adminbar_dashicons_inline() {
        . '#wpadminbar [class*=" dashicons"]:before'
        . '{font-family:dashicons!important}'
        . '</style>';
-}
-
-/**
- * head_probe: yalnizca elle kurulduğunda (option ile) bir kez calisir,
- * wp_head'e bagli tüm callback'leri kaydedip kendini kapatir.
- */
-add_action('wp_head', 'kampanya_head_probe', 99999);
-function kampanya_head_probe() {
-    if (get_option('kampanya_head_probe_arm') !== '1') {
-        return;
-    }
-    global $wp_filter;
-    $list = [];
-    if (isset($wp_filter['wp_head'])) {
-        foreach ($wp_filter['wp_head']->callbacks as $prio => $cbs) {
-            foreach ($cbs as $cb) {
-                $f = $cb['function'];
-                if (is_string($f)) {
-                    $name = $f;
-                } elseif (is_array($f)) {
-                    $name = (is_object($f[0]) ? get_class($f[0]) : (string) $f[0]) . '::' . $f[1];
-                } elseif ($f instanceof Closure) {
-                    $r = new ReflectionFunction($f);
-                    $name = 'closure@' . basename($r->getFileName()) . ':' . $r->getStartLine();
-                } else {
-                    $name = 'unknown';
-                }
-                $list[] = $prio . ' | ' . $name;
-            }
-        }
-    }
-    update_option('kampanya_head_probe_data', [
-        'url'       => home_url(add_query_arg([])),
-        'is_admin'  => is_admin(),
-        'callbacks' => $list,
-        'rm_class'  => class_exists('RankMath'),
-        'rm_head'   => class_exists('RankMath\\Frontend\\Frontend'),
-    ], false);
-    update_option('kampanya_head_probe_arm', '0', false);
 }
