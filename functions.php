@@ -1521,28 +1521,7 @@ function kampanya_head_probe() {
             }
         }
     }
-    $rm = [];
-    if (function_exists('rank_math')) {
-        $c = rank_math();
-        $rm['container_keys'] = method_exists($c, 'offsetExists') ? 'container-object' : gettype($c);
-        foreach (['frontend', 'head', 'json', 'schema'] as $k) {
-            $rm['has_' . $k] = isset($c->$k) ? true : (isset($c[$k]) ? true : false);
-        }
-    } else {
-        $rm['rank_math_fn'] = false;
-    }
-    $rm['disable_integration'] = apply_filters('rank_math/frontend/disable_integration', false);
-    $rm['is_configured']       = class_exists('RankMath\\Helper') && method_exists('RankMath\\Helper', 'is_configured')
-                                 ? RankMath\Helper::is_configured() : 'n/a';
-    foreach (['rank_math_registration_skip','rank-math-wizard-completed','rank_math_wizard_completed',
-              'rank_math_connect_data','rank-math-options-instant-indexing'] as $o) {
-        $rm['opt_' . $o] = get_option($o, '(unset)');
-    }
-    $rm['module_frontend_active'] = class_exists('RankMath\\Helper') && method_exists('RankMath\\Helper','is_module_active')
-        ? ['rich-snippet' => RankMath\Helper::is_module_active('rich-snippet')] : 'n/a';
-
     update_option('kampanya_head_probe_data', [
-        'rank_math' => $rm,
         'url'       => home_url(add_query_arg([])),
         'is_admin'  => is_admin(),
         'callbacks' => $list,
