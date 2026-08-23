@@ -2033,3 +2033,19 @@ html body .entry-content .k-card--light .k-card__btn   { background-color: #1714
    rule via specificity and stops the image shrinking below 1200px on mobile/tablet,
    causing horizontal overflow. Force it back to responsive. */
 html body .entry-content img { max-width: 100% !important; }
+
+/* Makale görselleri dikey (3:4 / 2:3) çekimler. Tam içerik genişliğinde
+   yayınlandıklarında ~1000px yüksekliğe ulaşıp yazının hemen başında
+   ekranı tamamen dolduruyorlar; okuyucu ilk paragrafa ulaşmak için
+   kaydırmak zorunda kalıyor ve LCP gereksiz büyüyor.
+   Yüksekliği sınırlayıp genişliği otomatik bırakıyoruz: en-boy oranı
+   korunur, yatay görseller etkilenmez (zaten bu yüksekliğin altındalar). */
+html body .entry-content figure.wp-block-image img {
+  max-height: 620px;
+  width: auto;
+  margin-left: auto;
+  margin-right: auto;
+}
+@media (max-width: 600px) {
+  html body .entry-content figure.wp-block-image img { max-height: 440px; }
+}
