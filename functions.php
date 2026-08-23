@@ -18,8 +18,8 @@ require_once DAILYPULSE_DIR . '/inc/shortcodes.php';
 /**
  * Google Fonts yükle — Barlow (UI) + Barlow Condensed (display)
  *
- * Body fontu (Roboto) Google CDN'den değil, temanın kendi
- * assets/fonts/roboto/ klasöründen self-hosted olarak yükleniyor
+ * Body fontu (Quicksand) Google CDN'den değil, temanın kendi
+ * assets/fonts/quicksand/ klasöründen self-hosted olarak yükleniyor
  * (bkz. custom.css içindeki @font-face tanımları).
  */
 function dailypulse_google_fonts() {
