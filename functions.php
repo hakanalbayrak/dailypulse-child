@@ -1218,7 +1218,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose'],
             ],
         ],
     ]);
@@ -1239,6 +1239,61 @@ function kampanya_uid_name($uid) {
 
 function kampanya_maintenance(WP_REST_Request $request) {
     $action = $request->get_param('action');
+
+    /**
+     * Rank Math neden hicbir sey basmiyor? Salt okunur teshis.
+     * Eklenti "aktif" görünüyor ama frontend'de ne meta description ne de
+     * schema çikiyor; rankmath/v1 REST namespace'i de yok. Buradaki
+     * sinyaller sorunun yükleme mi yoksa ayar mi oldugunu ayirir.
+     */
+    if ($action === 'seo_diagnose') {
+        $active = (array) get_option('active_plugins', []);
+        $rm_files = array_values(array_filter($active, function ($f) {
+            return stripos($f, 'seo-by-rank-math') !== false || stripos($f, 'rank-math') !== false;
+        }));
+
+        $modules = get_option('rank_math_modules', null);
+        $titles  = get_option('rank-math-options-titles', null);
+        $general = get_option('rank-math-options-general', null);
+
+        $out = [
+            'active_plugin_entries' => $rm_files,
+            'plugin_file_exists'    => array_map(function ($f) {
+                return [$f => file_exists(trailingslashit(WP_PLUGIN_DIR) . $f)];
+            }, $rm_files),
+            'class_RankMath'        => class_exists('RankMath'),
+            'const_RANK_MATH_VERSION' => defined('RANK_MATH_VERSION') ? RANK_MATH_VERSION : null,
+            'wizard_completed'      => get_option('rank_math_registration_skip', null),
+            'modules_option'        => is_array($modules) ? array_values($modules) : $modules,
+            'titles_option_keys'    => is_array($titles) ? array_slice(array_keys($titles), 0, 40) : $titles,
+            'noindex_post'          => is_array($titles) && isset($titles['pt_post_custom_robots']) ? $titles['pt_post_custom_robots'] : null,
+            'robots_post'           => is_array($titles) && isset($titles['pt_post_robots']) ? $titles['pt_post_robots'] : null,
+            'general_option_keys'   => is_array($general) ? array_slice(array_keys($general), 0, 40) : $general,
+            'blog_public'           => get_option('blog_public'),
+            'wp_head_hooked'        => [],
+            'other_seo_plugins'     => array_values(array_filter($active, function ($f) {
+                return preg_match('~(wordpress-seo|all-in-one-seo|seopress|squirrly|slim-seo)~i', $f);
+            })),
+        ];
+
+        global $wp_filter;
+        if (isset($wp_filter['wp_head'])) {
+            foreach ($wp_filter['wp_head']->callbacks as $prio => $cbs) {
+                foreach ($cbs as $id => $cb) {
+                    $name = is_string($cb['function']) ? $cb['function'] : (
+                        is_array($cb['function'])
+                            ? (is_object($cb['function'][0]) ? get_class($cb['function'][0]) : (string) $cb['function'][0]) . '::' . $cb['function'][1]
+                            : 'closure'
+                    );
+                    if (stripos($name, 'rank') !== false || stripos($name, 'seo') !== false) {
+                        $out['wp_head_hooked'][] = $prio . ' ' . $name;
+                    }
+                }
+            }
+        }
+
+        return new WP_REST_Response($out, 200);
+    }
 
     if ($action === 'diagnose') {
         require_once ABSPATH . 'wp-admin/includes/file.php';
