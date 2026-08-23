@@ -1740,7 +1740,12 @@ button.k-subscribe-btn:disabled,
 .k-post-card:hover .k-post-card__img-wrap {
   border-color: var(--k-rule-ink);
 }
-.k-post-card--hero .k-post-card__img-wrap { aspect-ratio: 16/7; }
+/* Hero kart görseli 16/7 (2.29:1) çok genişti: dikey (3:4) bir görselden
+   yalnızca %33'lük yatay bir şerit kalıyor ve ürünün altı/üstü kırpılıyordu.
+   16/9'a çekildiğinde dikey görsellerden %42, yatay (16:9) görsellerden ise
+   tamamı korunuyor. Kart yüksekliği bir miktar artıyor, karşılığında ürün
+   kadrajda kalıyor. */
+.k-post-card--hero .k-post-card__img-wrap { aspect-ratio: 16/9; }
 .k-post-card__img {
   width: 100%; height: 100%;
   object-fit: cover; display: block;
