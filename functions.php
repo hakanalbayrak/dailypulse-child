@@ -14,6 +14,7 @@ require_once DAILYPULSE_DIR . '/inc/enqueue.php';
 require_once DAILYPULSE_DIR . '/inc/customizer.php';
 require_once DAILYPULSE_DIR . '/inc/widgets.php';
 require_once DAILYPULSE_DIR . '/inc/shortcodes.php';
+require_once DAILYPULSE_DIR . '/inc/seo.php';
 
 /**
  * Google Fonts yükle — Barlow (UI) + Barlow Condensed (display)
