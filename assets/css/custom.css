@@ -50,6 +50,9 @@
   --k-signal:       #E4442B;   /* warm vermillion — urgency only */
   --k-signal-wash:  #F8E2DC;
 
+  --k-link-blue:       #1A73E8;   /* entry-content links — ordinary "link blue" */
+  --k-link-blue-hover: #1558B0;
+
   /* ── Legacy aliases (used throughout) ── */
   --k-black:        #17141A;
   --k-gray-900:     #2B1B2E;
@@ -1049,29 +1052,36 @@ body.page > .site-main .page-header {
   .single-post .entry-content p,
   .single-post .entry-content li { font-size: 18px; }
 }
-/* Links inside post content — underline, but NOT on buttons */
+/* Links inside post content — plain, recognizable "link blue", underlined,
+   but NOT on buttons. Replaces the earlier ink-gray/yellow-underline scheme:
+   on the live site those blended into body copy instead of reading as
+   clickable, so every entry-content link (product-name h3 links AND in-text
+   trigger links) now shares one ordinary blue. */
 .single-post .entry-content a:not(.wp-block-button__link) {
-  color: var(--k-ink-2) !important;
+  color: var(--k-link-blue) !important;
   text-decoration: underline;
+  text-decoration-color: var(--k-link-blue) !important;
   text-underline-offset: 2px;
 }
 .single-post .entry-content a:not(.wp-block-button__link):hover {
-  color: var(--k-ink) !important;
+  color: var(--k-link-blue-hover) !important;
+  text-decoration-color: var(--k-link-blue-hover) !important;
 }
 
-/* In-text affiliate trigger links — subtle yellow underline to stand out */
+/* In-text affiliate trigger links — same blue, kept bold so they still stand
+   out a little more than a plain reference link. */
 .single-post .entry-content p a[rel~="noopener"],
 .single-post .entry-content li a[rel~="noopener"] {
-  color: var(--k-ink) !important;
+  color: var(--k-link-blue) !important;
   font-weight: 600;
-  text-decoration-color: var(--k-yellow) !important;
+  text-decoration-color: var(--k-link-blue) !important;
   text-decoration-thickness: 2px !important;
   text-underline-offset: 3px !important;
 }
 .single-post .entry-content p a[rel~="noopener"]:hover,
 .single-post .entry-content li a[rel~="noopener"]:hover {
-  color: var(--k-ink) !important;
-  background: var(--k-yellow-wash) !important;
+  color: var(--k-link-blue-hover) !important;
+  background: rgba(26, 115, 232, 0.08) !important;
   padding: 0 2px;
   border-radius: 2px;
 }
@@ -2053,4 +2063,106 @@ html body .entry-content figure.wp-block-image img {
 }
 @media (max-width: 600px) {
   html body .entry-content figure.wp-block-image img { max-height: 440px; }
+}
+
+/* =============================================
+   ÜRÜN İNDEKSİ — analiz bölümünün sonuna otomatik eklenen
+   "1. Ürün Adı / 2. ... " numaralı liste (inc/content-extras.php).
+   Sadece linkler; a rengi genel entry-content a kuralından miras alınır.
+   ============================================= */
+html body .entry-content .k-product-index {
+  margin-top: 2.6rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--k-rule);
+}
+html body .entry-content .k-product-index ol {
+  margin: 0;
+  padding-left: 1.4rem;
+}
+html body .entry-content .k-product-index li {
+  font-size: 17px;
+  margin-bottom: 0.35rem;
+}
+html body .entry-content .k-product-index a {
+  font-weight: 600;
+}
+
+/* =============================================
+   İLGİLİ MAKALELER — makale sonuna otomatik eklenen, kategori/etiket
+   ortaklığına göre bulunan ilişkili yazılar (inc/content-extras.php).
+   .k-post-card ile aynı görsel dil, ama entry-content içine gömüldüğü
+   için Blocksy'nin h1-h6/p !important kurallarını yenecek şekilde
+   ayrı, yüksek özgüllükte bir bileşen olarak tanımlanıyor (bkz. .k-card
+   sistemi hakkındaki not yukarıda).
+   ============================================= */
+html body .entry-content .k-related {
+  margin-top: 3.2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--k-rule);
+}
+html body .entry-content .k-related__heading {
+  font-family: var(--f-ui) !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--k-ink-3) !important;
+  margin: 0 0 1.1rem !important;
+}
+html body .entry-content .k-related-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+@media (max-width: 782px) {
+  html body .entry-content .k-related-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  html body .entry-content .k-related-grid { grid-template-columns: 1fr; }
+}
+html body .entry-content .k-related-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--k-radius);
+  overflow: hidden;
+  background: var(--k-white);
+  border: 1px solid var(--k-rule);
+  text-decoration: none !important;
+  transition: border-color var(--dur, .2s) var(--ease, ease), transform var(--dur, .2s) var(--ease, ease);
+}
+html body .entry-content .k-related-card:hover {
+  border-color: var(--k-ink-3);
+  transform: translateY(-2px);
+}
+html body .entry-content .k-related-card__img-wrap {
+  aspect-ratio: 16/10;
+  background: var(--k-paper-3);
+  overflow: hidden;
+}
+html body .entry-content .k-related-card__img-wrap img {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+  object-fit: cover;
+  margin: 0 !important;
+  display: block;
+}
+html body .entry-content .k-related-card__body {
+  padding: 14px 16px 16px;
+}
+html body .entry-content .k-related-card__title {
+  font-family: var(--f-body) !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  color: var(--k-ink) !important;
+  text-transform: none !important;
+  margin: 0 0 6px !important;
+}
+html body .entry-content .k-related-card__excerpt {
+  font-family: var(--f-body) !important;
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+  color: var(--k-ink-3) !important;
+  margin: 0 !important;
 }
