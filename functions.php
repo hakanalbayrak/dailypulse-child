@@ -1220,7 +1220,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'content_extras_diagnose'],
             ],
         ],
     ]);
@@ -1439,6 +1439,27 @@ function kampanya_maintenance(WP_REST_Request $request) {
         }
 
         return ['updated' => $report, 'messages' => $skin->get_upgrade_messages()];
+    }
+
+    if ($action === 'content_extras_diagnose') {
+        $file = DAILYPULSE_DIR . '/inc/content-extras.php';
+        try {
+            require $file;
+            $ok = function_exists('kampanya_content_extras');
+            return [
+                'included_ok'        => true,
+                'function_defined'   => $ok,
+                'php_version'        => PHP_VERSION,
+            ];
+        } catch (\Throwable $e) {
+            return [
+                'included_ok' => false,
+                'error_class' => get_class($e),
+                'message'     => $e->getMessage(),
+                'file'        => $e->getFile(),
+                'line'        => $e->getLine(),
+            ];
+        }
     }
 
     return new WP_Error('unknown_action', 'Bilinmeyen işlem', ['status' => 400]);
