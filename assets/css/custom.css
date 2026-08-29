@@ -2075,14 +2075,30 @@ html body .entry-content .k-buybox__product {
   color: var(--k-yellow) !important;
   font-family: var(--f-display) !important;
   font-weight: 800 !important;
-  font-size: 1.3rem !important;
-  line-height: 1.25 !important;
+  font-size: 1.7rem !important;
+  line-height: 1.2 !important;
   letter-spacing: 0.2px;
   text-transform: none !important;
-  margin: 0 0 8px !important;
+  margin: 0 0 10px !important;
 }
 @media (max-width: 600px) {
-  html body .entry-content .k-buybox__product { font-size: 1.5rem !important; }
+  html body .entry-content .k-buybox__product { font-size: 2rem !important; }
+}
+
+/* Satın Al kutusunun tamamı link (bkz. buybox_wholelink transform script).
+   Sarmalayan <a> kendi rengini/altı çizili halini dayatmasın diye override
+   ediyoruz — .single-post .entry-content a:not(.wp-block-button__link)
+   kuralını yenecek özgüllükte (bkz. yukarıdaki .k-related notu, aynı desen). */
+html body .single-post .entry-content a.k-buybox__link {
+  display: block;
+  color: inherit !important;
+  text-decoration: none !important;
+}
+html body .single-post .entry-content a.k-buybox__link:hover {
+  color: inherit !important;
+}
+html body .single-post .entry-content a.k-buybox__link:hover .k-buybox__product {
+  color: var(--k-yellow-dim) !important;
 }
 
 /* =============================================
