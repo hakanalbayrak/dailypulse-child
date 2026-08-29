@@ -15,7 +15,7 @@ require_once DAILYPULSE_DIR . '/inc/customizer.php';
 require_once DAILYPULSE_DIR . '/inc/widgets.php';
 require_once DAILYPULSE_DIR . '/inc/shortcodes.php';
 require_once DAILYPULSE_DIR . '/inc/seo.php';
-require_once DAILYPULSE_DIR . '/inc/content-extras.php';
+// require_once DAILYPULSE_DIR . '/inc/content-extras.php'; // TEMPORARILY DISABLED — caused a fatal on every singular post, see commit history
 
 /**
  * Google Fonts yükle — Barlow (UI) + Barlow Condensed (display)
