@@ -2068,21 +2068,32 @@ html body .entry-content figure.wp-block-image img {
 /* =============================================
    SATIN AL KUTUSU — koyu (#17141A) CTA bloğunun en üstünde, hangi ürünün
    önerildiğini net gösteren ürün adı satırı. Önceki metin (etiket satırı)
-   ürün adını hiç söylemiyordu; bu satır onu belirginleştiriyor. Mobilde
-   biraz daha büyük — kutuyu hızlı taramada asıl göz atılan yer burası.
+   ürün adını hiç söylemiyordu; bu satır onu belirginleştiriyor.
+
+   FONT NOTU: burada bilerek --f-display (Barlow Condensed) KULLANILMIYOR.
+   Condensed yüzler dar olduğu için 1.7rem'de bile hemen altındaki 1.05rem
+   Quicksand etiket metninden daha küçük görünüyordu — ölçü büyüktü ama
+   okunaklılık değildi. Gövde fontu (Quicksand) aynı ölçüde belirgin şekilde
+   daha iri okunuyor.
+
+   Ürün adları 6 ile 61 karakter arasında değişiyor; bu yüzden mobilde
+   masaüstünden BÜYÜK değil, biraz daha küçük bir ölçü kullanıyoruz —
+   uzun adlar dar ekranda 4-5 satıra taşıp kutuyu şişirmesin diye.
    ============================================= */
 html body .entry-content .k-buybox__product {
   color: var(--k-yellow) !important;
-  font-family: var(--f-display) !important;
-  font-weight: 800 !important;
-  font-size: 1.7rem !important;
-  line-height: 1.2 !important;
-  letter-spacing: 0.2px;
+  font-family: var(--f-body) !important;
+  font-weight: 700 !important;
+  font-size: 2rem !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0 !important;
   text-transform: none !important;
-  margin: 0 0 10px !important;
+  margin: 0 0 12px !important;
 }
 @media (max-width: 600px) {
-  html body .entry-content .k-buybox__product { font-size: 2rem !important; }
+  html body .entry-content .k-buybox__product {
+    font-size: 1.75rem !important;
+  }
 }
 
 /* Satın Al kutusunun tamamı link (bkz. buybox_wholelink transform script).
