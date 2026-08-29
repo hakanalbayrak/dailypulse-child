@@ -1220,7 +1220,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'render_probe'],
             ],
         ],
     ]);
@@ -1439,6 +1439,48 @@ function kampanya_maintenance(WP_REST_Request $request) {
         }
 
         return ['updated' => $report, 'messages' => $skin->get_upgrade_messages()];
+    }
+
+    if ($action === 'render_probe') {
+        $pid  = (int) $request->get_param('post_id') ?: 3386;
+        $post = get_post($pid);
+        $raw  = $post ? $post->post_content : '';
+
+        $out = [
+            'raw_len'          => strlen($raw),
+            'raw_has_banner'   => strpos($raw, 'wp:group') !== false,
+            'object_cache'     => wp_using_ext_object_cache(),
+            'blocks_parsed'    => count(parse_blocks($raw)),
+        ];
+
+        // do_blocks alone, no the_content filters
+        $blocks_only = do_blocks($raw);
+        $out['do_blocks_len'] = strlen($blocks_only);
+        $out['do_blocks_has_h1'] = strpos($blocks_only, '</h1>') !== false;
+
+        // full the_content chain
+        $filtered = apply_filters('the_content', $raw);
+        $out['the_content_len'] = strlen($filtered);
+        $out['the_content_has_h1'] = strpos($filtered, '</h1>') !== false;
+
+        // which callbacks are on the_content
+        global $wp_filter;
+        $cbs = [];
+        if (isset($wp_filter['the_content'])) {
+            foreach ($wp_filter['the_content']->callbacks as $prio => $list) {
+                foreach ($list as $id => $cb) {
+                    $name = is_string($cb['function']) ? $cb['function'] : (
+                        is_array($cb['function'])
+                            ? (is_object($cb['function'][0]) ? get_class($cb['function'][0]) : (string) $cb['function'][0]) . '::' . (string) $cb['function'][1]
+                            : 'closure'
+                    );
+                    $cbs[] = $prio . ' ' . $name;
+                }
+            }
+        }
+        $out['the_content_callbacks'] = $cbs;
+
+        return $out;
     }
 
     if ($action === 'purge_cache_now') {
