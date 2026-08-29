@@ -1220,7 +1220,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'content_extras_diagnose'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'content_extras_diagnose', 'purge_cache_now'],
             ],
         ],
     ]);
@@ -1492,6 +1492,15 @@ function kampanya_maintenance(WP_REST_Request $request) {
         }
 
         return $result;
+    }
+
+    if ($action === 'purge_cache_now') {
+        $purged = false;
+        if (class_exists('\LiteSpeed\Purge')) {
+            \LiteSpeed\Purge::purge_all();
+            $purged = true;
+        }
+        return ['purged' => $purged];
     }
 
     return new WP_Error('unknown_action', 'Bilinmeyen işlem', ['status' => 400]);
