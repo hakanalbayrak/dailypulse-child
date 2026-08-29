@@ -141,6 +141,26 @@ function kampanya_related_posts_query($post_id, $limit = 3) {
     return array_values($collected);
 }
 
+/**
+ * Manuel özet üretir — get_the_excerpt() KASITLI OLARAK kullanılmıyor:
+ * özeti manuel girilmemiş yazılarda WordPress çekirdeği (wp_trim_excerpt)
+ * özeti üretmeden önce içeriği 'the_content' filtresinden geçiriyor. Biz
+ * zaten 'the_content' filtresinin içindeyiz (kampanya_content_extras),
+ * bu yüzden get_the_excerpt() her ilişkili yazı için filtreyi yeniden
+ * tetikler — is_singular/in_the_loop/is_main_query hâlâ true olduğundan
+ * guard bunu durduramaz ve sonsuz özyineleme (500 hatası) oluşur.
+ * Basit, filtre zincirine hiç girmeyen bir kırpma yeterli ve daha isabetli.
+ */
+function kampanya_plain_excerpt($post, $words = 20) {
+    if (!empty($post->post_excerpt)) {
+        return wp_trim_words(wp_strip_all_tags($post->post_excerpt), $words);
+    }
+    $text = strip_shortcodes((string) $post->post_content);
+    $text = preg_replace('~<!--.*?-->~s', ' ', $text);
+    $text = wp_strip_all_tags($text);
+    return wp_trim_words($text, $words);
+}
+
 function kampanya_render_related_posts($posts) {
     if (empty($posts)) {
         return '';
@@ -148,7 +168,7 @@ function kampanya_render_related_posts($posts) {
     $cards = '';
     foreach ($posts as $p) {
         $title   = get_the_title($p);
-        $excerpt = wp_trim_words(get_the_excerpt($p), 20);
+        $excerpt = kampanya_plain_excerpt($p, 20);
         $img     = has_post_thumbnail($p)
             ? get_the_post_thumbnail($p, 'card-regular', ['alt' => esc_attr($title)])
             : '';
@@ -170,16 +190,6 @@ function kampanya_render_related_posts($posts) {
 
 add_filter('the_content', 'kampanya_content_extras', 20);
 function kampanya_content_extras($content) {
-    // GEÇİCİ TEŞHİS — hangi guard'ın engellediğini görmek için her çağrıda kaydediyoruz.
-    update_option('kampanya_content_extras_debug', [
-        'is_admin'      => is_admin(),
-        'is_singular'   => is_singular('post'),
-        'in_the_loop'   => in_the_loop(),
-        'is_main_query' => is_main_query(),
-        'post_id'       => get_the_ID(),
-        'content_len'   => strlen((string) $content),
-    ], false);
-
     if (is_admin() || !is_singular('post') || !in_the_loop() || !is_main_query()) {
         return $content;
     }
@@ -188,8 +198,20 @@ function kampanya_content_extras($content) {
         return $content;
     }
 
+    // Yeniden giriş koruması: kampanya_plain_excerpt() bilerek the_content
+    // filtresine hiç girmiyor (bkz. yorum), ama ileride bu fonksiyon
+    // değişirse ya da başka bir kod yolu 'the_content'i içeriden tekrar
+    // tetiklerse burada sonsuz özyinelemeyi kesin olarak durduruyoruz.
+    static $running = false;
+    if ($running) {
+        return $content;
+    }
+    $running = true;
+
     $extra  = kampanya_render_product_index(kampanya_extract_product_links($content));
     $extra .= kampanya_render_related_posts(kampanya_related_posts_query($post_id, 3));
+
+    $running = false;
 
     if ($extra === '') {
         return $content;

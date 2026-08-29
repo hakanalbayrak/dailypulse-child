@@ -1220,7 +1220,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'content_extras_diagnose', 'purge_cache_now', 'content_extras_debug_read'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'content_extras_diagnose', 'purge_cache_now'],
             ],
         ],
     ]);
@@ -1492,10 +1492,6 @@ function kampanya_maintenance(WP_REST_Request $request) {
         }
 
         return $result;
-    }
-
-    if ($action === 'content_extras_debug_read') {
-        return ['debug' => get_option('kampanya_content_extras_debug', null)];
     }
 
     if ($action === 'purge_cache_now') {
