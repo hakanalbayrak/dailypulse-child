@@ -1220,7 +1220,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'content_extras_diagnose', 'purge_cache_now'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now'],
             ],
         ],
     ]);
@@ -1439,59 +1439,6 @@ function kampanya_maintenance(WP_REST_Request $request) {
         }
 
         return ['updated' => $report, 'messages' => $skin->get_upgrade_messages()];
-    }
-
-    if ($action === 'content_extras_diagnose') {
-        $file = DAILYPULSE_DIR . '/inc/content-extras.php';
-        $test_post_id = (int) $request->get_param('post_id') ?: 3386;
-        $result = ['included_ok' => false];
-        try {
-            require_once $file;
-            $result['included_ok'] = true;
-            $result['function_defined'] = function_exists('kampanya_content_extras');
-        } catch (\Throwable $e) {
-            return [
-                'stage'       => 'include',
-                'error_class' => get_class($e),
-                'message'     => $e->getMessage(),
-                'file'        => $e->getFile(),
-                'line'        => $e->getLine(),
-            ];
-        }
-
-        try {
-            $post = get_post($test_post_id);
-            $result['post_found'] = (bool) $post;
-            $result['post_status'] = $post ? $post->post_status : null;
-        } catch (\Throwable $e) {
-            $result['get_post_error'] = ['class' => get_class($e), 'message' => $e->getMessage(), 'line' => $e->getLine()];
-        }
-
-        try {
-            $links = kampanya_extract_product_links($post ? $post->post_content : '');
-            $result['links_found'] = count($links);
-            $idx = kampanya_render_product_index($links);
-            $result['index_html_len'] = strlen($idx);
-        } catch (\Throwable $e) {
-            $result['extract_or_index_error'] = ['class' => get_class($e), 'message' => $e->getMessage(), 'line' => $e->getLine()];
-        }
-
-        try {
-            $related = kampanya_related_posts_query($test_post_id, 3);
-            $result['related_count'] = count($related);
-        } catch (\Throwable $e) {
-            $result['related_query_error'] = ['class' => get_class($e), 'message' => $e->getMessage(), 'line' => $e->getLine()];
-            return $result;
-        }
-
-        try {
-            $html = kampanya_render_related_posts($related);
-            $result['related_html_len'] = strlen($html);
-        } catch (\Throwable $e) {
-            $result['render_related_error'] = ['class' => get_class($e), 'message' => $e->getMessage(), 'line' => $e->getLine()];
-        }
-
-        return $result;
     }
 
     if ($action === 'purge_cache_now') {
