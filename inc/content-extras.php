@@ -170,6 +170,16 @@ function kampanya_render_related_posts($posts) {
 
 add_filter('the_content', 'kampanya_content_extras', 20);
 function kampanya_content_extras($content) {
+    // GEÇİCİ TEŞHİS — hangi guard'ın engellediğini görmek için her çağrıda kaydediyoruz.
+    update_option('kampanya_content_extras_debug', [
+        'is_admin'      => is_admin(),
+        'is_singular'   => is_singular('post'),
+        'in_the_loop'   => in_the_loop(),
+        'is_main_query' => is_main_query(),
+        'post_id'       => get_the_ID(),
+        'content_len'   => strlen((string) $content),
+    ], false);
+
     if (is_admin() || !is_singular('post') || !in_the_loop() || !is_main_query()) {
         return $content;
     }
