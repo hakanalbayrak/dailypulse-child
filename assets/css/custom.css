@@ -2080,7 +2080,17 @@ html body .entry-content figure.wp-block-image img {
    masaüstünden BÜYÜK değil, biraz daha küçük bir ölçü kullanıyoruz —
    uzun adlar dar ekranda 4-5 satıra taşıp kutuyu şişirmesin diye.
    ============================================= */
-html body .entry-content .k-buybox__product {
+/* ÖZGÜLLÜK NOTU — bu seçici neden bu kadar uzun:
+   Eski satın-al kutusu tasarımından kalan şu kural hâlâ yürürlükte:
+     .entry-content .wp-block-group[style*="background:#17141A"] p:first-child
+     { font-size:12px !important; text-transform:uppercase; letter-spacing:2.5px }
+   Özgüllüğü (0,0,4,1); ürün adı da bu kutunun ilk <p>'si olduğu için
+   ona takılıyordu. Daha kısa bir seçici (0,0,2,2) !important olmasına
+   rağmen KAYBEDİYOR — bu yüzden ürün adı 12px büyük harf olarak
+   render ediliyordu. Aşağıdaki zincir (0,0,4,3) o kuralı kesin olarak
+   yeniyor. Kısaltmadan önce yukarıdaki kuralın hâlâ var olup olmadığına bak. */
+html body .entry-content .wp-block-group[style*="background:#17141A"] p.k-buybox__product,
+html body .entry-content p.k-buybox__product {
   color: var(--k-yellow) !important;
   font-family: var(--f-body) !important;
   font-weight: 700 !important;
@@ -2091,7 +2101,8 @@ html body .entry-content .k-buybox__product {
   margin: 0 0 12px !important;
 }
 @media (max-width: 600px) {
-  html body .entry-content .k-buybox__product {
+  html body .entry-content .wp-block-group[style*="background:#17141A"] p.k-buybox__product,
+  html body .entry-content p.k-buybox__product {
     font-size: 1.75rem !important;
   }
 }
