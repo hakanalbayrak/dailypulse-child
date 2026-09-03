@@ -154,6 +154,19 @@ function kampanya_seo_current_image() {
 }
 
 /**
+ * Google Search Console site doğrulaması.
+ *
+ * URL prefix mülkü (https://kampanya.website/) 2026-09-04'te bu meta etiketiyle
+ * doğrulandı. Search Console doğrulamayı periyodik olarak yeniden kontrol
+ * ediyor — etiket kaldırılırsa mülk doğrulanmamış duruma düşer ve indeksleme
+ * raporlarına erişim kaybedilir. SİLMEYİN.
+ */
+add_action('wp_head', 'kampanya_site_verification', 1);
+function kampanya_site_verification() {
+    echo '<meta name="google-site-verification" content="ywVlXYf1ffhDFCiSZFquvMIwchngFPny9K1FvaqXGvk" />' . "\n";
+}
+
+/**
  * meta description + Open Graph + Twitter kartları.
  */
 add_action('wp_head', 'kampanya_seo_meta_tags', 2);
