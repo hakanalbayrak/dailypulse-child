@@ -2241,15 +2241,22 @@ html body .entry-content .k-related-card__excerpt {
    Aşağıdaki iki seçici bunu içerik tarafına dokunmadan geri alıyor:
    biri butonun kendisini (sarı arka planlı <a>), diğeri sarı kutu
    içindeki linkleri hedefliyor.
+
+   DİKKAT — `single-post` sınıfı BODY'nin kendi üzerinde. Bu yüzden
+   `body.single-post` (bitişik) yazılmalı; `body .single-post` (boşluklu)
+   yazılırsa seçici body İÇİNDE bir .single-post elemanı arar, hiçbir şeyle
+   eşleşmez ve kural sessizce ölür. İlk denemede tam olarak bu oldu:
+   dosya deploy edildi, kural tarayıcıya ulaştı, ama hiçbir elemanla
+   eşleşmediği için butonlar mavi kalmaya devam etti.
    ============================================= */
-html body .single-post .entry-content a[style*="background:#FFD600"],
-html body .single-post .entry-content div[style*="background:#FFD600"] a {
+html body.single-post .entry-content a[style*="background:#FFD600"],
+html body.single-post .entry-content div[style*="background:#FFD600"] a {
   color: #17141A !important;
   text-decoration: none !important;
   text-decoration-color: transparent !important;
 }
-html body .single-post .entry-content a[style*="background:#FFD600"]:hover,
-html body .single-post .entry-content div[style*="background:#FFD600"] a:hover {
+html body.single-post .entry-content a[style*="background:#FFD600"]:hover,
+html body.single-post .entry-content div[style*="background:#FFD600"] a:hover {
   color: #17141A !important;
   text-decoration: none !important;
   filter: brightness(0.94);
