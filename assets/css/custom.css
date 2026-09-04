@@ -2222,3 +2222,35 @@ html body .entry-content .k-related-card__excerpt {
   color: var(--k-ink-3) !important;
   margin: 0 !important;
 }
+
+/* =============================================
+   SARI CTA BUTONLARI — mavi link rengi düzeltmesi (2026-09-04)
+
+   İçerikteki sarı butonlar inline style ile yazılıyor:
+     <a style="display:inline-block;background:#FFD600;color:#17141A;...">
+
+   Inline `color` bildirimi `!important` taşımıyor. Yukarıdaki
+     .single-post .entry-content a:not(.wp-block-button__link) {
+       color: var(--k-link-blue) !important;
+     }
+   kuralı ise taşıyor — ve !important'lı kural, !important'sız inline
+   bildirimi yener. Sonuç: sarı zemin üzerinde MAVİ ve altı çizili buton
+   yazısı. Aynı sebeple sarı banner içindeki başlık linki de maviye
+   dönüyordu.
+
+   Aşağıdaki iki seçici bunu içerik tarafına dokunmadan geri alıyor:
+   biri butonun kendisini (sarı arka planlı <a>), diğeri sarı kutu
+   içindeki linkleri hedefliyor.
+   ============================================= */
+html body .single-post .entry-content a[style*="background:#FFD600"],
+html body .single-post .entry-content div[style*="background:#FFD600"] a {
+  color: #17141A !important;
+  text-decoration: none !important;
+  text-decoration-color: transparent !important;
+}
+html body .single-post .entry-content a[style*="background:#FFD600"]:hover,
+html body .single-post .entry-content div[style*="background:#FFD600"] a:hover {
+  color: #17141A !important;
+  text-decoration: none !important;
+  filter: brightness(0.94);
+}
