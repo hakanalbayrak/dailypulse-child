@@ -2261,3 +2261,54 @@ html body.single-post .entry-content div[style*="background:#FFD600"] a:hover {
   text-decoration: none !important;
   filter: brightness(0.94);
 }
+
+/* =============================================
+   KARŞILAŞTIRMA TABLOSU — .k-table (2026-09-04)
+
+   İçerikte tabloyu inline style ile kurmak çalışmıyor. Başlık satırına
+   `<tr style="background:#17141A;color:#fff">` yazınca renk <th>'lere
+   MİRAS yoluyla geçmesi gerekir, ama Blocksy şunu gönderiyor:
+
+     p, li, td, th, figcaption, blockquote, cite { color: ... !important }
+
+   `!important` mirası ezdiği için <th> yazısı koyu mürekkebe dönüyor ve
+   siyah zeminde SİYAH yazı kalıyor — okunmuyor. (Bkz. CLAUDE.md'deki
+   "Styling Gotchas" notu; aynı tuzağın tablo hâli.)
+
+   Çözüm k-card sistemiyle aynı: sınıf ver, `html body .entry-content`
+   önekiyle özgüllüğü yükselt, rengi <th> üzerinde !important ile yaz.
+   ============================================= */
+html body .entry-content .k-table-wrap {
+  overflow-x: auto;
+  margin: 2rem 0;
+  -webkit-overflow-scrolling: touch;
+}
+html body .entry-content table.k-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  margin: 0;
+}
+html body .entry-content table.k-table thead tr {
+  background: #17141A;
+}
+html body .entry-content table.k-table thead th {
+  color: #fff !important;
+  font-weight: 800 !important;
+  font-family: var(--f-ui);
+  text-align: left;
+  padding: 12px;
+  line-height: 1.3;
+  vertical-align: bottom;
+}
+html body .entry-content table.k-table tbody td {
+  padding: 11px 12px;
+  border-bottom: 1px solid #e5e2e8;
+  vertical-align: top;
+}
+html body .entry-content table.k-table tbody tr:nth-child(even) {
+  background: #faf9fb;
+}
+html body .entry-content table.k-table tbody tr:last-child td {
+  border-bottom: none;
+}
