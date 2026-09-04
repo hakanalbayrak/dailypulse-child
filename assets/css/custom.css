@@ -434,12 +434,34 @@ header .ct-button:hover,
   background: var(--k-yellow-wash) !important;
   padding-left: 8px !important;
 }
-.ct-header .ct-toggle,
-.ct-header [data-id="hamburger"] span,
-.ct-header [data-id="hamburger"] svg,
-.ct-header .hamburger-bar {
+/* ── Header toggles (hamburger / arama) ─────────────────────────────
+   DİKKAT: butonun kendisine `background` VERİLMEZ. Eskiden bu blok
+   `.ct-header .ct-toggle`'a da `background: var(--k-ink)` uyguluyordu;
+   `.ct-toggle` BUTONUN kendisi olduğu için mobilde menü tuşunun arkasına
+   koyu bir kare basıyordu. Kural muhtemelen Blocksy'nin <span> çubuklu
+   hamburger varyantı için yazılmıştı (orada çubuk rengi background ile
+   verilir), ama tema SVG varyantını basıyor: <svg><rect>…</rect></svg>.
+   Sonuç: koyu kare + `.ct-icon` kuralından gelen gri-mavi çubuklar.
+
+   Doğrusu: buton şeffaf kalır, mürekkep rengi yalnızca ÇUBUKLARA gider.
+   Her iki varyant da (span ve svg/rect) aşağıda ayrı ayrı ele alınıyor. */
+.ct-header .ct-toggle {
   color: var(--k-ink) !important;
+  background: transparent !important;
+}
+.ct-header [data-id="hamburger"] span,
+.ct-header .hamburger-bar {
   background: var(--k-ink) !important;
+}
+.ct-header .ct-toggle svg,
+.ct-header [data-id="hamburger"] svg {
+  background: transparent !important;
+  fill: var(--k-ink) !important;
+}
+.ct-header .ct-toggle svg rect,
+.ct-header .ct-toggle svg path,
+.ct-header [data-id="hamburger"] svg rect {
+  fill: var(--k-ink) !important;
 }
 .ct-mobile-overlay .ct-button,
 .ct-panel .ct-button,
