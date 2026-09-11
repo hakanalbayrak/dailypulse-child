@@ -41,6 +41,13 @@ add_filter('wp_sitemaps_add_provider', function ($provider, $name) {
     return $name === 'users' ? false : $provider;
 }, 10, 2);
 
+// Blocksy's post cards on the blog and archive listings print an author link
+// (/author/<login>/) on every post - the login leaked there even after the
+// archive itself redirected. Point every author link at the homepage.
+add_filter('author_link', function () {
+    return home_url('/');
+}, 99);
+
 add_action('template_redirect', function () {
     if (is_author()) {
         wp_redirect(home_url('/'), 301);
