@@ -27,7 +27,7 @@ require_once DAILYPULSE_DIR . '/inc/surum.php';
  * (bkz. custom.css içindeki @font-face tanımları).
  */
 function dailypulse_google_fonts() {
-    $fonts_url = 'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@500;600;700&display=swap';
+    $fonts_url = 'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;800;900&family=Barlow:wght@500;600;700&display=swap';
     wp_enqueue_style('dailypulse-google-fonts', $fonts_url, array(), null);
 }
 add_action('wp_enqueue_scripts', 'dailypulse_google_fonts');
@@ -124,22 +124,20 @@ function kampanya_logo_inline($html, $attachment_id, $size, $icon, $attr) {
 }
 
 /**
- * The logo SVG — horizontal lockup.
- * viewBox 1060 × 220: tag mark 200 px, hairline, wordmark 790 px.
+ * The logo SVG — horizontal lockup (ince detay, 2026-10-04).
+ * viewBox 330 × 80: 64 px mark whose i-dot is the yellow "detail", then a
+ * thin "ince" + bold "detay" wordmark (brand/ in the project repo).
  * Barlow Condensed is loaded on the page via Google Fonts so
  * inline SVG can use it correctly.
  */
 function kampanya_logo_svg() {
-    // No <title> element — avoids browser native tooltip on hover
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 220"'
-        . ' class="k-logo-svg" role="img" aria-label="kampanya.website">'
-        . '<path d="M 14 30 L 132 30 L 186 100 L 132 170 L 14 170 Z" fill="#FFD600" stroke="#111111" stroke-width="3"/>'
-        . '<circle cx="150" cy="100" r="9" fill="#111111"/>'
-        . '<text x="26" y="145" font-family="\'Barlow Condensed\',sans-serif" font-weight="900" font-size="140" fill="#111111" letter-spacing="-2">k</text>'
-        . '<line x1="222" y1="28" x2="222" y2="210" stroke="#111111" stroke-width="1"/>'
-        . '<text x="248" y="162" font-size="180" font-family="\'Barlow Condensed\',sans-serif" font-weight="900" fill="#111111" letter-spacing="-2" textLength="790" lengthAdjust="spacingAndGlyphs">kampanya</text>'
-        . '<rect x="248" y="178" width="790" height="2.5" fill="#111111"/>'
-        . '<text x="248" y="208" font-size="25" font-family="\'Barlow Condensed\',sans-serif" font-weight="700" fill="#111111" letter-spacing="7">.WEBSITE</text>'
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 80"'
+        . ' class="k-logo-svg" role="img" aria-label="ince detay">'
+        . '<rect x="8" y="8" width="64" height="64" rx="14" fill="#17141A"/>'
+        . '<circle cx="40" cy="24" r="6.5" fill="#FFD600"/>'
+        . '<rect x="35" y="35" width="10" height="26" rx="2" fill="#F7F4EC"/>'
+        . '<text x="88" y="55" font-family="\'Barlow Condensed\',sans-serif" font-size="46" fill="#17141A" letter-spacing="0.5">'
+        . '<tspan font-weight="400">ince</tspan><tspan font-weight="700" dx="8">detay</tspan></text>'
         . '</svg>';
 }
 
@@ -147,15 +145,13 @@ function kampanya_logo_svg() {
  * Dark variant — white wordmark + yellow tag mark for use on black footer
  */
 function kampanya_logo_svg_dark() {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 220"'
-        . ' class="k-logo-svg k-logo-svg--dark" role="img" aria-label="kampanya.website">'
-        . '<path d="M 14 30 L 132 30 L 186 100 L 132 170 L 14 170 Z" fill="#FFD600" stroke="#FFD600" stroke-width="1"/>'
-        . '<circle cx="150" cy="100" r="9" fill="#111111"/>'
-        . '<text x="26" y="145" font-family="\'Barlow Condensed\',sans-serif" font-weight="900" font-size="140" fill="#111111" letter-spacing="-2">k</text>'
-        . '<line x1="222" y1="28" x2="222" y2="210" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>'
-        . '<text x="248" y="162" font-size="180" font-family="\'Barlow Condensed\',sans-serif" font-weight="900" fill="#FFFFFF" letter-spacing="-2" textLength="790" lengthAdjust="spacingAndGlyphs">kampanya</text>'
-        . '<rect x="248" y="178" width="790" height="2.5" fill="#FFD600"/>'
-        . '<text x="248" y="208" font-size="25" font-family="\'Barlow Condensed\',sans-serif" font-weight="700" fill="rgba(255,255,255,0.6)" letter-spacing="7">.WEBSITE</text>'
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 80"'
+        . ' class="k-logo-svg k-logo-svg--dark" role="img" aria-label="ince detay">'
+        . '<rect x="8" y="8" width="64" height="64" rx="14" fill="#F7F4EC"/>'
+        . '<circle cx="40" cy="24" r="6.5" fill="#FFD600"/>'
+        . '<rect x="35" y="35" width="10" height="26" rx="2" fill="#17141A"/>'
+        . '<text x="88" y="55" font-family="\'Barlow Condensed\',sans-serif" font-size="46" fill="#F7F4EC" letter-spacing="0.5">'
+        . '<tspan font-weight="400">ince</tspan><tspan font-weight="700" dx="8">detay</tspan></text>'
         . '</svg>';
 }
 
@@ -231,7 +227,7 @@ add_action('wp_head', function() {
 
 /* ============================================================
    SSL CERTIFICATE MONITORING — Detect & Auto-Fix Certificate Issues
-   Runs daily to ensure kampanya.website cert stays valid.
+   Runs daily to ensure the site's cert stays valid.
    Alerts if renewal fails or cert mismatch detected.
    ============================================================ */
 
@@ -247,7 +243,7 @@ add_action('kampanya_ssl_daily_check', function() {
 });
 
 function kampanya_ssl_monitor() {
-    $domain = 'kampanya.website';
+    $domain = parse_url(home_url(), PHP_URL_HOST);
     $log_file = WP_CONTENT_DIR . '/ssl-monitor.log';
     
     // Get certificate info
@@ -349,7 +345,7 @@ add_action('rest_api_init', function () {
     register_rest_route('kampanya/v1', '/ssl-status', [
         'methods'             => 'GET',
         'callback'            => function () {
-            $domain = 'kampanya.website';
+            $domain = parse_url(home_url(), PHP_URL_HOST);
             $stream = stream_context_create(array('ssl' => array('capture_peer_cert' => true)));
             $fp = @stream_socket_client('ssl://' . $domain . ':443', $errno, $errstr, 10, STREAM_CLIENT_CONNECT, $stream);
             

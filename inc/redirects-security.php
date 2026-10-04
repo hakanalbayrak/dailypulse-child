@@ -21,6 +21,21 @@ function kampanya_redirect_map() {
     ];
 }
 
+/**
+ * kampanya.website -> incedetay.com (2026-10-04). Both hostnames reach this
+ * install, so the old one is sent to the new one with its path intact.
+ * GET/HEAD only, and never the WP Pusher hook: GitHub's webhook POSTs to the
+ * address it was registered with and does not follow a redirect, so
+ * redirecting it would silently stop push-to-deploy.
+ */
+add_action('init', function () {
+    if (!in_array($_SERVER['REQUEST_METHOD'] ?? 'GET', ['GET', 'HEAD'], true)) return;
+    if (!preg_match('/(^|\.)kampanya\.website$/i', $_SERVER['HTTP_HOST'] ?? '')) return;
+    if (strpos($_SERVER['QUERY_STRING'] ?? '', 'wppusher') !== false) return;
+    wp_redirect(untrailingslashit(home_url()) . ($_SERVER['REQUEST_URI'] ?? '/'), 301);
+    exit;
+}, 0);
+
 add_action('template_redirect', function () {
     $path = trim((string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH), '/');
     $map  = kampanya_redirect_map();
