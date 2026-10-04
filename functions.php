@@ -817,29 +817,46 @@ function kampanya_smtp_send($to, $subject, $body) {
         return ['ok' => false, 'error' => 'credentials_missing'];
     }
 
-    $response = wp_remote_post('https://api.resend.com/emails', [
-        'timeout' => 15,
-        'headers' => [
-            'Authorization' => 'Bearer ' . $api_key,
-            'Content-Type'  => 'application/json',
-        ],
-        'body' => wp_json_encode([
-            'from'    => 'Kampanya.Website <bildirim@kampanya.website>',
-            'to'      => [$to],
-            'subject' => $subject,
-            'html'    => $body,
-        ]),
-    ]);
+    // incedetay.com is the sender since 2026-10-04. If Resend rejects it (a key
+    // limited to the old domain, or the domain no longer verified) fall back to
+    // the old verified address, so confirmation mails never silently stop.
+    // Only a rejected request falls back; a network error does not (it may have
+    // been delivered), so nothing is ever sent twice.
+    $senders = [
+        'ince detay <bildirim@incedetay.com>',
+        'Kampanya.Website <bildirim@kampanya.website>',
+    ];
+    $code = 0;
+    $resp_body = null;
+    $from = '';
+    foreach ($senders as $from) {
+        $response = wp_remote_post('https://api.resend.com/emails', [
+            'timeout' => 15,
+            'headers' => [
+                'Authorization' => 'Bearer ' . $api_key,
+                'Content-Type'  => 'application/json',
+            ],
+            'body' => wp_json_encode([
+                'from'    => $from,
+                'to'      => [$to],
+                'subject' => $subject,
+                'html'    => $body,
+            ]),
+        ]);
 
-    if (is_wp_error($response)) {
-        error_log('kampanya_smtp_send error: ' . $response->get_error_message());
-        return ['ok' => false, 'error' => $response->get_error_message()];
+        if (is_wp_error($response)) {
+            error_log('kampanya_smtp_send error: ' . $response->get_error_message());
+            return ['ok' => false, 'error' => $response->get_error_message()];
+        }
+
+        $code      = wp_remote_retrieve_response_code($response);
+        $resp_body = json_decode(wp_remote_retrieve_body($response), true);
+        error_log('kampanya_smtp_send Resend: from=' . $from . ' code=' . $code . ' resp=' . json_encode($resp_body));
+        if ($code >= 200 && $code < 300) {
+            break;
+        }
     }
-
-    $code      = wp_remote_retrieve_response_code($response);
-    $resp_body = json_decode(wp_remote_retrieve_body($response), true);
-    error_log('kampanya_smtp_send Resend: code=' . $code . ' resp=' . json_encode($resp_body));
-    return ['ok' => ($code >= 200 && $code < 300), 'code' => $code, 'body' => $resp_body];
+    return ['ok' => ($code >= 200 && $code < 300), 'code' => $code, 'body' => $resp_body, 'from' => $from];
 }
 
 function kampanya_email_base($title, $content, $accent = '#FFD600') {
@@ -1218,7 +1235,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email'],
             ],
         ],
     ]);
@@ -1446,6 +1463,23 @@ function kampanya_maintenance(WP_REST_Request $request) {
             $purged = true;
         }
         return ['purged' => $purged];
+    }
+
+    // Sends one test mail to the site's OWN admin address (never a caller-supplied
+    // one) so a sender-domain change can be proven end to end.
+    if ($action === 'test_email') {
+        $to = get_option('admin_email');
+        $r  = kampanya_smtp_send($to, 'ince detay: e-posta gönderim testi', kampanya_email_base(
+            'Gönderim testi',
+            '<p style="color:#ffffff;font-size:15px;line-height:1.7;margin:0">Bu mesaj, göndericinin yeni alan adından çıktığını doğrulamak için gönderildi.</p>'
+        ));
+        return [
+            'sent' => !empty($r['ok']),
+            'from' => $r['from'] ?? null,
+            'code' => $r['code'] ?? null,
+            'to'   => preg_replace('/^(.).*(@.*)$/', '$1***$2', (string) $to),
+            'error' => $r['error'] ?? ($r['body']['message'] ?? null),
+        ];
     }
 
     return new WP_Error('unknown_action', 'Bilinmeyen işlem', ['status' => 400]);
