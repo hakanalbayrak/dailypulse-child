@@ -1465,20 +1465,45 @@ function kampanya_maintenance(WP_REST_Request $request) {
         return ['purged' => $purged];
     }
 
-    // Sends one test mail to the site's OWN admin address (never a caller-supplied
-    // one) so a sender-domain change can be proven end to end.
+    // One test mail, then Resend's own delivery verdict for it. Recipient: the
+    // site's admin address, or an optional `to` - but only on the site's own two
+    // domains, so this stays a diagnostic and never a general mailer.
     if ($action === 'test_email') {
-        $to = get_option('admin_email');
-        $r  = kampanya_smtp_send($to, 'ince detay: e-posta gönderim testi', kampanya_email_base(
+        $to    = get_option('admin_email');
+        $asked = (string) $request->get_param('to');
+        if ($asked !== '') {
+            if (!preg_match('/^[^@\s]+@(incedetay\.com|kampanya\.website)$/i', $asked)) {
+                return new WP_Error('bad_to', 'Yalnızca site alan adlarına gönderilir', ['status' => 400]);
+            }
+            $to = $asked;
+        }
+        $r = kampanya_smtp_send($to, 'ince detay: e-posta gönderim testi', kampanya_email_base(
             'Gönderim testi',
             '<p style="color:#ffffff;font-size:15px;line-height:1.7;margin:0">Bu mesaj, göndericinin yeni alan adından çıktığını doğrulamak için gönderildi.</p>'
         ));
+        $durum = null;
+        $id    = $r['body']['id'] ?? '';
+        for ($i = 0; $id && $i < 4; $i++) {
+            sleep(3);
+            $g = wp_remote_get('https://api.resend.com/emails/' . rawurlencode($id), [
+                'timeout' => 10,
+                'headers' => ['Authorization' => 'Bearer ' . get_option('k_resend_key', '')],
+            ]);
+            if (is_wp_error($g)) {
+                continue;
+            }
+            $j     = json_decode(wp_remote_retrieve_body($g), true);
+            $durum = $j['last_event'] ?? null;
+            if (in_array($durum, ['delivered', 'bounced', 'complained', 'failed'], true)) {
+                break;
+            }
+        }
         return [
-            'sent' => !empty($r['ok']),
-            'from' => $r['from'] ?? null,
-            'code' => $r['code'] ?? null,
-            'to'   => preg_replace('/^(.).*(@.*)$/', '$1***$2', (string) $to),
-            'error' => $r['error'] ?? ($r['body']['message'] ?? null),
+            'sent'     => !empty($r['ok']),
+            'from'     => $r['from'] ?? null,
+            'to'       => $to,
+            'delivery' => $durum,
+            'error'    => $r['error'] ?? ($r['body']['message'] ?? null),
         ];
     }
 
