@@ -808,6 +808,19 @@ function kampanya_rest_unsubscribe(WP_REST_Request $request) {
 
 /* ---- Email helpers ---- */
 
+/**
+ * Plain-text twin of an HTML email: links become "label (url)" so the confirm
+ * link survives, block ends become line breaks. A mail with no text part is
+ * a mild spam signal; this is cheap to send.
+ */
+function kampanya_email_plain($html) {
+    $html = preg_replace('/<a [^>]*href="([^"]+)"[^>]*>(.*?)<\/a>/is', '$2 ($1)', $html);
+    $html = preg_replace('/<\/(p|h1|tr|div)>|<br\s*\/?>/i', "\n", $html);
+    $t    = html_entity_decode(wp_strip_all_tags($html), ENT_QUOTES, 'UTF-8');
+    $t    = preg_replace("/[ \t]+/", ' ', $t);
+    return trim(preg_replace("/\n\s*\n+/", "\n\n", $t));
+}
+
 function kampanya_smtp_send($to, $subject, $body) {
     // Resend Transactional Email API — key stored in WP options
     $api_key = get_option('k_resend_key', '');
@@ -841,6 +854,8 @@ function kampanya_smtp_send($to, $subject, $body) {
                 'to'      => [$to],
                 'subject' => $subject,
                 'html'    => $body,
+                'text'    => kampanya_email_plain($body),
+                'reply_to' => 'info@incedetay.com',
             ]),
         ]);
 
@@ -886,7 +901,7 @@ function kampanya_email_base($title, $content, $accent = '#FFD600') {
         <table width="100%" cellpadding="0" cellspacing="0" border="0">
           <tr>
             <td style="vertical-align:middle;">
-              <span style="font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:20px;font-weight:900;color:' . $accent . ';letter-spacing:-0.5px;text-transform:uppercase;">KAMPANYA</span><span style="font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:400;color:rgba(255,255,255,0.35);letter-spacing:3px;text-transform:uppercase;">.WEBSITE</span>
+              <span style="font-family:Arial,Helvetica,sans-serif;font-size:20px;font-weight:400;color:#F7F4EC;letter-spacing:-0.5px;">ince </span><span style="font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:20px;font-weight:900;color:' . $accent . ';letter-spacing:-0.5px;">detay</span>
             </td>
           </tr>
           <tr>
@@ -911,12 +926,12 @@ function kampanya_email_base($title, $content, $accent = '#FFD600') {
           <!-- FOOTER -->
           <tr>
             <td class="ef" style="padding:20px 40px;border-top:1px solid #2A2730;">
-              <p style="margin:0;color:#3D3A42;font-size:11px;text-align:center;line-height:1.8;font-family:Arial,Helvetica,sans-serif;letter-spacing:0.3px;">
-                <a href="' . home_url() . '" style="color:' . $accent . ';text-decoration:none;font-weight:700;font-size:11px;">KAMPANYA.WEBSITE</a>
+              <p style="margin:0;color:#8A8594;font-size:11px;text-align:center;line-height:1.8;font-family:Arial,Helvetica,sans-serif;letter-spacing:0.3px;">
+                <a href="' . home_url() . '" style="color:' . $accent . ';text-decoration:none;font-weight:700;font-size:11px;">İNCEDETAY.COM</a>
                 &nbsp;&nbsp;·&nbsp;&nbsp;
-                <a href="' . home_url('/abonelik-iptal') . '" style="color:#3D3A42;text-decoration:underline;">Abonelikten çık</a>
+                <a href="' . home_url('/abonelik-iptal') . '" style="color:#8A8594;text-decoration:underline;">Abonelikten çık</a>
                 &nbsp;&nbsp;·&nbsp;&nbsp;
-                <a href="' . home_url('/gizlilik-politikasi') . '" style="color:#3D3A42;text-decoration:underline;">Gizlilik</a>
+                <a href="' . home_url('/gizlilik-politikasi') . '" style="color:#8A8594;text-decoration:underline;">Gizlilik</a>
               </p>
             </td>
           </tr>
@@ -928,7 +943,7 @@ function kampanya_email_base($title, $content, $accent = '#FFD600') {
     <!-- BOTTOM TAGLINE -->
     <tr>
       <td style="padding:16px 0 0;text-align:center;">
-        <p style="margin:0;color:#2A2730;font-size:10px;font-family:Arial,Helvetica,sans-serif;letter-spacing:2px;text-transform:uppercase;">Haftalık fırsatlar &nbsp;·&nbsp; indirimler &nbsp;·&nbsp; kampanyalar</p>
+        <p style="margin:0;color:#6B6875;font-size:10px;font-family:Arial,Helvetica,sans-serif;letter-spacing:2px;text-transform:uppercase;">Türkiye’nin detay bülteni</p>
       </td>
     </tr>
 
@@ -963,13 +978,13 @@ function kampanya_send_confirmation_email($email, $confirm_url) {
         <td class="ep" style="padding:44px 40px 36px;">
           <p style="margin:0 0 6px;font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:11px;font-weight:900;color:#FFD600;letter-spacing:3px;text-transform:uppercase;">Adım 1 / 2</p>
           <h1 style="margin:0 0 20px;font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:30px;font-weight:900;color:#FFFFFF;letter-spacing:-0.5px;text-transform:uppercase;line-height:1.05;">E-postanızı<br>onaylayın</h1>
-          <p style="color:#6B6875;font-size:15px;line-height:1.75;margin:0 0 36px;font-family:Arial,Helvetica,sans-serif;">Bültenimize abone olmak için aşağıdaki butona tıklayın. Her hafta en iyi fırsatlar ve kampanyalar doğrudan gelen kutunuza gelecek.</p>
+          <p style="color:#A9A4B3;font-size:15px;line-height:1.75;margin:0 0 36px;font-family:Arial,Helvetica,sans-serif;">Bültenimize abone olmak için aşağıdaki butona tıklayın. Her hafta en iyi fırsatlar ve kampanyalar doğrudan gelen kutunuza gelecek.</p>
           ' . kampanya_email_btn($confirm_url, 'Aboneliğimi Onayla') . '
-          <p style="color:#3D3A42;font-size:12px;line-height:1.7;margin:0;font-family:Arial,Helvetica,sans-serif;">Bu bağlantı 24 saat geçerlidir. Bu isteği siz yapmadıysanız e-postayı silebilirsiniz.</p>
+          <p style="color:#8A8594;font-size:12px;line-height:1.7;margin:0;font-family:Arial,Helvetica,sans-serif;">Bu bağlantı 24 saat geçerlidir. Bu isteği siz yapmadıysanız e-postayı silebilirsiniz.</p>
         </td>
       </tr>';
 
-    return kampanya_smtp_send($email, 'Aboneliğinizi onaylayın — Kampanya.Website', kampanya_email_base('Aboneliğinizi Onaylayın', $content));
+    return kampanya_smtp_send($email, 'Aboneliğinizi onaylayın — ince detay', kampanya_email_base('Aboneliğinizi Onaylayın', $content));
 }
 
 function kampanya_send_welcome_email($email) {
@@ -978,28 +993,28 @@ function kampanya_send_welcome_email($email) {
         <td class="ep" style="padding:44px 40px 36px;">
           <p style="margin:0 0 6px;font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:11px;font-weight:900;color:#FFD600;letter-spacing:3px;text-transform:uppercase;">Hoş geldiniz</p>
           <h1 style="margin:0 0 20px;font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:30px;font-weight:900;color:#FFD600;letter-spacing:-0.5px;text-transform:uppercase;line-height:1.05;">Aboneliğiniz<br>onaylandı!</h1>
-          <p style="color:#6B6875;font-size:15px;line-height:1.75;margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;">Artık Kampanya.Website bülteninin bir parçasısınız.</p>
-          <p style="color:#6B6875;font-size:15px;line-height:1.75;margin:0 0 36px;font-family:Arial,Helvetica,sans-serif;">Her hafta en güncel indirimler, fırsatlar ve kampanyalar — doğrudan gelen kutunuza. Bir şey kaçırmayacaksınız.</p>
+          <p style="color:#A9A4B3;font-size:15px;line-height:1.75;margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;">Artık ince detay bülteninin bir parçasısınız.</p>
+          <p style="color:#A9A4B3;font-size:15px;line-height:1.75;margin:0 0 36px;font-family:Arial,Helvetica,sans-serif;">Her hafta en güncel indirimler, fırsatlar ve kampanyalar — doğrudan gelen kutunuza. Bir şey kaçırmayacaksınız.</p>
           ' . kampanya_email_btn(home_url('/firsatlar'), 'Fırsatları Keşfet') . '
         </td>
       </tr>';
 
-    kampanya_smtp_send($email, 'Bültenimize hoş geldiniz — Kampanya.Website', kampanya_email_base('Hoş Geldiniz', $content));
+    kampanya_smtp_send($email, 'Bültenimize hoş geldiniz — ince detay', kampanya_email_base('Hoş Geldiniz', $content));
 }
 
 function kampanya_send_unsubscribe_confirmation($email) {
     $content = '
       <tr>
         <td class="ep" style="padding:44px 40px 36px;">
-          <p style="margin:0 0 6px;font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:11px;font-weight:900;color:#3D3A42;letter-spacing:3px;text-transform:uppercase;">Bildirim</p>
+          <p style="margin:0 0 6px;font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:11px;font-weight:900;color:#8A8594;letter-spacing:3px;text-transform:uppercase;">Bildirim</p>
           <h1 style="margin:0 0 20px;font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:30px;font-weight:900;color:#FFFFFF;letter-spacing:-0.5px;text-transform:uppercase;line-height:1.05;">Aboneliğiniz<br>iptal edildi</h1>
-          <p style="color:#6B6875;font-size:15px;line-height:1.75;margin:0 0 12px;font-family:Arial,Helvetica,sans-serif;"><span style="color:#3D3A42;font-size:13px;">' . esc_html($email) . '</span><br>adresi bülten listemizden çıkarıldı.</p>
-          <p style="color:#6B6875;font-size:15px;line-height:1.75;margin:0 0 36px;font-family:Arial,Helvetica,sans-serif;">Fikrinizi değiştirirseniz istediğiniz zaman tekrar abone olabilirsiniz.</p>
+          <p style="color:#A9A4B3;font-size:15px;line-height:1.75;margin:0 0 12px;font-family:Arial,Helvetica,sans-serif;"><span style="color:#8A8594;font-size:13px;">' . esc_html($email) . '</span><br>adresi bülten listemizden çıkarıldı.</p>
+          <p style="color:#A9A4B3;font-size:15px;line-height:1.75;margin:0 0 36px;font-family:Arial,Helvetica,sans-serif;">Fikrinizi değiştirirseniz istediğiniz zaman tekrar abone olabilirsiniz.</p>
           ' . kampanya_email_btn(home_url(), 'Ana Sayfaya Dön', 'ghost') . '
         </td>
       </tr>';
 
-    kampanya_smtp_send($email, 'Aboneliğiniz iptal edildi — Kampanya.Website', kampanya_email_base('Abonelik İptal', $content, '#2A2730'));
+    kampanya_smtp_send($email, 'Aboneliğiniz iptal edildi — ince detay', kampanya_email_base('Abonelik İptal', $content, '#2A2730'));
 }
 
 /* ============================================================
