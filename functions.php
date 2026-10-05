@@ -997,7 +997,7 @@ function kampanya_send_confirmation_email($email, $confirm_url) {
         <td class="ep" style="padding:44px 40px 36px;">
           <p style="margin:0 0 6px;font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:11px;font-weight:900;color:#FFD600;letter-spacing:3px;text-transform:uppercase;">Adım 1 / 2</p>
           <h1 style="margin:0 0 20px;font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:30px;font-weight:900;color:#FFFFFF;letter-spacing:-0.5px;text-transform:uppercase;line-height:1.05;">E-postanızı<br>onaylayın</h1>
-          <p style="color:#A9A4B3;font-size:15px;line-height:1.75;margin:0 0 36px;font-family:Arial,Helvetica,sans-serif;">Bültenimize abone olmak için aşağıdaki butona tıklayın. Her hafta en iyi fırsatlar ve kampanyalar doğrudan gelen kutunuza gelecek.</p>
+          <p style="color:#A9A4B3;font-size:15px;line-height:1.75;margin:0 0 36px;font-family:Arial,Helvetica,sans-serif;">Bültenimize abone olmak için aşağıdaki butona tıklayın. Her hafta detaylı incelemeler ve ürün karşılaştırmaları doğrudan gelen kutunuza gelecek.</p>
           ' . kampanya_email_btn($confirm_url, 'Aboneliğimi Onayla') . '
           <p style="color:#8A8594;font-size:12px;line-height:1.7;margin:0;font-family:Arial,Helvetica,sans-serif;">Bu bağlantı 24 saat geçerlidir. Bu isteği siz yapmadıysanız e-postayı silebilirsiniz.</p>
         </td>
@@ -1013,7 +1013,7 @@ function kampanya_send_welcome_email($email) {
           <p style="margin:0 0 6px;font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:11px;font-weight:900;color:#FFD600;letter-spacing:3px;text-transform:uppercase;">Hoş geldiniz</p>
           <h1 style="margin:0 0 20px;font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:30px;font-weight:900;color:#FFD600;letter-spacing:-0.5px;text-transform:uppercase;line-height:1.05;">Aboneliğiniz<br>onaylandı!</h1>
           <p style="color:#A9A4B3;font-size:15px;line-height:1.75;margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;">Artık ince detay bülteninin bir parçasısınız.</p>
-          <p style="color:#A9A4B3;font-size:15px;line-height:1.75;margin:0 0 36px;font-family:Arial,Helvetica,sans-serif;">Her hafta en güncel indirimler, fırsatlar ve kampanyalar — doğrudan gelen kutunuza. Bir şey kaçırmayacaksınız.</p>
+          <p style="color:#A9A4B3;font-size:15px;line-height:1.75;margin:0 0 36px;font-family:Arial,Helvetica,sans-serif;">Her hafta yeni detaylı incelemeler ve ürün karşılaştırmaları — doğrudan gelen kutunuza. Haftada en fazla iki e-posta gönderiyoruz.</p>
           ' . kampanya_email_btn(home_url('/blog'), 'Rehberlere Göz At') . '
         </td>
       </tr>';

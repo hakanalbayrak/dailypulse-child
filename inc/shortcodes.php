@@ -24,9 +24,10 @@ add_shortcode('dp_subscribe', 'dailypulse_subscribe_shortcode');
 
 // [dp_proof_bar]
 function dailypulse_proof_bar_shortcode() {
-    ob_start();
-    get_template_part('template-parts/proof-bar');
-    return ob_get_clean();
+    // Devre dışı (2026-10-05): şablonun varsayılan rakamları (53K+ abone, 2.4M okuma,
+    // %68 açılma, 340+ yazı) uydurmaydı. Gerçek istatistik yayınlanacaksa şablon
+    // gerçek verilerle yeniden yazılmalı.
+    return '';
 }
 add_shortcode('dp_proof_bar', 'dailypulse_proof_bar_shortcode');
 
