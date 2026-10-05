@@ -1269,7 +1269,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id', 'indexnow_hepsi'],
             ],
         ],
     ]);
@@ -1532,6 +1532,23 @@ function kampanya_maintenance(WP_REST_Request $request) {
             }
         }
         return ['applied' => $apply, 'changed' => $paths];
+    }
+
+    // Sitemap'teki tüm adresleri IndexNow'a bildirir (Bing, Yandex, Seznam, Naver). Salt genel
+    // adresler gider; anahtar dosyası /<anahtar>.txt olarak yayınlanır.
+    if ($action === 'indexnow_hepsi') {
+        $urller = [home_url('/')];
+        $atla   = idk_noindex_idler();
+        foreach (get_posts(['numberposts' => -1, 'post_status' => 'publish', 'post_type' => ['post', 'page'],
+                            'post__not_in' => $atla, 'fields' => 'ids']) as $pid) {
+            $urller[] = get_permalink($pid);
+        }
+        foreach (get_categories(['hide_empty' => true]) as $c) {
+            $urller[] = get_category_link($c);
+        }
+        $urller = array_values(array_unique($urller));
+        $r = idk_indexnow_gonder($urller, true);
+        return $r + ['anahtar_dosyasi' => home_url('/' . idk_indexnow_anahtar() . '.txt')];
     }
 
     // GA4 ölçüm kimliği (G-XXXXXXXXXX). Gizli bir bilgi değil; boş değer analitiği

@@ -34,6 +34,14 @@ add_filter('document_title_parts', function ($p) {
     if (is_front_page()) {
         return ['title' => 'ince detay', 'tagline' => 'Türkiye’nin detay bülteni'];
     }
+    // Makale başlığı arama sonucunda kesilecek kadar uzunsa, kısa bir SEO başlığı
+    // (rank_math_title yazı meta'sı; scripts/fix-seo-basliklari.py yazar) kullanılır.
+    if (is_singular()) {
+        $ozel = trim((string) get_post_meta(get_queried_object_id(), 'rank_math_title', true));
+        if ($ozel !== '') {
+            $p['title'] = $ozel;
+        }
+    }
     $p['site'] = 'ince detay';
     // " – ince detay" = 13 karakter. Başlık zaten uzunsa markayı eklemeyip
     // başlığın kesilmesini önlüyoruz.
@@ -97,10 +105,15 @@ add_action('wp_head', function () {
 add_filter('wp_robots', function ($r) {
     $woo = function_exists('is_cart') && (is_cart() || is_checkout() || is_account_page());
     $ozel = is_singular() && in_array((int) get_queried_object_id(), idk_noindex_idler(), true);
-    if (is_tag() || is_search() || is_404() || $woo || $ozel) {
+    // Tarih arşivleri (/2026/, /2026/09/) kategori listelerinin kopyası: noindex
+    if (is_tag() || is_search() || is_404() || is_date() || $woo || $ozel) {
         $r['noindex'] = true;
         $r['follow']  = true;
         unset($r['max-image-preview']);
+    } else {
+        // Arama sonucunda tam özet ve büyük görsel gösterilmesine izin ver
+        $r['max-snippet']       = '-1';
+        $r['max-video-preview'] = '-1';
     }
     return $r;
 });
@@ -131,7 +144,7 @@ add_filter('wp_sitemaps_posts_query_args', function ($args, $post_type) {
 add_filter('robots_txt', function ($out) {
     return str_replace(
         'Allow: /wp-admin/admin-ajax.php',
-        "Allow: /wp-admin/admin-ajax.php\nDisallow: /go/",
+        "Allow: /wp-admin/admin-ajax.php\nDisallow: /go/\nDisallow: /?s=\nDisallow: /search/",
         $out
     );
 }, 20);
@@ -264,3 +277,126 @@ add_action('wp_footer', function () {
 </script>
     <?php
 }, 30);
+
+/* ------------------------------------------------------------------
+   8. GÜVENLİK BAŞLIKLARI (PageSpeed "Güven ve Güvenlik" uyarıları)
+   CSP bilerek yok: satır içi betikler/stiller yüzünden kırılgan.
+   ------------------------------------------------------------------ */
+add_action('send_headers', function () {
+    if (is_admin()) {
+        return;
+    }
+    header('Strict-Transport-Security: max-age=31536000');
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()');
+});
+
+/* ------------------------------------------------------------------
+   9. <head> TEMİZLİĞİ — tarayıcıya ve arama motoruna işe yaramayan etiketler
+   ------------------------------------------------------------------ */
+add_action('init', function () {
+    remove_action('wp_head', 'rsd_link');
+    remove_action('wp_head', 'wp_generator');
+    remove_action('wp_head', 'wp_shortlink_wp_head', 10);
+    remove_action('template_redirect', 'wp_shortlink_header', 11);
+    remove_action('wp_head', 'wp_oembed_add_discovery_links');
+    add_filter('the_generator', '__return_empty_string');
+    // Yorumlar kapalı: yorum akışı bağlantısı boşuna
+    add_filter('feed_links_show_comments_feed', '__return_false');
+}, 20);
+
+add_action('wp_head', function () {
+    echo '<meta name="theme-color" content="#17141A">' . "\n";
+}, 3);
+
+// jquery-migrate (eski jQuery API'leri için uyumluluk katmanı) ön yüzde gerekmiyor
+add_action('wp_default_scripts', function ($scripts) {
+    if (is_admin() || empty($scripts->registered['jquery'])) {
+        return;
+    }
+    $scripts->registered['jquery']->deps = array_diff((array) $scripts->registered['jquery']->deps, ['jquery-migrate']);
+});
+
+/* ------------------------------------------------------------------
+   10. BÜYÜK/KÜÇÜK HARF — /HAKKIMIZDA/ 200 dönüp kopya sayfa oluşturuyordu
+   ------------------------------------------------------------------ */
+add_action('init', function () {
+    if (!in_array($_SERVER['REQUEST_METHOD'] ?? 'GET', ['GET', 'HEAD'], true)) {
+        return;
+    }
+    $uri  = (string) ($_SERVER['REQUEST_URI'] ?? '');
+    $yol  = (string) parse_url($uri, PHP_URL_PATH);
+    if ($yol === '' || $yol === strtolower($yol) || preg_match('~^/(wp-admin|wp-content|wp-includes|wp-json)/~i', $yol)) {
+        return;
+    }
+    $q = (string) parse_url($uri, PHP_URL_QUERY);
+    wp_redirect(untrailingslashit(home_url()) . strtolower($yol) . ($q !== '' ? '?' . $q : ''), 301);
+    exit;
+}, 1);
+
+/* ------------------------------------------------------------------
+   11. IndexNow — Bing, Yandex, Seznam, Naver'e yeni/güncellenen adresi anında bildirir
+   (Google IndexNow'u desteklemiyor; Google için sitemap + Search Console.)
+   Anahtar dosyası /<anahtar>.txt olarak sunulur; anahtar gizli değil, sahipliği kanıtlar.
+   ------------------------------------------------------------------ */
+function idk_indexnow_anahtar() {
+    $k = (string) get_option('idk_indexnow_key', '');
+    if (!preg_match('/^[a-f0-9]{32}$/', $k)) {
+        $k = bin2hex(random_bytes(16));
+        update_option('idk_indexnow_key', $k, false);
+    }
+    return $k;
+}
+
+add_action('init', function () {
+    $yol = trim((string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH), '/');
+    if (!preg_match('/^([a-f0-9]{32})\.txt$/', $yol, $m) || $m[1] !== idk_indexnow_anahtar()) {
+        return;
+    }
+    status_header(200);
+    header('Content-Type: text/plain; charset=utf-8');
+    echo $m[1];
+    exit;
+}, 1);
+
+/** @return array ['ok'=>bool, ...] — $bekle=false iken yanıt beklenmez (yayın isteğini yavaşlatmaz) */
+function idk_indexnow_gonder(array $urller, $bekle = false) {
+    $urller = array_values(array_unique(array_filter($urller)));
+    if (!$urller) {
+        return ['ok' => false, 'hata' => 'adres yok'];
+    }
+    $anahtar = idk_indexnow_anahtar();
+    $govde   = wp_json_encode([
+        'host'        => parse_url(home_url(), PHP_URL_HOST),
+        'key'         => $anahtar,
+        'keyLocation' => home_url('/' . $anahtar . '.txt'),
+        'urlList'     => array_slice($urller, 0, 10000),
+    ]);
+    $r = wp_remote_post('https://api.indexnow.org/indexnow', [
+        'timeout'  => $bekle ? 20 : 3,
+        'blocking' => (bool) $bekle,
+        'headers'  => ['Content-Type' => 'application/json; charset=utf-8'],
+        'body'     => $govde,
+    ]);
+    if (!$bekle) {
+        return ['ok' => true, 'gonderilen' => count($urller)];
+    }
+    if (is_wp_error($r)) {
+        return ['ok' => false, 'hata' => $r->get_error_message()];
+    }
+    $kod = (int) wp_remote_retrieve_response_code($r);
+    return ['ok' => in_array($kod, [200, 202], true), 'kod' => $kod, 'gonderilen' => count($urller)];
+}
+
+// Yazı/sayfa yayınlanınca ya da yayındayken güncellenince
+add_action('transition_post_status', function ($yeni, $eski, $post) {
+    if ($yeni !== 'publish' || !in_array($post->post_type, ['post', 'page'], true)) {
+        return;
+    }
+    if (in_array((int) $post->ID, idk_noindex_idler(), true)) {
+        return;
+    }
+    idk_indexnow_gonder([get_permalink($post)]);
+}, 10, 3);

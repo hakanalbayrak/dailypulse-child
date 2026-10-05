@@ -164,12 +164,15 @@ function kampanya_seo_current_image() {
     if (is_singular('post') && has_post_thumbnail()) {
         $src = wp_get_attachment_image_src(get_post_thumbnail_id(), 'full');
         if ($src) {
-            return ['url' => $src[0], 'w' => $src[1], 'h' => $src[2]];
+            $alt = trim((string) get_post_meta(get_post_thumbnail_id(), '_wp_attachment_image_alt', true));
+            return ['url' => $src[0], 'w' => $src[1], 'h' => $src[2],
+                    'alt' => $alt !== '' ? $alt : wp_strip_all_tags(get_the_title())];
         }
     }
     $dosya = get_stylesheet_directory() . '/assets/images/og-varsayilan.png';
     if (file_exists($dosya)) {
-        return ['url' => get_stylesheet_directory_uri() . '/assets/images/og-varsayilan.png', 'w' => 1200, 'h' => 630];
+        return ['url' => get_stylesheet_directory_uri() . '/assets/images/og-varsayilan.png', 'w' => 1200, 'h' => 630,
+                'alt' => 'ince detay: Türkçe ürün rehberleri ve karşılaştırmalar'];
     }
     return null;
 }
@@ -250,6 +253,18 @@ function kampanya_seo_meta_tags() {
         printf('<meta property="og:image" content="%s" />' . "\n", esc_url($img['url']));
         printf('<meta property="og:image:width" content="%d" />' . "\n", (int) $img['w']);
         printf('<meta property="og:image:height" content="%d" />' . "\n", (int) $img['h']);
+        if (!empty($img['alt'])) {
+            printf('<meta property="og:image:alt" content="%s" />' . "\n", esc_attr($img['alt']));
+        }
+    }
+    if (is_singular('post')) {
+        $pid = get_queried_object_id();
+        printf('<meta property="article:published_time" content="%s" />' . "\n", esc_attr(get_post_time('c', true, $pid)));
+        printf('<meta property="article:modified_time" content="%s" />' . "\n", esc_attr(get_post_modified_time('c', true, $pid)));
+        $kat = get_the_category($pid);
+        if ($kat) {
+            printf('<meta property="article:section" content="%s" />' . "\n", esc_attr($kat[0]->name));
+        }
     }
     printf('<meta name="twitter:card" content="%s" />' . "\n", $img ? 'summary_large_image' : 'summary');
     printf('<meta name="twitter:title" content="%s" />' . "\n", esc_attr($title));
@@ -258,7 +273,37 @@ function kampanya_seo_meta_tags() {
     }
     if ($img) {
         printf('<meta name="twitter:image" content="%s" />' . "\n", esc_url($img['url']));
+        if (!empty($img['alt'])) {
+            printf('<meta name="twitter:image:alt" content="%s" />' . "\n", esc_attr($img['alt']));
+        }
     }
+}
+
+/**
+ * BreadcrumbList: Ana Sayfa > (Kategori) > Sayfa. Ana sayfada üretilmez.
+ */
+function kampanya_seo_breadcrumbs() {
+    $adimlar = [['Ana Sayfa', home_url('/')]];
+    if (is_singular('post')) {
+        $kat = get_the_category(get_queried_object_id());
+        if ($kat) {
+            $adimlar[] = [$kat[0]->name, get_category_link($kat[0])];
+        }
+        $adimlar[] = [wp_strip_all_tags(get_the_title()), get_permalink()];
+    } elseif (is_page() && !is_front_page()) {
+        $adimlar[] = [wp_strip_all_tags(get_the_title()), get_permalink()];
+    } elseif (is_category()) {
+        $adimlar[] = [single_term_title('', false), kampanya_seo_current_url()];
+    } elseif (is_home() && !is_front_page()) {
+        $adimlar[] = [get_the_title((int) get_option('page_for_posts')) ?: 'Blog', kampanya_seo_current_url()];
+    } else {
+        return null;
+    }
+    $liste = [];
+    foreach ($adimlar as $i => $a) {
+        $liste[] = ['@type' => 'ListItem', 'position' => $i + 1, 'name' => $a[0], 'item' => $a[1]];
+    }
+    return ['@type' => 'BreadcrumbList', 'itemListElement' => $liste];
 }
 
 /**
@@ -286,6 +331,7 @@ function kampanya_seo_schema() {
             'datePublished'    => get_the_date('c', $id),
             'dateModified'     => get_the_modified_date('c', $id),
             'inLanguage'       => 'tr-TR',
+            'isAccessibleForFree' => true,
             'author'           => [
                 '@type' => 'Organization',
                 'name'  => get_bloginfo('name'),
@@ -345,7 +391,7 @@ function kampanya_seo_schema() {
                 'mainEntity' => $items,
             ];
         }
-    } elseif (is_front_page() || is_home()) {
+    } elseif (is_front_page()) {
         if (get_site_icon_url(512)) {
             $graph[] = [
                 '@type' => 'Organization',
@@ -362,6 +408,34 @@ function kampanya_seo_schema() {
             'name'        => get_bloginfo('name'),
             'description' => get_bloginfo('description'),
             'inLanguage'  => 'tr-TR',
+        ];
+    }
+
+    // Her sayfa türü için BreadcrumbList; kategori/blog için CollectionPage; sayfalar için WebPage
+    $bc = kampanya_seo_breadcrumbs();
+    if ($bc) {
+        $graph[] = $bc;
+    }
+    if (is_category() || (is_home() && !is_front_page())) {
+        $graph[] = [
+            '@type'       => 'CollectionPage',
+            '@id'         => kampanya_seo_current_url() . '#webpage',
+            'url'         => kampanya_seo_current_url(),
+            'name'        => kampanya_seo_current_title(),
+            'description' => kampanya_seo_current_description(),
+            'inLanguage'  => 'tr-TR',
+            'isPartOf'    => ['@id' => home_url('/') . '#website'],
+        ];
+    } elseif (is_page() && !is_front_page() && !is_page('sikca-sorulan-sorular')) {
+        $tur = is_page('hakkimizda') ? 'AboutPage' : (is_page('iletisim') ? 'ContactPage' : 'WebPage');
+        $graph[] = [
+            '@type'       => $tur,
+            '@id'         => get_permalink() . '#webpage',
+            'url'         => get_permalink(),
+            'name'        => wp_strip_all_tags(get_the_title()),
+            'description' => kampanya_seo_current_description(),
+            'inLanguage'  => 'tr-TR',
+            'isPartOf'    => ['@id' => home_url('/') . '#website'],
         ];
     }
 
