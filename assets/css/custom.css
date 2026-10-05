@@ -820,7 +820,7 @@ footer [class*="widget_"], .ct-footer [class*="widget_"] {
 /* Copyright */
 .ct-footer-copyright p { visibility: hidden; font-size: 0 !important; height: 0; }
 .ct-footer-copyright::after {
-  content: 'Copyright © 2026 - Kampanya.website';
+  content: 'Copyright © 2026 - ince detay';
   font-family: var(--f-ui);
   font-size: 11px;
   letter-spacing: .14em;

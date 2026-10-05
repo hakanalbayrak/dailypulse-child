@@ -1,6 +1,6 @@
 <?php
 /**
- * Kampanya.website — Blocksy Child Theme Functions
+ * ince detay — Blocksy Child Theme Functions
  */
 
 if (!defined('ABSPATH')) exit;
@@ -171,7 +171,7 @@ function kampanya_footer_logo_inject() {
             var link = document.createElement('a');
             link.className = 'k-footer-logo-wrap';
             link.href = '/';
-            link.setAttribute('aria-label', 'Kampanya.website');
+            link.setAttribute('aria-label', 'ince detay');
             link.innerHTML = <?php echo json_encode($svg); ?>;
             bar.insertBefore(link, bar.firstChild);
         }
@@ -400,7 +400,7 @@ add_action('init', function() {
     if (is_array($header_data['offcanvas'])) {
         foreach ($header_data['offcanvas'] as &$item) {
             if (isset($item['content']) && strpos($item['content'], '304 North Cardinal') !== false) {
-                $item['content'] = '<p><strong>Konumuz</strong></p><p>📍 İstanbul, Türkiye<br>info@kampanya.website<br>Tel: +90 533 466 80 88</p>';
+                $item['content'] = '<p><strong>Konumuz</strong></p><p>📍 İstanbul, Türkiye<br>info@incedetay.com<br>Tel: +90 533 466 80 88</p>';
                 $updated = true;
                 break;
             }
@@ -567,8 +567,8 @@ function kampanya_favicon_links() {
  */
 function kampanya_override_copyright($text) {
     if (is_string($text)) {
-        $text = str_replace('The Daily Pulse Team', 'Kampanya.website', $text);
-        $text = str_replace('The Daily Pulse', 'Kampanya.website', $text);
+        $text = str_replace('The Daily Pulse Team', 'ince detay', $text);
+        $text = str_replace('The Daily Pulse', 'ince detay', $text);
         $text = str_replace('thedailypulse.com', 'kampanya.website', $text);
     }
     return $text;
@@ -584,8 +584,8 @@ function kampanya_footer_copyright_buffer_start() {
 }
 function kampanya_footer_copyright_buffer_end() {
     $html = ob_get_clean();
-    $html = str_replace('The Daily Pulse Team', 'Kampanya.website', $html);
-    $html = str_replace('The Daily Pulse', 'Kampanya.website', $html);
+    $html = str_replace('The Daily Pulse Team', 'ince detay', $html);
+    $html = str_replace('The Daily Pulse', 'ince detay', $html);
     $html = str_replace('thedailypulse.com', 'kampanya.website', $html);
     echo $html;
 }
@@ -995,7 +995,7 @@ function kampanya_send_welcome_email($email) {
           <h1 style="margin:0 0 20px;font-family:\'Arial Black\',Impact,Arial,sans-serif;font-size:30px;font-weight:900;color:#FFD600;letter-spacing:-0.5px;text-transform:uppercase;line-height:1.05;">Aboneliğiniz<br>onaylandı!</h1>
           <p style="color:#A9A4B3;font-size:15px;line-height:1.75;margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;">Artık ince detay bülteninin bir parçasısınız.</p>
           <p style="color:#A9A4B3;font-size:15px;line-height:1.75;margin:0 0 36px;font-family:Arial,Helvetica,sans-serif;">Her hafta en güncel indirimler, fırsatlar ve kampanyalar — doğrudan gelen kutunuza. Bir şey kaçırmayacaksınız.</p>
-          ' . kampanya_email_btn(home_url('/firsatlar'), 'Fırsatları Keşfet') . '
+          ' . kampanya_email_btn(home_url('/blog'), 'Rehberlere Göz At') . '
         </td>
       </tr>';
 
@@ -1250,7 +1250,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka'],
             ],
         ],
     ]);
@@ -1478,6 +1478,41 @@ function kampanya_maintenance(WP_REST_Request $request) {
             $purged = true;
         }
         return ['purged' => $purged];
+    }
+
+    // 2026-10-05 domain move: Blocksy keeps header/footer text (contact block,
+    // copyright line) in theme mods, which no post/page edit can reach. Rewrites
+    // the old host, the old mailboxes and the old brand name inside those strings.
+    // Dry run unless apply=true; returns only the changed paths.
+    if ($action === 'theme_mods_marka') {
+        $apply = filter_var($request->get_param('apply'), FILTER_VALIDATE_BOOLEAN);
+        $mods  = get_theme_mods();
+        $paths = [];
+        $walk  = function ($v, $path) use (&$walk, &$paths) {
+            if (is_array($v)) {
+                foreach ($v as $k => $x) {
+                    $v[$k] = $walk($x, $path . '/' . $k);
+                }
+                return $v;
+            }
+            if (!is_string($v)) {
+                return $v;
+            }
+            $n = preg_replace('~https?://(?:www\.)?kampanya\.website~i', untrailingslashit(home_url()), $v);
+            $n = preg_replace('/(?:info|iletisim)@kampanya\.website/i', 'info@incedetay.com', $n);
+            $n = preg_replace('/Kampanya\.\s?website/i', 'ince detay', $n);
+            if ($n !== $v) {
+                $paths[$path] = mb_substr(wp_strip_all_tags($n), 0, 90);
+            }
+            return $n;
+        };
+        foreach ($mods as $key => $val) {
+            $new = $walk($val, $key);
+            if ($apply && $new !== $val) {
+                set_theme_mod($key, $new);
+            }
+        }
+        return ['applied' => $apply, 'changed' => $paths];
     }
 
     // One test mail, then Resend's own delivery verdict for it. Recipient: the

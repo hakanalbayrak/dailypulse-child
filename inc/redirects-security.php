@@ -18,6 +18,9 @@ function kampanya_redirect_map() {
         // 2026-09-11: article 51 merged into article 50 (same product class,
         // the two posts were competing for the same search term)
         'kisisel-finans-planlayici-organizer-urunleri' => '/butce-takibi-icin-planlayici-defter-rehberi/',
+        // 2026-10-05: the Firsatlar page listed invented discounts and was hidden;
+        // old links and the main-menu entry go to the guides instead of a 404
+        'firsatlar' => '/blog/',
     ];
 }
 
