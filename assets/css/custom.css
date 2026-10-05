@@ -4,7 +4,8 @@
    Warm paper · Ink · Yellow · Signal vermillion
    ============================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@500;600;700&display=swap');
+/* Barlow fonts are loaded once, non-blocking, from functions.php (an @import here
+   duplicated that request and delayed first paint by seconds). */
 
 /* Quicksand — self-hosted variable font (not via Google Fonts CDN) for
    reliability. The earlier @import-based Quicksand attempt never actually
@@ -2404,3 +2405,12 @@ html body .idk-404 .idk-404__liste { margin: 0 0 1.5rem; padding-left: 1.2rem; }
 html body .idk-404 .idk-404__liste li { margin: .35rem 0; }
 html body .idk-404 .idk-404__btn { display: inline-block; padding: 12px 24px; margin-right: 16px; font-weight: 700; color: #17141A !important; background: #FFD600; border-radius: 8px; text-decoration: none; }
 html body .idk-404 .idk-404__link { font-weight: 600; }
+
+/* Kart tarihleri: #8e8892 beyaz üstünde 3.45:1'di (WCAG AA 4.5:1 ister) */
+html body .k-post-card__date { color: #66616f !important; }
+
+/* Dokunma hedefleri: WCAG 2.2 AA en az 24x24 px ister. Menü düğmesi 18x18,
+   alt bilgi bağlantıları ~13 px yüksekti. */
+html body .ct-header-trigger { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+html body footer .menu-item a,
+html body .k-hero__trust a { display: inline-block; padding-block: 6px; }

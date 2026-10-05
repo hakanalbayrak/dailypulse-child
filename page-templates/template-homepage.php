@@ -19,12 +19,12 @@ get_header(); ?>
       </div>
 
       <h1 class="k-hero__title">
-        En İyi Kampanyaları<br>
-        <span class="k-hero__title-accent">Kaçırmayın</span>
+        Satın Almadan Önce<br>
+        <span class="k-hero__title-accent">Ayrıntıya Bakın</span>
       </h1>
 
       <p class="k-hero__subtitle">
-        Türkiye'nin en güncel indirimleri, fırsatları ve kampanyaları doğrudan<br class="k-hero__br">
+        Bağımsız ürün rehberleri ve karşılaştırmalar, yeni yazılar çıktıkça<br class="k-hero__br">
         e-posta kutunuza gelsin. Haftada en fazla 2 e-posta, sıfır spam.
       </p>
 
