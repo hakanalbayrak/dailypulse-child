@@ -400,3 +400,31 @@ add_action('transition_post_status', function ($yeni, $eski, $post) {
     }
     idk_indexnow_gonder([get_permalink($post)]);
 }, 10, 3);
+
+/* ------------------------------------------------------------------
+   12. HIZ — gövde fontunu önceden yükle, jQuery'yi render'ı engellemeyecek yere al
+   ------------------------------------------------------------------ */
+// Quicksand (self-host) yalnızca custom.css indirilip ayrıştırıldıktan sonra keşfediliyordu;
+// ana sayfada en büyük boyama (LCP) hero metni, yani bu fontu bekleyen metin. Türkçe için hem
+// latin hem latin-ext alt kümesi gerekli (ğ ş İ latin-ext'te, ı latin'de).
+add_action('wp_head', function () {
+    $dizin = get_stylesheet_directory_uri() . '/assets/fonts/quicksand/';
+    foreach (['quicksand-variable-latin.woff2', 'quicksand-variable-latin-ext.woff2'] as $f) {
+        printf('<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin>' . "\n", esc_url($dizin . $f));
+    }
+}, 1);
+
+// jQuery <head>'de render'ı engelliyordu (~150 ms). Footer'a alınır; WordPress bağımlılık
+// sırasını korur, yani jQuery isteyen betikler hâlâ ondan SONRA çalışır. Başlıkta jQuery'yi
+// doğrudan çağıran satır içi betik varsa bu satır kaldırılmalı (bkz. scripts/saglik-taramasi).
+add_action('wp_enqueue_scripts', function () {
+    if (is_admin()) {
+        return;
+    }
+    $w = wp_scripts();
+    foreach (['jquery', 'jquery-core', 'jquery-migrate'] as $h) {
+        if (isset($w->registered[$h])) {
+            $w->add_data($h, 'group', 1);
+        }
+    }
+}, 1);
