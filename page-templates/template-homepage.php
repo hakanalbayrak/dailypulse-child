@@ -24,7 +24,7 @@ get_header(); ?>
       </h1>
 
       <p class="k-hero__subtitle">
-        Bağımsız ürün rehberleri ve karşılaştırmalar, yeni yazılar çıktıkça<br class="k-hero__br">
+        Bağımsız ürün rehberleri ve karşılaştırmalar, yeni yazılar çıktıkça
         e-posta kutunuza gelsin. Haftada en fazla 2 e-posta, sıfır spam.
       </p>
 

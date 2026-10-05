@@ -2414,3 +2414,7 @@ html body .k-post-card__date { color: #66616f !important; }
 html body .ct-header-trigger { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
 html body footer .menu-item a,
 html body .k-hero__trust a { display: inline-block; padding-block: 6px; }
+
+/* Metin içi bağlantılar: #1a73e8 krem zeminde 4.09:1'di; #1558c0 yaklaşık 6:1 */
+html body .entry-content p a:not(.k-buybox__link):not(.wp-block-button__link),
+html body .entry-content li a:not(.k-buybox__link):not(.wp-block-button__link) { color: #1558c0; }

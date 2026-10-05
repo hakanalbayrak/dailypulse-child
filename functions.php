@@ -191,7 +191,6 @@ function kampanya_footer_logo_inject() {
             var link = document.createElement('a');
             link.className = 'k-footer-logo-wrap';
             link.href = '/';
-            link.setAttribute('aria-label', 'ince detay');
             link.innerHTML = <?php echo json_encode($svg); ?>;
             bar.insertBefore(link, bar.firstChild);
         }

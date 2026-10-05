@@ -20,9 +20,11 @@ if (!defined('ABSPATH')) exit;
  * sitemap'ten çıkarılan yazı/sayfalar. Silinmiyor, yalnızca noindex.
  *   82-85  : "Kampanya" dönemi genel yazıları (ürün, buy-box ve h1 yok)
  *   3364   : abone-olundu, 3365: abonelik-iptal (işlem sonrası sayfalar)
+ *   11-14  : WooCommerce mağaza/sepet/ödeme/hesabım — site satış yapmıyor; WooCommerce
+ *            12'yi sepet sayfası olarak tanımadığı için is_cart() yetmiyordu
  */
 function idk_noindex_idler() {
-    return [82, 83, 84, 85, 3364, 3365];
+    return [82, 83, 84, 85, 3364, 3365, 11, 12, 13, 14];
 }
 
 /* ------------------------------------------------------------------
