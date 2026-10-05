@@ -24,7 +24,9 @@ if (!defined('ABSPATH')) exit;
  *            12'yi sepet sayfası olarak tanımadığı için is_cart() yetmiyordu
  */
 function idk_noindex_idler() {
-    return [82, 83, 84, 85, 3364, 3365, 11, 12, 13, 14];
+    // 3300 (648 kelime, 10 ürün, yoğun affiliate), 3358 ve 3344 (~350 kelimelik kitap yazıları):
+    // AdSense/Google "yetersiz içerik" değerlendirmesi için genişletilene kadar dizine girmez.
+    return [82, 83, 84, 85, 3364, 3365, 11, 12, 13, 14, 3300, 3358, 3344];
 }
 
 /* ------------------------------------------------------------------
@@ -146,7 +148,7 @@ add_filter('robots_txt', function ($out) {
         'Allow: /wp-admin/admin-ajax.php',
         "Allow: /wp-admin/admin-ajax.php\nDisallow: /go/\nDisallow: /?s=\nDisallow: /search/",
         $out
-    );
+    ) . "\nUser-agent: Mediapartners-Google\nDisallow:\n";
 }, 20);
 
 /* ------------------------------------------------------------------
@@ -161,7 +163,7 @@ function idk_llms_uret() {
     $out .= "Dil: Türkçe. Bazı bağlantılar affiliate (ortaklık) bağlantısıdır; ayrıntılar Affiliate Disclosure sayfasındadır. "
           . "İletişim: info@incedetay.com\n\n";
 
-    $sayfalar = ['hakkimizda', 'sikca-sorulan-sorular', 'affiliate-disclosure', 'gizlilik-politikasi', 'iletisim'];
+    $sayfalar = ['hakkimizda', 'editoryal-ilkeler', 'sikca-sorulan-sorular', 'affiliate-disclosure', 'gizlilik-politikasi', 'iletisim'];
     $satir = [];
     foreach ($sayfalar as $slug) {
         $p = get_page_by_path($slug);
@@ -227,9 +229,13 @@ add_action('wp_footer', function () {
     }
     $ga = (string) get_option('idk_ga_id', '');
     $ga = preg_match('/^G-[A-Z0-9]{4,14}$/', $ga) ? $ga : '';
+    $ads = idk_adsense_id();
+    $metin = $ads
+        ? 'Bu site, çalışması için gerekli çerezleri kullanır. İzin verirseniz ziyaretçi sayısını anlamak ve reklam göstermek için analitik ve reklam çerezlerini de kullanırız.'
+        : 'Bu site, çalışması için gerekli çerezleri kullanır. İzin verirseniz ziyaretçi sayısını anlamak için analitik çerezleri de kullanırız.';
     ?>
 <div id="idk-cerez" class="idk-cerez" role="region" aria-label="Çerez tercihi" hidden>
-  <p class="idk-cerez__metin">Bu site, çalışması için gerekli çerezleri kullanır. İzin verirseniz ziyaretçi sayısını anlamak için analitik çerezleri de kullanırız. Ayrıntılar: <a href="<?php echo esc_url(home_url('/cerez-politikasi/')); ?>">Çerez Politikası</a></p>
+  <p class="idk-cerez__metin"><?php echo esc_html($metin); ?> Ayrıntılar: <a href="<?php echo esc_url(home_url('/cerez-politikasi/')); ?>">Çerez Politikası</a></p>
   <div class="idk-cerez__dugmeler">
     <button type="button" class="idk-cerez__btn" data-idk-cerez="reddet">Reddet</button>
     <button type="button" class="idk-cerez__btn idk-cerez__btn--birincil" data-idk-cerez="kabul">Kabul et</button>
@@ -237,7 +243,7 @@ add_action('wp_footer', function () {
 </div>
 <script>
 (function () {
-  var GA = <?php echo wp_json_encode($ga); ?>, ANAHTAR = 'idk_cerez', kutu = document.getElementById('idk-cerez');
+  var GA = <?php echo wp_json_encode($ga); ?>, ADS = <?php echo wp_json_encode($ads); ?>, ANAHTAR = 'idk_cerez', kutu = document.getElementById('idk-cerez');
   if (!kutu) { return; }
   function oku() {
     try { return localStorage.getItem(ANAHTAR); } catch (e) {
@@ -260,14 +266,24 @@ add_action('wp_footer', function () {
     gtag('js', new Date());
     gtag('config', GA, { anonymize_ip: true });
   }
+  // Reklam komut dosyası da YALNIZCA "Kabul et"ten sonra yüklenir (hesap doğrulaması için
+  // sayfada yalnızca <meta name="google-adsense-account"> bulunur, reklam kodu değil).
+  function reklam() {
+    if (!ADS || window.idkAdsYuklendi) { return; }
+    window.idkAdsYuklendi = true;
+    var s = document.createElement('script');
+    s.async = true; s.crossOrigin = 'anonymous';
+    s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + ADS;
+    document.head.appendChild(s);
+  }
   var secim = oku();
-  if (secim === 'kabul') { analitik(); } else if (secim !== 'reddet') { kutu.hidden = false; }
+  if (secim === 'kabul') { analitik(); reklam(); } else if (secim !== 'reddet') { kutu.hidden = false; }
   kutu.addEventListener('click', function (e) {
     var b = e.target.closest('[data-idk-cerez]');
     if (!b) { return; }
     var v = b.getAttribute('data-idk-cerez');
     yaz(v); kutu.hidden = true;
-    if (v === 'kabul') { analitik(); }
+    if (v === 'kabul') { analitik(); reklam(); }
   });
   // Çerez politikasındaki "tercihleri değiştir" bağlantısı
   document.addEventListener('click', function (e) {
@@ -428,3 +444,48 @@ add_action('wp_enqueue_scripts', function () {
         }
     }
 }, 1);
+
+/* ------------------------------------------------------------------
+   13. GOOGLE ADSENSE HAZIRLIĞI (2026-10-05)
+   - hesap kimliği kaydedilince: <meta name="google-adsense-account"> (hesap doğrulaması) ve
+     /ads.txt; reklam komut dosyası YALNIZCA çerez bildirimi kabul edilince yüklenir (bkz. §7)
+   - kimlik gizli değildir; yönetici eylemiyle kaydedilir (kampanya/v1/maintenance set_adsense_id)
+   ------------------------------------------------------------------ */
+function idk_adsense_id() {
+    $id = (string) get_option('idk_adsense_id', '');
+    return preg_match('/^ca-pub-\d{16}$/', $id) ? $id : '';
+}
+
+add_action('wp_head', function () {
+    if ($id = idk_adsense_id()) {
+        printf('<meta name="google-adsense-account" content="%s">' . "\n", esc_attr($id));
+    }
+}, 2);
+
+add_action('init', function () {
+    $yol = trim((string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH), '/');
+    if ($yol !== 'ads.txt' || !($id = idk_adsense_id())) {
+        return;
+    }
+    status_header(200);
+    header('Content-Type: text/plain; charset=utf-8');
+    echo 'google.com, ' . substr($id, 3) . ", DIRECT, f08c47fec0942fa0\n";
+    exit;
+}, 1);
+
+/* Sağlıkla ilgili yazıların sonuna tıbbi-tavsiye uyarısı: "güvenilmez sağlık iddiası" politikası */
+function idk_saglik_yazilari() {
+    return [3389, 3407, 3386, 3548, 3545, 3586, 3360, 3391, 3544, 3541, 3543, 3554];
+}
+
+add_filter('the_content', function ($c) {
+    if (is_admin() || !is_singular('post') || !in_the_loop() || !is_main_query()) {
+        return $c;
+    }
+    $id = get_the_ID();
+    if (!in_array($id, idk_saglik_yazilari(), true) && !in_array('saglik', wp_get_post_categories($id, ['fields' => 'slugs']), true)) {
+        return $c;
+    }
+    return $c . '<p class="idk-uyari"><em>Bu yazı genel bilgilendirme amaçlıdır; tıbbi tavsiye, teşhis ya da tedavi yerine geçmez. '
+        . 'Sağlığınızla ilgili kararlar için bir sağlık uzmanına danışın.</em></p>';
+}, 15);

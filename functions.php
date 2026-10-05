@@ -1269,7 +1269,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id', 'indexnow_hepsi'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id', 'set_adsense_id', 'indexnow_hepsi'],
             ],
         ],
     ]);
@@ -1549,6 +1549,16 @@ function kampanya_maintenance(WP_REST_Request $request) {
         $urller = array_values(array_unique($urller));
         $r = idk_indexnow_gonder($urller, true);
         return $r + ['anahtar_dosyasi' => home_url('/' . idk_indexnow_anahtar() . '.txt')];
+    }
+
+    // AdSense yayıncı kimliği (ca-pub-0000000000000000). Gizli değil; boş değer kapatır.
+    if ($action === 'set_adsense_id') {
+        $id = strtolower(trim((string) $request->get_param('id')));
+        if ($id !== '' && !preg_match('/^ca-pub-\d{16}$/', $id)) {
+            return new WP_Error('bad_id', 'Kimlik ca-pub-XXXXXXXXXXXXXXXX (16 hane) biçiminde olmalı', ['status' => 400]);
+        }
+        update_option('idk_adsense_id', $id, false);
+        return ['adsense_id' => $id, 'ads_txt' => $id ? home_url('/ads.txt') : null];
     }
 
     // GA4 ölçüm kimliği (G-XXXXXXXXXX). Gizli bir bilgi değil; boş değer analitiği
