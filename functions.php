@@ -17,6 +17,7 @@ require_once DAILYPULSE_DIR . '/inc/shortcodes.php';
 require_once DAILYPULSE_DIR . '/inc/seo.php';
 require_once DAILYPULSE_DIR . '/inc/content-extras.php';
 require_once DAILYPULSE_DIR . '/inc/redirects-security.php';
+require_once DAILYPULSE_DIR . '/inc/yayin-hazirligi.php';
 require_once DAILYPULSE_DIR . '/inc/surum.php';
 
 /**
@@ -1250,7 +1251,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id'],
             ],
         ],
     ]);
@@ -1513,6 +1514,17 @@ function kampanya_maintenance(WP_REST_Request $request) {
             }
         }
         return ['applied' => $apply, 'changed' => $paths];
+    }
+
+    // GA4 ölçüm kimliği (G-XXXXXXXXXX). Gizli bir bilgi değil; boş değer analitiği
+    // kapatır. Kimlik yalnızca ziyaretçi çerez bildirimini KABUL ederse yüklenir.
+    if ($action === 'set_analytics_id') {
+        $id = strtoupper(trim((string) $request->get_param('id')));
+        if ($id !== '' && !preg_match('/^G-[A-Z0-9]{4,14}$/', $id)) {
+            return new WP_Error('bad_id', 'Kimlik G-XXXXXXXXXX biçiminde olmalı', ['status' => 400]);
+        }
+        update_option('idk_ga_id', $id, false);
+        return ['analytics_id' => $id];
     }
 
     // One test mail, then Resend's own delivery verdict for it. Recipient: the

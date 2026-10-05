@@ -133,24 +133,79 @@ function kampanya_seo_current_description() {
         $post   = get_post($id);
         return kampanya_seo_description_pure($stored, $post ? $post->post_content : '');
     }
+    if (is_home() && !is_front_page()) {
+        // Yazı listesi sayfası: kendi sayfasına yazılmış açıklamayı kullan
+        $pid    = (int) get_option('page_for_posts');
+        $stored = $pid ? get_post_meta($pid, 'rank_math_description', true) : '';
+        if ($stored) {
+            return kampanya_seo_trim_pure((string) $stored);
+        }
+    }
     if (is_home() || is_front_page()) {
         return kampanya_seo_trim_pure(get_bloginfo('description'));
     }
     if (is_category() || is_tag() || is_tax()) {
-        $d = term_description();
-        return kampanya_seo_trim_pure(kampanya_seo_text_pure($d));
+        $d = kampanya_seo_trim_pure(kampanya_seo_text_pure(term_description()));
+        if ($d === '') {
+            $ad = single_term_title('', false);
+            $d  = is_category()
+                ? $ad . ' kategorisindeki ürün rehberleri ve karşılaştırmalar.'
+                : $ad . ' etiketli yazılar.';
+        }
+        return $d;
     }
     return kampanya_seo_trim_pure(get_bloginfo('description'));
 }
 
 function kampanya_seo_current_image() {
-    if (is_singular() && has_post_thumbnail()) {
+    // Makaleler kendi kapak görselini kullanır. Sayfalar ve arşivler marka
+    // kartını: eski sayfa görselleri başka bir siteden kalmaydı (ör. "ekip"
+    // fotoğrafı) ve paylaşım önizlemesinde yanlış izlenim veriyordu.
+    if (is_singular('post') && has_post_thumbnail()) {
         $src = wp_get_attachment_image_src(get_post_thumbnail_id(), 'full');
         if ($src) {
             return ['url' => $src[0], 'w' => $src[1], 'h' => $src[2]];
         }
     }
+    $dosya = get_stylesheet_directory() . '/assets/images/og-varsayilan.png';
+    if (file_exists($dosya)) {
+        return ['url' => get_stylesheet_directory_uri() . '/assets/images/og-varsayilan.png', 'w' => 1200, 'h' => 630];
+    }
     return null;
+}
+
+/** Sayfa/arşiv başlığı (og:title için). */
+function kampanya_seo_current_title() {
+    if (is_front_page()) {
+        return get_bloginfo('name');
+    }
+    if (is_singular()) {
+        return get_the_title(get_queried_object_id());
+    }
+    if (is_home()) {
+        return get_the_title((int) get_option('page_for_posts')) ?: 'Blog';
+    }
+    if (is_category() || is_tag() || is_tax()) {
+        return single_term_title('', false);
+    }
+    return get_bloginfo('name');
+}
+
+/** Geçerli sayfanın kanonik adresi (og:url ve canonical için). */
+function kampanya_seo_current_url() {
+    if (is_singular()) {
+        return get_permalink(get_queried_object_id());
+    }
+    if (is_home() && !is_front_page()) {
+        return get_permalink((int) get_option('page_for_posts'));
+    }
+    if (is_category() || is_tag() || is_tax()) {
+        $u = get_term_link(get_queried_object());
+        if (!is_wp_error($u)) {
+            return $u;
+        }
+    }
+    return home_url('/');
 }
 
 /**
@@ -175,8 +230,8 @@ function kampanya_seo_meta_tags() {
         return;
     }
     $desc = kampanya_seo_current_description();
-    $title = is_singular() ? get_the_title(get_queried_object_id()) : get_bloginfo('name');
-    $url   = is_singular() ? get_permalink(get_queried_object_id()) : home_url('/');
+    $title = kampanya_seo_current_title();
+    $url   = kampanya_seo_current_url();
     $img   = kampanya_seo_current_image();
 
     echo "\n<!-- kampanya seo -->\n";
@@ -236,11 +291,14 @@ function kampanya_seo_schema() {
                 'name'  => get_bloginfo('name'),
                 'url'   => home_url('/'),
             ],
-            'publisher'        => [
+            'publisher'        => array_filter([
                 '@type' => 'Organization',
                 'name'  => get_bloginfo('name'),
                 'url'   => home_url('/'),
-            ],
+                'logo'  => get_site_icon_url(512)
+                    ? ['@type' => 'ImageObject', 'url' => get_site_icon_url(512), 'width' => 512, 'height' => 512]
+                    : null,
+            ]),
         ];
         if ($img) {
             $article['image'] = [
@@ -268,7 +326,35 @@ function kampanya_seo_schema() {
                 'mainEntity' => $items,
             ];
         }
+    } elseif (is_page('sikca-sorulan-sorular')) {
+        // SSS sayfası: başlık sayfa başlığı olduğu için bölüm başlığı yok;
+        // çıkarıcı için yapay bir "Sıkça Sorulan Sorular" h2'si öne eklenir.
+        $faq = kampanya_seo_faq_pure('<h2>Sıkça Sorulan Sorular</h2>' . get_post_field('post_content', get_queried_object_id()), 20);
+        if (count($faq) >= 2) {
+            $items = [];
+            foreach ($faq as $f) {
+                $items[] = [
+                    '@type'          => 'Question',
+                    'name'           => $f['q'],
+                    'acceptedAnswer' => ['@type' => 'Answer', 'text' => $f['a']],
+                ];
+            }
+            $graph[] = [
+                '@type'      => 'FAQPage',
+                '@id'        => get_permalink() . '#faq',
+                'mainEntity' => $items,
+            ];
+        }
     } elseif (is_front_page() || is_home()) {
+        if (get_site_icon_url(512)) {
+            $graph[] = [
+                '@type' => 'Organization',
+                '@id'   => home_url('/') . '#organization',
+                'name'  => get_bloginfo('name'),
+                'url'   => home_url('/'),
+                'logo'  => ['@type' => 'ImageObject', 'url' => get_site_icon_url(512), 'width' => 512, 'height' => 512],
+            ];
+        }
         $graph[] = [
             '@type'       => 'WebSite',
             '@id'         => home_url('/') . '#website',

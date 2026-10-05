@@ -2334,3 +2334,73 @@ html body .entry-content table.k-table tbody tr:nth-child(even) {
 html body .entry-content table.k-table tbody tr:last-child td {
   border-bottom: none;
 }
+
+
+/* ============================================================
+   Yayın öncesi hazırlık (2026-10-05): sayfa h1, çerez bildirimi, 404
+   Blocksy p/h1 renklerini !important ile ezdiği için seçiciler
+   "html body" ile başlıyor.
+   ============================================================ */
+html body .entry-content .idk-sayfa-baslik,
+html body .idk-sayfa-baslik {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  line-height: 1.05;
+  margin: 0 0 1.25rem;
+}
+
+html body .idk-cerez {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 99999;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  background: #17141A;
+  border-left: 6px solid #FFD600;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, .35);
+}
+html body .idk-cerez[hidden] { display: none; }
+html body .idk-cerez .idk-cerez__metin {
+  flex: 1 1 320px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #F7F4EC !important;
+}
+html body .idk-cerez .idk-cerez__metin a { color: #FFD600 !important; text-decoration: underline; }
+html body .idk-cerez .idk-cerez__dugmeler { display: flex; gap: 10px; }
+html body .idk-cerez .idk-cerez__btn {
+  min-height: 44px;
+  padding: 10px 22px;
+  font: 700 14px/1 'Barlow', sans-serif;
+  color: #F7F4EC;
+  background: transparent;
+  border: 2px solid #8A8594;
+  border-radius: 8px;
+  cursor: pointer;
+}
+html body .idk-cerez .idk-cerez__btn--birincil { color: #17141A; background: #FFD600; border-color: #FFD600; }
+html body .idk-cerez .idk-cerez__btn:focus-visible { outline: 3px solid #F7F4EC; outline-offset: 2px; }
+@media (max-width: 560px) {
+  html body .idk-cerez { left: 8px; right: 8px; bottom: 8px; }
+  html body .idk-cerez .idk-cerez__dugmeler { width: 100%; }
+  html body .idk-cerez .idk-cerez__btn { flex: 1; }
+}
+
+html body .idk-404 { max-width: 720px; margin: 0 auto; }
+html body .idk-404 .idk-404__baslik { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.05; margin: 0 0 .75rem; }
+html body .idk-404 .idk-404__alt { font-size: 1.25rem; margin: 2rem 0 .5rem; }
+html body .idk-404 .idk-404__liste { margin: 0 0 1.5rem; padding-left: 1.2rem; }
+html body .idk-404 .idk-404__liste li { margin: .35rem 0; }
+html body .idk-404 .idk-404__btn { display: inline-block; padding: 12px 24px; margin-right: 16px; font-weight: 700; color: #17141A !important; background: #FFD600; border-radius: 8px; text-decoration: none; }
+html body .idk-404 .idk-404__link { font-weight: 600; }
