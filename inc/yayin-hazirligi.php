@@ -267,7 +267,7 @@ add_action('wp_footer', function () {
     gtag('config', GA, { anonymize_ip: true });
   }
   // Reklam komut dosyası da YALNIZCA "Kabul et"ten sonra yüklenir (hesap doğrulaması için
-  // sayfada yalnızca <meta name="google-adsense-account"> bulunur, reklam kodu değil).
+  // sayfada yalnızca hesap kimliği etiketi bulunur, reklam kodu değil).
   function reklam() {
     if (!ADS || window.idkAdsYuklendi) { return; }
     window.idkAdsYuklendi = true;
