@@ -148,7 +148,8 @@ add_filter('robots_txt', function ($out) {
         'Allow: /wp-admin/admin-ajax.php',
         "Allow: /wp-admin/admin-ajax.php\nDisallow: /go/\nDisallow: /?s=\nDisallow: /search/",
         $out
-    ) . "\nUser-agent: Mediapartners-Google\nDisallow:\n";
+    ) . (stripos($out, 'Sitemap:') === false ? "\nSitemap: " . home_url('/sitemap.xml') . "\n" : '')
+      . "\nUser-agent: Mediapartners-Google\nDisallow:\n";
 }, 20);
 
 /* ------------------------------------------------------------------
@@ -195,7 +196,7 @@ function idk_llms_uret() {
     foreach ($gruplar as $ad => $liste) {
         $out .= '## ' . $ad . "\n" . implode("\n", $liste) . "\n\n";
     }
-    $out .= "## Sitemap\n- [wp-sitemap.xml]($url/wp-sitemap.xml)\n";
+    $out .= "## Sitemap\n- [sitemap.xml]($url/sitemap.xml)\n";
     return $out;
 }
 
@@ -204,10 +205,10 @@ add_action('init', function () {
     if ($yol !== 'llms.txt') {
         return;
     }
-    $metin = get_transient('idk_llms_v1');
+    $metin = get_transient('idk_llms_v2');
     if ($metin === false) {
         $metin = idk_llms_uret();
-        set_transient('idk_llms_v1', $metin, 6 * HOUR_IN_SECONDS);
+        set_transient('idk_llms_v2', $metin, 6 * HOUR_IN_SECONDS);
     }
     status_header(200);
     header('Content-Type: text/plain; charset=utf-8');
@@ -217,7 +218,8 @@ add_action('init', function () {
 
 // Yeni yazı/sayfa yayınlanınca llms.txt tazelensin
 add_action('save_post', function () {
-    delete_transient('idk_llms_v1');
+    delete_transient('idk_llms_v2');
+    delete_transient('idk_sitemap_v1');
 });
 
 /* ------------------------------------------------------------------
@@ -489,3 +491,67 @@ add_filter('the_content', function ($c) {
     return $c . '<p class="idk-uyari"><em>Bu yazı genel bilgilendirme amaçlıdır; tıbbi tavsiye, teşhis ya da tedavi yerine geçmez. '
         . 'Sağlığınızla ilgili kararlar için bir sağlık uzmanına danışın.</em></p>';
 }, 15);
+
+/* ------------------------------------------------------------------
+   14. TEK SİTEMAP: https://incedetay.com/sitemap.xml
+   WordPress'in varsayılanı bir dizin dosyası + 3 alt dosya + /sitemap.xml'den 301 idi.
+   Search Console'da tek ve doğrudan bir adres istendi: tüm adresler tek düz dosyada, yönlendirme yok.
+   Kapsam eski dizinle birebir aynı: yayındaki yazı/sayfalar (noindex olanlar hariç) + dolu kategoriler.
+   ------------------------------------------------------------------ */
+add_filter('wp_sitemaps_enabled', '__return_false');
+
+function idk_sitemap_xml() {
+    $atla    = idk_noindex_idler();
+    $yazilar = get_posts([
+        'numberposts'  => -1,
+        'post_status'  => 'publish',
+        'post_type'    => ['post', 'page'],
+        'post__not_in' => $atla,
+        'orderby'      => 'modified',
+        'order'        => 'DESC',
+    ]);
+    $ana    = (int) get_option('page_on_front');
+    $blog   = (int) get_option('page_for_posts');
+    $ogeler = [];
+    $enYeni = $yazilar ? get_post_modified_time('c', true, $yazilar[0]) : gmdate('c');
+    foreach ($yazilar as $p) {
+        $ID  = (int) $p->ID;
+        $url = ($ana && $ID === $ana) ? home_url('/') : get_permalink($p);
+        // ana sayfa ve yazı listesi sayfası, sitedeki en son değişiklik kadar günceldir
+        $ogeler[$url] = ($ID === $ana || $ID === $blog) ? $enYeni : get_post_modified_time('c', true, $p);
+    }
+    foreach (get_categories(['hide_empty' => true]) as $c) {
+        $son = get_posts(['numberposts' => 1, 'category' => $c->term_id, 'post_status' => 'publish',
+                          'post__not_in' => $atla, 'orderby' => 'modified', 'order' => 'DESC']);
+        if ($son) {
+            $ogeler[get_category_link($c)] = get_post_modified_time('c', true, $son[0]);
+        }
+    }
+    $x = '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+    foreach ($ogeler as $u => $m) {
+        $x .= '<url><loc>' . htmlspecialchars($u, ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</loc><lastmod>' . htmlspecialchars($m, ENT_XML1, 'UTF-8') . '</lastmod></url>' . "\n";
+    }
+    return $x . '</urlset>' . "\n";
+}
+
+add_action('init', function () {
+    $yol = trim((string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH), '/');
+    // eski WordPress sitemap adresleri (wp-sitemap.xml, wp-sitemap-posts-post-1.xml ...) kalıcı olarak tek dosyaya
+    if (preg_match('~^wp-sitemap[\w.-]*\.(xml|xsl)$~', $yol)) {
+        wp_redirect(home_url('/sitemap.xml'), 301);
+        exit;
+    }
+    if ($yol !== 'sitemap.xml') {
+        return;
+    }
+    $xml = get_transient('idk_sitemap_v1');
+    if ($xml === false) {
+        $xml = idk_sitemap_xml();
+        set_transient('idk_sitemap_v1', $xml, HOUR_IN_SECONDS);
+    }
+    status_header(200);
+    header('Content-Type: application/xml; charset=UTF-8');
+    header('X-Robots-Tag: noindex, follow');   // sitemap dosyasının kendisi aramada çıkmasın
+    echo $xml;
+    exit;
+}, 1);
