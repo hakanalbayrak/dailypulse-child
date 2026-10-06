@@ -561,3 +561,13 @@ add_action('init', function () {
     echo $xml;
     exit;
 }, 1);
+
+/* ------------------------------------------------------------------
+   15. SITE KIT — yalnızca YÖNETİM PANELİ için; ön yüze etiket basmasın
+   Site Kit, bağlandığında kendi gtag/AdSense kodunu çerez onayından ÖNCE yükler. Burada izleme ve
+   reklam etiketleri her zaman engellenir; tek kapı, çerez bildirimi (§7, §13). Filtre adı Site Kit
+   1.189.0 kaynağından: includes/Core/Modules/Tags/Module_Web_Tag.php.
+   ------------------------------------------------------------------ */
+foreach (['analytics-4', 'adsense', 'ads', 'tagmanager'] as $idk_modul) {
+    add_filter("googlesitekit_{$idk_modul}_tag_blocked", '__return_true');
+}

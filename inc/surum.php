@@ -5,7 +5,7 @@
  * one actually running (not just that "a" child theme is running).
  */
 if (!defined('ABSPATH')) exit;
-define('KAMPANYA_TEMA_SURUM', '20261006-075514');
+define('KAMPANYA_TEMA_SURUM', '20261006-235202');
 add_action('wp_head', function () {
     echo '<meta name="kampanya-tema-surum" content="' . esc_attr(KAMPANYA_TEMA_SURUM) . '" />' . "\n";
 }, 2);
