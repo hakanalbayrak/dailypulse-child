@@ -107,6 +107,12 @@ add_action('wp_head', function () {
 add_filter('wp_robots', function ($r) {
     $woo = function_exists('is_cart') && (is_cart() || is_checkout() || is_account_page());
     $ozel = is_singular() && in_array((int) get_queried_object_id(), idk_noindex_idler(), true);
+    // Yalnızca noindex yazılar içeren bir kategori (ör. /category/egitim/) dizine girecek bir şey göstermez
+    if (!$ozel && is_category()) {
+        $var = get_posts(['numberposts' => 1, 'category' => (int) get_queried_object_id(), 'post_status' => 'publish',
+                          'post__not_in' => idk_noindex_idler(), 'fields' => 'ids']);
+        $ozel = !$var;
+    }
     // Tarih arşivleri (/2026/, /2026/09/) kategori listelerinin kopyası: noindex
     if (is_tag() || is_search() || is_404() || is_date() || $woo || $ozel) {
         $r['noindex'] = true;
