@@ -557,7 +557,7 @@ add_action('init', function () {
     }
     status_header(200);
     header('Content-Type: application/xml; charset=UTF-8');
-    header('X-Robots-Tag: noindex, follow');   // sitemap dosyasının kendisi aramada çıkmasın
+    // X-Robots-Tag: noindex BİLEREK yok: URL Denetimi'nde "URL is not available to Google" uyarısı veriyordu
     echo $xml;
     exit;
 }, 1);
