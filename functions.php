@@ -1429,7 +1429,9 @@ function kampanya_maintenance(WP_REST_Request $request) {
         foreach ($ids as $id) {
             $n += idk_webp_ek($id);
         }
-        return ['islenen_ek' => count($ids), 'uretilen_dosya' => $n, 'sonraki' => count($ids) < $a ? null : $b + $a, 'webp_destegi' => wp_image_editor_supports(['mime_type' => 'image/webp'])];
+        $ornek = [];
+        foreach (array_slice($ids, 0, 1) as $oid) { $f = get_attached_file($oid); $ornek = ['f' => $f, 'var' => is_file($f . '.webp'), 'glob' => array_map('basename', (array) glob(dirname($f) . '/' . pathinfo($f, PATHINFO_FILENAME) . '*webp*'))]; }
+        return ['ornek' => $ornek, 'islenen_ek' => count($ids), 'uretilen_dosya' => $n, 'sonraki' => count($ids) < $a ? null : $b + $a, 'webp_destegi' => wp_image_editor_supports(['mime_type' => 'image/webp'])];
     }
 
     if ($action === 'fix_litespeed_qs') {
