@@ -1242,7 +1242,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id', 'set_adsense_id', 'indexnow_hepsi'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id', 'set_adsense_id', 'indexnow_hepsi', 'litespeed_oku'],
             ],
         ],
     ]);
@@ -1359,6 +1359,21 @@ function kampanya_maintenance(WP_REST_Request $request) {
                 'current_version' => get_bloginfo('version'),
             ],
         ];
+    }
+
+    if ($action === 'litespeed_oku') {
+        // Salt okunur: sayfa önbelleği ve ilgili ayarlar (TTFB teşhisi için).
+        $anahtarlar = ['cache', 'cache-priv', 'cache-commenter', 'cache-rest', 'cache-page_login', 'cache-mobile', 'cache-browser', 'cache-browser_ttl', 'cache-ttl_pub', 'cache-ttl_front', 'cache-ttl_feed', 'cache-exc', 'cache-exc_cat', 'cache-exc_tag', 'cache-exc_qs', 'cache-vary_group', 'cache-exc_cookies', 'cache-ttl_browser', 'optm-css_min', 'optm-css_comb', 'optm-js_min', 'optm-js_comb', 'optm-ccss_con', 'optm-css_async', 'optm-js_defer', 'optm-qs_rm', 'media-lazy', 'img_optm-webp', 'guest', 'guest_optm', 'object', 'esi', 'crawler'];
+        $cikti = [];
+        foreach ($anahtarlar as $a) {
+            $cikti[$a] = get_option('litespeed.conf.' . $a, 'unset');
+        }
+        $cikti['_const'] = [
+            'WP_CACHE' => defined('WP_CACHE') ? WP_CACHE : null,
+            'LSCWP_V'  => defined('LSCWP_V') ? LSCWP_V : null,
+            'advanced-cache.php' => file_exists(WP_CONTENT_DIR . '/advanced-cache.php'),
+        ];
+        return $cikti;
     }
 
     if ($action === 'fix_litespeed_qs') {
