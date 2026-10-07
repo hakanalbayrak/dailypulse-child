@@ -1398,6 +1398,7 @@ function kampanya_maintenance(WP_REST_Request $request) {
             'cache'         => true,
             'cache-browser' => true,
             'cache-ttl_pub' => 36000,
+            'cache-ttl_browser' => 31557600,
         ]);
         if (class_exists('\LiteSpeed\Purge')) {
             \LiteSpeed\Purge::purge_all();
