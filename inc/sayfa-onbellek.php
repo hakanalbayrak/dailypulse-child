@@ -66,7 +66,7 @@ function idk_css_satir_ici($html)
             function ($m) use (&$toplam, $site) {
                 $url = $m[2];
                 $dosya = ABSPATH . ltrim(substr($url, strlen($site)), '/');
-                if (!is_file($dosya) || ($boyut = filesize($dosya)) > 90000 || $toplam + $boyut > 160000) {
+                if (!is_file($dosya) || ($boyut = filesize($dosya)) > 110000 || $toplam + $boyut > 230000) {
                     return $m[0];
                 }
                 $css = (string) file_get_contents($dosya);
