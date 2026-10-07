@@ -54,6 +54,9 @@ add_action('template_redirect', function () {
  */
 function idk_css_satir_ici($html)
 {
+    if (is_file(Idk_Onbellek::dizin() . '/INLINE_KAPALI')) {
+        return $html;
+    }
     $site = untrailingslashit(site_url());
     $parcalar = preg_split('#(<noscript>.*?</noscript>)#s', $html, -1, PREG_SPLIT_DELIM_CAPTURE);
     $toplam = 0;

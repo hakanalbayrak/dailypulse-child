@@ -1249,7 +1249,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id', 'set_adsense_id', 'indexnow_hepsi', 'litespeed_oku', 'litespeed_cache_ac', 'litespeed_cache_kapat', 'onbellek_kapat', 'onbellek_ac', 'onbellek_durum', 'webp_uret'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id', 'set_adsense_id', 'indexnow_hepsi', 'litespeed_oku', 'litespeed_cache_ac', 'litespeed_cache_kapat', 'onbellek_kapat', 'onbellek_ac', 'onbellek_durum', 'webp_uret', 'css_inline_ac', 'css_inline_kapat'],
             ],
         ],
     ]);
@@ -1414,6 +1414,16 @@ function kampanya_maintenance(WP_REST_Request $request) {
             @unlink($d . '/KAPALI');
         }
         return ['silinen' => Idk_Onbellek::temizle(), 'kapali' => Idk_Onbellek::kapali()];
+    }
+    if ($action === 'css_inline_ac' || $action === 'css_inline_kapat') {
+        $f = Idk_Onbellek::dizin() . '/INLINE_KAPALI';
+        if ($action === 'css_inline_kapat') {
+            is_dir(dirname($f)) || @mkdir(dirname($f), 0755, true);
+            @file_put_contents($f, '1');
+        } else {
+            @unlink($f);
+        }
+        return ['silinen' => Idk_Onbellek::temizle(), 'inline_kapali' => is_file($f)];
     }
     if ($action === 'onbellek_durum') {
         $n = count((array) glob(Idk_Onbellek::dizin() . '/*.idk'));
