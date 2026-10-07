@@ -601,3 +601,23 @@ add_action('init', function () {
 foreach (['analytics-4', 'adsense', 'ads', 'tagmanager'] as $idk_modul) {
     add_filter("googlesitekit_{$idk_modul}_tag_blocked", '__return_true');
 }
+
+
+/* GEÇİCİ TEŞHİS (TTFB): ?idk_prof=1 ile Server-Timing başlığı. İş bitince kaldırılacak. */
+if (isset($_GET['idk_prof'])) {
+    $GLOBALS['idk_t'] = ['tema_yuklendi' => microtime(true)];
+    foreach (['init', 'wp_loaded', 'parse_request', 'wp', 'template_redirect'] as $idk_h) {
+        add_action($idk_h, function () use ($idk_h) {
+            $GLOBALS['idk_t'][$idk_h] = microtime(true);
+        }, -9999);
+    }
+    add_action('send_headers', function () {
+        $b = $_SERVER['REQUEST_TIME_FLOAT'];
+        $o = [];
+        foreach ($GLOBALS['idk_t'] as $k => $t) {
+            $o[] = $k . ';dur=' . round(($t - $b) * 1000);
+        }
+        $o[] = 'send_headers;dur=' . round((microtime(true) - $b) * 1000);
+        header('Server-Timing: ' . implode(', ', $o));
+    }, 9999);
+}
