@@ -72,14 +72,14 @@ function idk_css_satir_ici($html)
         }
         foreach ($kimlikler as $k) {
             $p = preg_replace_callback(
-                "#<link rel='stylesheet' id='" . preg_quote($k, '#') . "' (href='[^']+') media='all' />#",
+                "#<link rel='stylesheet' id='(" . preg_quote($k, '#') . ")' (href='[^']+') media='all' />#",
                 function ($m) use (&$eklendi, $kritik) {
                     $once = '';
                     if (!$eklendi) {
                         $eklendi = true;
                         $once = '<style id="idk-kritik">' . str_replace('</style', '<\\/style', $kritik) . "</style>\n";
                     }
-                    return $once . "<link rel='stylesheet' " . $m[1] . " media='print' onload=\"this.media='all'\" /><noscript><link rel='stylesheet' " . $m[1] . " media='all' /></noscript>";
+                    return $once . "<link rel='stylesheet' id='" . $m[1] . "' " . $m[2] . " media='print' onload=\"this.media='all'\" /><noscript><link rel='stylesheet' id='" . $m[1] . "-ns' " . $m[2] . " media='all' /></noscript>";
                 },
                 $p
             );
