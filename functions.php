@@ -1242,7 +1242,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id', 'set_adsense_id', 'indexnow_hepsi', 'litespeed_oku'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id', 'set_adsense_id', 'indexnow_hepsi', 'litespeed_oku', 'litespeed_cache_ac'],
             ],
         ],
     ]);
@@ -1374,6 +1374,23 @@ function kampanya_maintenance(WP_REST_Request $request) {
             'advanced-cache.php' => file_exists(WP_CONTENT_DIR . '/advanced-cache.php'),
         ];
         return $cikti;
+    }
+
+    if ($action === 'litespeed_cache_ac') {
+        // Sayfa önbelleğini aç. Genel TTL 10 saat: önbellekteki sayfalarda form nonce'ları (24 saat
+        // geçerli, 12 saatte yenilenir) süresi dolmadan yenilenir. Yayın/güncelleme önbelleği zaten temizler.
+        if (!class_exists('\LiteSpeed\Conf')) {
+            return ['hata' => 'litespeed yok'];
+        }
+        \LiteSpeed\Conf::cls()->update_confs([
+            'cache'         => true,
+            'cache-browser' => true,
+            'cache-ttl_pub' => 36000,
+        ]);
+        if (class_exists('\LiteSpeed\Purge')) {
+            \LiteSpeed\Purge::purge_all();
+        }
+        return ['cache' => get_option('litespeed.conf.cache'), 'ttl' => get_option('litespeed.conf.cache-ttl_pub'), 'browser' => get_option('litespeed.conf.cache-browser')];
     }
 
     if ($action === 'fix_litespeed_qs') {
