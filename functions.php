@@ -20,6 +20,7 @@ require_once DAILYPULSE_DIR . '/inc/redirects-security.php';
 require_once DAILYPULSE_DIR . '/inc/yayin-hazirligi.php';
 require_once DAILYPULSE_DIR . '/inc/surum.php';
 require_once DAILYPULSE_DIR . '/inc/sayfa-onbellek.php';
+require_once DAILYPULSE_DIR . '/inc/webp.php';
 
 /**
  * Barlow + Barlow Condensed artık temanın kendi assets/fonts/barlow/ klasöründen
@@ -1248,7 +1249,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id', 'set_adsense_id', 'indexnow_hepsi', 'litespeed_oku', 'litespeed_cache_ac', 'litespeed_cache_kapat', 'onbellek_kapat', 'onbellek_ac', 'onbellek_durum'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id', 'set_adsense_id', 'indexnow_hepsi', 'litespeed_oku', 'litespeed_cache_ac', 'litespeed_cache_kapat', 'onbellek_kapat', 'onbellek_ac', 'onbellek_durum', 'webp_uret'],
             ],
         ],
     ]);
@@ -1417,6 +1418,18 @@ function kampanya_maintenance(WP_REST_Request $request) {
     if ($action === 'onbellek_durum') {
         $n = count((array) glob(Idk_Onbellek::dizin() . '/*.idk'));
         return ['kopya' => $n, 'kapali' => Idk_Onbellek::kapali(), 'stub' => is_file(WP_CONTENT_DIR . '/advanced-cache.php'), 'wp_cache' => defined('WP_CACHE') ? WP_CACHE : null, 'surum' => Idk_Onbellek::surum()];
+    }
+
+    if ($action === 'webp_uret') {
+        // Toplu üretim: ?baslangic ve ?adet ile parça parça (zaman aşımı olmasın).
+        $b = max(0, (int) $request->get_param('baslangic'));
+        $a = min(40, max(1, (int) ($request->get_param('adet') ?: 20)));
+        $ids = get_posts(['post_type' => 'attachment', 'post_mime_type' => 'image', 'post_status' => 'inherit', 'posts_per_page' => $a, 'offset' => $b, 'orderby' => 'ID', 'order' => 'ASC', 'fields' => 'ids']);
+        $n = 0;
+        foreach ($ids as $id) {
+            $n += idk_webp_ek($id);
+        }
+        return ['islenen_ek' => count($ids), 'uretilen_dosya' => $n, 'sonraki' => count($ids) < $a ? null : $b + $a, 'webp_destegi' => wp_image_editor_supports(['mime_type' => 'image/webp'])];
     }
 
     if ($action === 'fix_litespeed_qs') {
