@@ -461,7 +461,7 @@ add_action('transition_post_status', function ($yeni, $eski, $post) {
 // ana sayfada en büyük boyama (LCP) hero metni, yani bu fontu bekleyen metin. Türkçe için hem
 // latin hem latin-ext alt kümesi gerekli (ğ ş İ latin-ext'te, ı latin'de).
 add_action('wp_head', function () {
-    foreach (['quicksand/quicksand-variable-latin.woff2', 'quicksand/quicksand-variable-latin-ext.woff2'] as $f) {
+    foreach (['quicksand/quicksand-variable-latin.woff2', 'quicksand/quicksand-variable-latin-ext.woff2', 'barlow/barlow-condensed-900-latin.woff2', 'barlow/barlow-condensed-900-latin-ext.woff2', 'barlow/barlow-600-latin.woff2'] as $f) {
         printf('<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin>' . "\n", esc_url(get_stylesheet_directory_uri() . '/assets/fonts/' . $f));
     }
 }, 1);
