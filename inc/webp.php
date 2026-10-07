@@ -40,7 +40,8 @@ function idk_webp_uret($dosya, $zorla = false)
     if (is_wp_error($e)) {
         return false;
     }
-    $e->set_quality(72);
+    $boyut = @getimagesize($dosya);
+    $e->set_quality($boyut && $boyut[0] <= 800 ? 58 : 70);
     $r = $e->save($hedef, 'image/webp');
     if (is_wp_error($r)) {
         return false;
@@ -96,7 +97,7 @@ add_action('wp_body_open', function () {
         return $sources;
     }, 20);
     add_filter('wp_content_img_tag', function ($tag) {
-        return preg_replace_callback('#https?://[^"\'\s,]+?\.(?:jpe?g|png)#i', function ($m) {
+        return preg_replace_callback('#https?://[^"\'\s,]+?\.(?:jpe?g|png)(?!\.webp)#i', function ($m) {
             return idk_webp_url($m[0]);
         }, $tag);
     }, 20);
