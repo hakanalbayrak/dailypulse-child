@@ -36,14 +36,26 @@ function idk_webp_uret($dosya, $zorla = false)
     if (!$zorla && is_file($hedef) && filemtime($hedef) >= filemtime($dosya)) {
         return true;
     }
-    $e = wp_get_image_editor($dosya);
-    if (is_wp_error($e)) {
+    // WP görüntü düzenleyicisi kalite ayarını yok sayıyor (aynı boyutta çıktı veriyor); GD'yi doğrudan kullan.
+    if (!function_exists('imagewebp')) {
         return false;
     }
     $boyut = @getimagesize($dosya);
-    $e->set_quality($boyut && $boyut[0] <= 800 ? 58 : 70);
-    $r = $e->save($hedef, 'image/webp');
-    if (is_wp_error($r)) {
+    if (!$boyut) {
+        return false;
+    }
+    $im = preg_match('/\.png$/i', $dosya) ? @imagecreatefrompng($dosya) : @imagecreatefromjpeg($dosya);
+    if (!$im) {
+        return false;
+    }
+    if (preg_match('/\.png$/i', $dosya)) {
+        imagepalettetotruecolor($im);
+        imagealphablending($im, true);
+        imagesavealpha($im, true);
+    }
+    $ok = imagewebp($im, $hedef, $boyut[0] <= 800 ? 58 : 70);
+    imagedestroy($im);
+    if (!$ok) {
         return false;
     }
     // WebP, orijinalden büyükse (nadir) kullanma.
