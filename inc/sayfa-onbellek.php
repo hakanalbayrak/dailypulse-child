@@ -42,8 +42,58 @@ add_action('template_redirect', function () {
         || is_preview() || is_customize_preview() || is_robots() || is_trackback()) {
         return;
     }
-    ob_start(['Idk_Onbellek', 'kaydet']);
+    ob_start(function ($html) {
+        return Idk_Onbellek::kaydet(idk_css_satir_ici($html));
+    });
 }, 0);
+
+/**
+ * Sitenin kendi, render'ı engelleyen stil dosyalarını HTML'ye gömer (yalnızca anonim/önbellekli sayfalar).
+ * Her biri ayrı bir istek ve gidiş-dönüş demekti; yavaş mobil ağda ilk boyamayı ~1 sn geciktiriyordu.
+ * <noscript> içindekilere ve media='all' olmayanlara (async yüklenenler) dokunulmaz. Hata olursa <link> kalır.
+ */
+function idk_css_satir_ici($html)
+{
+    $site = untrailingslashit(site_url());
+    $parcalar = preg_split('#(<noscript>.*?</noscript>)#s', $html, -1, PREG_SPLIT_DELIM_CAPTURE);
+    $toplam = 0;
+    foreach ($parcalar as $i => $p) {
+        if ($i % 2 === 1) {
+            continue;
+        }
+        $parcalar[$i] = preg_replace_callback(
+            "#<link rel='stylesheet' id='([^']+)' href='(" . preg_quote($site, '#') . "/[^']+?\.css)(?:\?[^']*)?' media='all' />\s*#",
+            function ($m) use (&$toplam, $site) {
+                $url = $m[2];
+                $dosya = ABSPATH . ltrim(substr($url, strlen($site)), '/');
+                if (!is_file($dosya) || ($boyut = filesize($dosya)) > 90000 || $toplam + $boyut > 160000) {
+                    return $m[0];
+                }
+                $css = (string) file_get_contents($dosya);
+                if ($css === '' || stripos($css, '@import') !== false) {
+                    return $m[0];
+                }
+                $taban = substr($url, 0, strrpos($url, '/') + 1);
+                $css = preg_replace_callback('#url\(\s*([\'"]?)(?!data:|https?:|//|/|\#)([^\'")]+)\1\s*\)#i', function ($u) use ($taban) {
+                    $parts = explode('/', rtrim($taban, '/') . '/' . $u[2]);
+                    $out = [];
+                    foreach ($parts as $x) {
+                        if ($x === '..') {
+                            array_pop($out);
+                        } elseif ($x !== '.') {
+                            $out[] = $x;
+                        }
+                    }
+                    return 'url(' . implode('/', $out) . ')';
+                }, $css);
+                $toplam += strlen($css);
+                return '<style id="' . esc_attr($m[1]) . '-satir-ici">' . str_replace('</style', '<\/style', $css) . "</style>\n";
+            },
+            $p
+        );
+    }
+    return implode('', $parcalar);
+}
 
 // Değişiklikte temizle.
 $idk_temizle = function () {
