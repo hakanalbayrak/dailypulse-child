@@ -19,6 +19,7 @@ require_once DAILYPULSE_DIR . '/inc/content-extras.php';
 require_once DAILYPULSE_DIR . '/inc/redirects-security.php';
 require_once DAILYPULSE_DIR . '/inc/yayin-hazirligi.php';
 require_once DAILYPULSE_DIR . '/inc/surum.php';
+require_once DAILYPULSE_DIR . '/inc/sayfa-onbellek.php';
 
 /**
  * Barlow + Barlow Condensed artık temanın kendi assets/fonts/barlow/ klasöründen
@@ -642,6 +643,11 @@ add_action('rest_api_init', function () {
 function kampanya_purge_cache() {
     $purged = [];
 
+    if (class_exists('Idk_Onbellek')) {
+        Idk_Onbellek::temizle();
+        $purged[] = 'idk_sayfa';
+    }
+
     // LiteSpeed Cache
     if (class_exists('\LiteSpeed\Purge')) {
         \LiteSpeed\Purge::purge_all();
@@ -1242,7 +1248,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id', 'set_adsense_id', 'indexnow_hepsi', 'litespeed_oku', 'litespeed_cache_ac'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id', 'set_adsense_id', 'indexnow_hepsi', 'litespeed_oku', 'litespeed_cache_ac', 'litespeed_cache_kapat', 'onbellek_kapat', 'onbellek_ac', 'onbellek_durum'],
             ],
         ],
     ]);
@@ -1376,6 +1382,11 @@ function kampanya_maintenance(WP_REST_Request $request) {
         return $cikti;
     }
 
+    if ($action === 'litespeed_cache_kapat') {
+        // Sunucu LiteSpeed değil (x-litespeed-* başlıkları dışarı sızıyor); eklenti önbelleği işe yaramıyor, eski haline döndür.
+        \LiteSpeed\Conf::cls()->update_confs(['cache' => false, 'cache-browser' => false, 'cache-ttl_pub' => 604800]);
+        return ['cache' => get_option('litespeed.conf.cache')];
+    }
     if ($action === 'litespeed_cache_ac') {
         // Sayfa önbelleğini aç. Genel TTL 10 saat: önbellekteki sayfalarda form nonce'ları (24 saat
         // geçerli, 12 saatte yenilenir) süresi dolmadan yenilenir. Yayın/güncelleme önbelleği zaten temizler.
@@ -1391,6 +1402,21 @@ function kampanya_maintenance(WP_REST_Request $request) {
             \LiteSpeed\Purge::purge_all();
         }
         return ['cache' => get_option('litespeed.conf.cache'), 'ttl' => get_option('litespeed.conf.cache-ttl_pub'), 'browser' => get_option('litespeed.conf.cache-browser')];
+    }
+
+    if ($action === 'onbellek_kapat' || $action === 'onbellek_ac') {
+        $d = Idk_Onbellek::dizin();
+        if ($action === 'onbellek_kapat') {
+            is_dir($d) || @mkdir($d, 0755, true);
+            @file_put_contents($d . '/KAPALI', '1');
+        } else {
+            @unlink($d . '/KAPALI');
+        }
+        return ['silinen' => Idk_Onbellek::temizle(), 'kapali' => Idk_Onbellek::kapali()];
+    }
+    if ($action === 'onbellek_durum') {
+        $n = count((array) glob(Idk_Onbellek::dizin() . '/*.idk'));
+        return ['kopya' => $n, 'kapali' => Idk_Onbellek::kapali(), 'stub' => is_file(WP_CONTENT_DIR . '/advanced-cache.php'), 'surum' => Idk_Onbellek::surum()];
     }
 
     if ($action === 'fix_litespeed_qs') {
