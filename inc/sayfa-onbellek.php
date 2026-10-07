@@ -66,25 +66,34 @@ function idk_css_satir_ici($html)
     $kimlikler = ['blocksy-dynamic-global-css', 'dailypulse-custom-css', 'ct-main-styles-css', 'ct-page-title-styles-css'];
     $parcalar = preg_split('#(<noscript>.*?</noscript>)#s', $html, -1, PREG_SPLIT_DELIM_CAPTURE);
     $eklendi = false;
+    $adresler = [];
     foreach ($parcalar as $i => $p) {
         if ($i % 2 === 1) {
             continue;
         }
         foreach ($kimlikler as $k) {
             $p = preg_replace_callback(
-                "#<link rel='stylesheet' id='(" . preg_quote($k, '#') . ")' (href='[^']+') media='all' />#",
-                function ($m) use (&$eklendi, $kritik) {
+                "#<link rel='stylesheet' id='(" . preg_quote($k, '#') . ")' href='([^']+)' media='all' />#",
+                function ($m) use (&$eklendi, &$adresler, $kritik) {
                     $once = '';
                     if (!$eklendi) {
                         $eklendi = true;
                         $once = '<style id="idk-kritik">' . str_replace('</style', '<\\/style', $kritik) . "</style>\n";
                     }
-                    return $once . "<link rel='stylesheet' id='" . $m[1] . "' " . $m[2] . " media='print' onload=\"this.media='all'\" /><noscript><link rel='stylesheet' id='" . $m[1] . "-ns' " . $m[2] . " media='all' /></noscript>";
+                    $adresler[] = html_entity_decode($m[2]);
+                    return $once . "<noscript><link rel='stylesheet' id='" . $m[1] . "-ns' href='" . $m[2] . "' media='all' /></noscript>";
                 },
                 $p
             );
         }
         $parcalar[$i] = $p;
     }
-    return implode('', $parcalar);
+    $html = implode('', $parcalar);
+    if ($adresler) {
+        // Tam stil dosyaları sayfa yüklendikten ~1 sn sonra, sırayla (kritik CSS ilk ekranı zaten boyadı).
+        $js = '<script>addEventListener("load",function(){setTimeout(function(){' . wp_json_encode($adresler, JSON_UNESCAPED_SLASHES)
+            . '.forEach(function(u){var l=document.createElement("link");l.rel="stylesheet";l.href=u;document.head.appendChild(l)})},1000)})</script>';
+        $html = preg_replace('#</head>#', $js . "\n</head>", $html, 1);
+    }
+    return $html;
 }
