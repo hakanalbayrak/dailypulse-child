@@ -60,6 +60,8 @@ function idk_css_satir_ici($html)
     $tip = is_front_page() ? 'anasayfa' : (is_singular('post') ? 'yazi' : (is_page() ? 'sayfa' : 'arsiv'));
     $dosya = get_stylesheet_directory() . '/assets/css/kritik-' . $tip . '.css';
     $kritik = is_file($dosya) ? trim((string) file_get_contents($dosya)) : '';
+    // Kritik CSS sayfaya gömülünce göreli url(../fonts/...) sayfa adresine göre çözülüp 404 verir; mutlak yap.
+    $kritik = preg_replace('#url\((["\']?)\.\./#', 'url($1' . get_stylesheet_directory_uri() . '/assets/', $kritik);
     if ($kritik === '') {
         return $html;
     }
