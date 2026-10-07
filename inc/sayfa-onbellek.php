@@ -48,62 +48,43 @@ add_action('template_redirect', function () {
 }, 0);
 
 /**
- * Sitenin kendi, render'ı engelleyen stil dosyalarını HTML'ye gömer (yalnızca anonim/önbellekli sayfalar).
- * Her biri ayrı bir istek ve gidiş-dönüş demekti; yavaş mobil ağda ilk boyamayı ~1 sn geciktiriyordu.
- * <noscript> içindekilere ve media='all' olmayanlara (async yüklenenler) dokunulmaz. Hata olursa <link> kalır.
+ * Kritik CSS: ekranın üstünü boyamak için gereken kurallar (scripts/kritik-css.mjs üretir, sayfa türüne
+ * göre assets/css/kritik-*.css) HTML'ye gömülür; tam stil dosyaları ilk boyamadan SONRA yüklenir
+ * (media=print → all). Yalnızca anonim/önbellekli sayfalarda; kritik dosya yoksa hiçbir şey değişmez.
  */
 function idk_css_satir_ici($html)
 {
     if (is_file(Idk_Onbellek::dizin() . '/INLINE_KAPALI')) {
         return $html;
     }
-    $site = untrailingslashit(site_url());
+    $tip = is_front_page() ? 'anasayfa' : (is_singular('post') ? 'yazi' : (is_page() ? 'sayfa' : 'arsiv'));
+    $dosya = get_stylesheet_directory() . '/assets/css/kritik-' . $tip . '.css';
+    $kritik = is_file($dosya) ? trim((string) file_get_contents($dosya)) : '';
+    if ($kritik === '') {
+        return $html;
+    }
+    $kimlikler = ['blocksy-dynamic-global-css', 'dailypulse-custom-css', 'ct-main-styles-css', 'ct-page-title-styles-css'];
     $parcalar = preg_split('#(<noscript>.*?</noscript>)#s', $html, -1, PREG_SPLIT_DELIM_CAPTURE);
-    $toplam = 0;
+    $eklendi = false;
     foreach ($parcalar as $i => $p) {
         if ($i % 2 === 1) {
             continue;
         }
-        $parcalar[$i] = preg_replace_callback(
-            "#<link rel='stylesheet' id='([^']+)' href='(" . preg_quote($site, '#') . "/[^']+?\.css)(?:\?[^']*)?' media='all' />\s*#",
-            function ($m) use (&$toplam, $site) {
-                $url = $m[2];
-                $dosya = ABSPATH . ltrim(substr($url, strlen($site)), '/');
-                if (!is_file($dosya) || ($boyut = filesize($dosya)) > 110000 || $toplam + $boyut > 230000) {
-                    return $m[0];
-                }
-                $css = (string) file_get_contents($dosya);
-                if ($css === '' || stripos($css, '@import') !== false) {
-                    return $m[0];
-                }
-                $taban = substr($url, 0, strrpos($url, '/') + 1);
-                $css = preg_replace_callback('#url\(\s*([\'"]?)(?!data:|https?:|//|/|\#)([^\'")]+)\1\s*\)#i', function ($u) use ($taban) {
-                    $parts = explode('/', rtrim($taban, '/') . '/' . $u[2]);
-                    $out = [];
-                    foreach ($parts as $x) {
-                        if ($x === '..') {
-                            array_pop($out);
-                        } elseif ($x !== '.') {
-                            $out[] = $x;
-                        }
+        foreach ($kimlikler as $k) {
+            $p = preg_replace_callback(
+                "#<link rel='stylesheet' id='" . preg_quote($k, '#') . "' (href='[^']+') media='all' />#",
+                function ($m) use (&$eklendi, $kritik) {
+                    $once = '';
+                    if (!$eklendi) {
+                        $eklendi = true;
+                        $once = '<style id="idk-kritik">' . str_replace('</style', '<\\/style', $kritik) . "</style>\n";
                     }
-                    return 'url(' . implode('/', $out) . ')';
-                }, $css);
-                $toplam += strlen($css);
-                return '<style id="' . esc_attr($m[1]) . '-satir-ici">' . str_replace('</style', '<\/style', $css) . "</style>\n";
-            },
-            $p
-        );
+                    return $once . "<link rel='stylesheet' " . $m[1] . " media='print' onload=\"this.media='all'\" /><noscript><link rel='stylesheet' " . $m[1] . " media='all' /></noscript>";
+                },
+                $p
+            );
+        }
+        $parcalar[$i] = $p;
     }
     return implode('', $parcalar);
-}
-
-// Değişiklikte temizle.
-$idk_temizle = function () {
-    Idk_Onbellek::temizle();
-};
-foreach (['save_post', 'deleted_post', 'trashed_post', 'edit_term', 'delete_term', 'wp_update_nav_menu', 'switch_theme',
-          'customize_save_after', 'update_option_blogname', 'update_option_blogdescription', 'update_option_page_on_front',
-          'update_option_page_for_posts', 'update_option_idk_ga_id', 'update_option_idk_adsense_id', 'widget_update_callback'] as $idk_h) {
-    add_action($idk_h, $idk_temizle);
 }
