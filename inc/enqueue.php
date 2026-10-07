@@ -50,3 +50,16 @@ function dailypulse_enqueue_assets() {
     ));
 }
 add_action('wp_enqueue_scripts', 'dailypulse_enqueue_assets');
+
+
+/**
+ * Blocksy ana stil dosyasının, bu sitenin sayfalarında kullanılan kısımlarına indirilmiş sürümü
+ * (scripts/css-arindir.sh üretir; PageSpeed "kullanılmayan CSS"). ?idk_orig=1 özgün dosyayı yükler (karşılaştırma için).
+ */
+add_filter('style_loader_src', function ($src, $handle) {
+    if ($handle !== 'ct-main-styles' || isset($_GET['idk_orig'])) {
+        return $src;
+    }
+    $f = DAILYPULSE_DIR . '/assets/css/blocksy-main.purged.css';
+    return is_file($f) ? DAILYPULSE_URI . '/assets/css/blocksy-main.purged.css?ver=' . filemtime($f) : $src;
+}, 10, 2);
