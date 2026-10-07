@@ -601,3 +601,18 @@ foreach (['analytics-4', 'adsense', 'ads', 'tagmanager'] as $idk_modul) {
     add_filter("googlesitekit_{$idk_modul}_tag_blocked", '__return_true');
 }
 
+
+/* GEÇİCİ DENEY (PSI): ?idk_t=f|i|j|g|fij → CSP ile yazı tipi/görsel/betik/gtag engelle. İş bitince kaldırılacak. */
+if (isset($_GET['idk_t'])) {
+    add_action('wp_head', function () {
+        $t = (string) $_GET['idk_t'];
+        $d = [];
+        if (strpos($t, 'f') !== false) { $d[] = "font-src 'none'"; }
+        if (strpos($t, 'i') !== false) { $d[] = "img-src data:"; }
+        if (strpos($t, 'j') !== false) { $d[] = "script-src 'none'"; }
+        if ($t === 'g') { $d[] = "script-src 'self' 'unsafe-inline'"; }
+        if ($d) {
+            echo '<meta http-equiv="Content-Security-Policy" content="' . esc_attr(implode('; ', $d)) . '">' . "\n";
+        }
+    }, 0);
+}
