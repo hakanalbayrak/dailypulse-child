@@ -262,17 +262,11 @@ add_action('wp_footer', function () {
     try { localStorage.setItem(ANAHTAR, v); } catch (e) {}
     document.cookie = 'idk_cerez=' + v + ';path=/;max-age=15552000;SameSite=Lax;Secure';
   }
-  // Analitik YALNIZCA "Kabul et"ten sonra yüklenir.
+  // Analitik etiketi <head>'de Consent Mode v2 ile (varsayılan: reddedildi) bulunur;
+  // "Kabul et"ten sonra yalnızca izin durumu güncellenir.
   function analitik() {
-    if (!GA || window.idkGaYuklendi) { return; }
-    window.idkGaYuklendi = true;
-    var s = document.createElement('script');
-    s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA;
-    document.head.appendChild(s);
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { window.dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', GA, { anonymize_ip: true });
+    if (!GA || typeof window.gtag !== 'function') { return; }
+    window.gtag('consent', 'update', { analytics_storage: 'granted' });
   }
   // Reklam komut dosyası da YALNIZCA "Kabul et"ten sonra yüklenir (hesap doğrulaması için
   // sayfada yalnızca hesap kimliği etiketi bulunur, reklam kodu değil).
@@ -301,6 +295,32 @@ add_action('wp_footer', function () {
 </script>
     <?php
 }, 30);
+
+/* ------------------------------------------------------------------
+   7b. GA4 etiketi + Consent Mode v2 (varsayılan: depolama reddedildi)
+   Google'ın etiket denetleyicisi çerez penceresine tıklamaz; etiket <head>'de
+   bulunmalı. İzin verilene kadar çerez yazılmaz, kimlik tutulmaz.
+   ------------------------------------------------------------------ */
+add_action('wp_head', function () {
+    if (is_admin() || is_feed() || is_embed() || is_user_logged_in()) {
+        return;
+    }
+    $ga = (string) get_option('idk_ga_id', '');
+    if (!preg_match('/^G-[A-Z0-9]{4,14}$/', $ga)) {
+        return;
+    }
+    ?>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});
+try { if (localStorage.getItem('idk_cerez') === 'kabul') { gtag('consent','update',{analytics_storage:'granted'}); } } catch (e) {}
+gtag('js', new Date());
+gtag('config', <?php echo wp_json_encode($ga); ?>, {anonymize_ip: true});
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo esc_attr($ga); ?>"></script>
+    <?php
+}, 2);
 
 /* ------------------------------------------------------------------
    8. GÜVENLİK BAŞLIKLARI (PageSpeed "Güven ve Güvenlik" uyarıları)
