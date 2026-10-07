@@ -27,20 +27,20 @@ function idk_webp_url($url)
 }
 
 /** Tek dosya için .webp üret. true = üretildi/zaten var. */
-function idk_webp_uret($dosya)
+function idk_webp_uret($dosya, $zorla = false)
 {
     if (!is_file($dosya) || !preg_match('/\.(jpe?g|png)$/i', $dosya)) {
         return false;
     }
     $hedef = $dosya . '.webp';
-    if (is_file($hedef) && filemtime($hedef) >= filemtime($dosya)) {
+    if (!$zorla && is_file($hedef) && filemtime($hedef) >= filemtime($dosya)) {
         return true;
     }
     $e = wp_get_image_editor($dosya);
     if (is_wp_error($e)) {
         return false;
     }
-    $e->set_quality(80);
+    $e->set_quality(72);
     $r = $e->save($hedef, 'image/webp');
     if (is_wp_error($r)) {
         return false;
@@ -54,16 +54,16 @@ function idk_webp_uret($dosya)
 }
 
 /** Ekin tüm boyutları (tam + ara boyutlar) için üret. */
-function idk_webp_ek($id)
+function idk_webp_ek($id, $zorla = false)
 {
     $meta = wp_get_attachment_metadata($id);
     $tam = get_attached_file($id);
     if (!$tam || !is_array($meta)) {
         return 0;
     }
-    $n = idk_webp_uret($tam) ? 1 : 0;
+    $n = idk_webp_uret($tam, $zorla && false) ? 1 : 0;
     foreach ((array) ($meta['sizes'] ?? []) as $s) {
-        if (!empty($s['file']) && idk_webp_uret(dirname($tam) . '/' . $s['file'])) {
+        if (!empty($s['file']) && idk_webp_uret(dirname($tam) . '/' . $s['file'], $zorla && (int) ($s['width'] ?? 9999) <= 800)) {
             $n++;
         }
     }

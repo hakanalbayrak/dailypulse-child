@@ -1437,7 +1437,7 @@ function kampanya_maintenance(WP_REST_Request $request) {
         $ids = get_posts(['post_type' => 'attachment', 'post_mime_type' => 'image', 'post_status' => 'inherit', 'posts_per_page' => $a, 'offset' => $b, 'orderby' => 'ID', 'order' => 'ASC', 'fields' => 'ids']);
         $n = 0;
         foreach ($ids as $id) {
-            $n += idk_webp_ek($id);
+            $n += idk_webp_ek($id, (bool) $request->get_param('zorla'));
         }
         $ornek = [];
         foreach (array_slice($ids, 0, 1) as $oid) { $f = get_attached_file($oid); $ornek = ['f' => $f, 'var' => is_file($f . '.webp'), 'glob' => array_map('basename', (array) glob(dirname($f) . '/' . pathinfo($f, PATHINFO_FILENAME) . '*webp*'))]; }
