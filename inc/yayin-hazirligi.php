@@ -318,7 +318,16 @@ try { if (localStorage.getItem('idk_cerez') === 'kabul') { gtag('consent','updat
 gtag('js', new Date());
 gtag('config', <?php echo wp_json_encode($ga); ?>, {anonymize_ip: true});
 </script>
-<script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo esc_attr($ga); ?>"></script>
+<script>
+// gtag.js sayfa yüklendikten sonra gelir (ilk boyamayı/LCP'yi geciktirmesin); dataLayer kuyruğu korunur.
+addEventListener('load', function () {
+  setTimeout(function () {
+    var s = document.createElement('script');
+    s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=<?php echo esc_js($ga); ?>';
+    document.head.appendChild(s);
+  }, 1500);
+});
+</script>
     <?php
 }, 2);
 
@@ -602,17 +611,3 @@ foreach (['analytics-4', 'adsense', 'ads', 'tagmanager'] as $idk_modul) {
 }
 
 
-/* GEÇİCİ DENEY (PSI): ?idk_t=f|i|j|g|fij → CSP ile yazı tipi/görsel/betik/gtag engelle. İş bitince kaldırılacak. */
-if (isset($_GET['idk_t'])) {
-    add_action('wp_head', function () {
-        $t = (string) $_GET['idk_t'];
-        $d = [];
-        if (strpos($t, 'f') !== false) { $d[] = "font-src 'none'"; }
-        if (strpos($t, 'i') !== false) { $d[] = "img-src data:"; }
-        if (strpos($t, 'j') !== false) { $d[] = "script-src 'none'"; }
-        if ($t === 'g') { $d[] = "script-src 'self' 'unsafe-inline'"; }
-        if ($d) {
-            echo '<meta http-equiv="Content-Security-Policy" content="' . esc_attr(implode('; ', $d)) . '">' . "\n";
-        }
-    }, 0);
-}
