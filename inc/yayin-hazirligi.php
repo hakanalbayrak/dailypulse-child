@@ -452,11 +452,21 @@ add_action('transition_post_status', function ($yeni, $eski, $post) {
 // ana sayfada en büyük boyama (LCP) hero metni, yani bu fontu bekleyen metin. Türkçe için hem
 // latin hem latin-ext alt kümesi gerekli (ğ ş İ latin-ext'te, ı latin'de).
 add_action('wp_head', function () {
-    $dizin = get_stylesheet_directory_uri() . '/assets/fonts/quicksand/';
-    foreach (['quicksand-variable-latin.woff2', 'quicksand-variable-latin-ext.woff2'] as $f) {
-        printf('<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin>' . "\n", esc_url($dizin . $f));
+    foreach (['quicksand/quicksand-variable-latin.woff2', 'quicksand/quicksand-variable-latin-ext.woff2',
+              'barlow/barlow-condensed-900-latin.woff2', 'barlow/barlow-condensed-900-latin-ext.woff2'] as $f) {
+        printf('<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin>' . "\n", esc_url(get_stylesheet_directory_uri() . '/assets/fonts/' . $f));
     }
 }, 1);
+
+// Ekranın üstünü boyamak için gerekmeyen stil dosyaları render'ı engellemesin (media=print →
+// yüklenince all). Form altbilgide, "trending" bloğu mobilde gizli, ürün-inceleme eklentisi kullanılmıyor.
+add_filter('style_loader_tag', function ($tag, $handle) {
+    if (is_admin() || !in_array($handle, ['fluent-form-styles', 'fluentform-public-default', 'blocksy-ext-trending-styles', 'blocksy-ext-product-reviews-styles'], true)) {
+        return $tag;
+    }
+    $async = preg_replace('/media=([\'"])all\1/', "media='print' onload=\"this.media='all'\"", $tag, 1);
+    return $async . '<noscript>' . $tag . '</noscript>' . "\n";
+}, 10, 2);
 
 // jQuery <head>'de render'ı engelliyordu (~150 ms). Footer'a alınır; WordPress bağımlılık
 // sırasını korur, yani jQuery isteyen betikler hâlâ ondan SONRA çalışır. Başlıkta jQuery'yi

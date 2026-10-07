@@ -20,12 +20,20 @@ function dailypulse_asset_version($relative_path) {
     return file_exists($full_path) ? (string) filemtime($full_path) : DAILYPULSE_VERSION;
 }
 
+/**
+ * custom.css'in küçültülmüş sürümü (scripts/css-kucult.py üretir, tema-deploy.py her
+ * yayında yeniden üretir). Küçültülmüş dosya yoksa kaynak dosya kullanılır.
+ */
+function dailypulse_css_path() {
+    return file_exists(DAILYPULSE_DIR . '/assets/css/custom.min.css') ? '/assets/css/custom.min.css' : '/assets/css/custom.css';
+}
+
 function dailypulse_enqueue_assets() {
     wp_enqueue_style(
         'dailypulse-custom',
-        DAILYPULSE_URI . '/assets/css/custom.css',
+        DAILYPULSE_URI . dailypulse_css_path(),
         array(),
-        dailypulse_asset_version('/assets/css/custom.css')
+        dailypulse_asset_version(dailypulse_css_path())
     );
 
     wp_enqueue_script(

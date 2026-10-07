@@ -21,36 +21,9 @@ require_once DAILYPULSE_DIR . '/inc/yayin-hazirligi.php';
 require_once DAILYPULSE_DIR . '/inc/surum.php';
 
 /**
- * Google Fonts yükle — Barlow (UI) + Barlow Condensed (display)
- *
- * Body fontu (Quicksand) Google CDN'den değil, temanın kendi
- * assets/fonts/quicksand/ klasöründen self-hosted olarak yükleniyor
- * (bkz. custom.css içindeki @font-face tanımları).
+ * Barlow + Barlow Condensed artık temanın kendi assets/fonts/barlow/ klasöründen
+ * (custom.css içindeki @font-face) yükleniyor; Google Fonts isteği ve preconnect'ler kaldırıldı.
  */
-function dailypulse_google_fonts() {
-    $fonts_url = 'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;800;900&family=Barlow:wght@500;600;700&display=swap';
-    wp_enqueue_style('dailypulse-google-fonts', $fonts_url, array(), null);
-}
-add_action('wp_enqueue_scripts', 'dailypulse_google_fonts');
-
-/**
- * Yazı tipi stilini render'ı engellemeyecek şekilde yükle (media=print →
- * yüklenince all) ve fonts.googleapis/gstatic bağlantılarını önceden aç.
- * display=swap olduğu için metin hemen yedek fontla görünür, font gelince
- * yer değiştirir. JS kapalıysa <noscript> normal stili yükler.
- */
-add_filter('style_loader_tag', function ($tag, $handle) {
-    if ($handle !== 'dailypulse-google-fonts') {
-        return $tag;
-    }
-    $async = preg_replace('/media=([\'"])all\1/', "media='print' onload=\"this.media='all'\"", $tag, 1);
-    return $async . '<noscript>' . $tag . '</noscript>' . "\n";
-}, 10, 2);
-
-add_action('wp_head', function () {
-    echo '<link rel="preconnect" href="https://fonts.googleapis.com">' . "\n";
-    echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
-}, 1);
 
 /**
  * Tema desteklerini ekle
