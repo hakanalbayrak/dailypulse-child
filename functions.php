@@ -1416,7 +1416,7 @@ function kampanya_maintenance(WP_REST_Request $request) {
     }
     if ($action === 'onbellek_durum') {
         $n = count((array) glob(Idk_Onbellek::dizin() . '/*.idk'));
-        return ['kopya' => $n, 'kapali' => Idk_Onbellek::kapali(), 'stub' => is_file(WP_CONTENT_DIR . '/advanced-cache.php') ? file_get_contents(WP_CONTENT_DIR . '/advanced-cache.php') : false, 'wp_cache' => defined('WP_CACHE') ? WP_CACHE : null, 'dropin_loaded' => function_exists('wp_cache_postload') || did_action('plugins_loaded') ? class_exists('Idk_Onbellek', false) : null, 'dir' => Idk_Onbellek::dizin(), 'files' => array_map('basename', (array) glob(Idk_Onbellek::dizin() . '/*')), 'ssl' => is_ssl(), 'https_srv' => $_SERVER['HTTPS'] ?? null, 'xfp' => $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? null, 'surum' => Idk_Onbellek::surum()];
+        return ['kopya' => $n, 'kapali' => Idk_Onbellek::kapali(), 'stub' => is_file(WP_CONTENT_DIR . '/advanced-cache.php'), 'wp_cache' => defined('WP_CACHE') ? WP_CACHE : null, 'surum' => Idk_Onbellek::surum()];
     }
 
     if ($action === 'fix_litespeed_qs') {
