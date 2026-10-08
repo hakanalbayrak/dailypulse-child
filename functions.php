@@ -1249,7 +1249,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id', 'set_adsense_id', 'indexnow_hepsi', 'litespeed_oku', 'litespeed_cache_ac', 'litespeed_cache_kapat', 'onbellek_kapat', 'onbellek_ac', 'onbellek_durum', 'webp_uret', 'css_inline_ac', 'css_inline_kapat', 'smtp_oku', 'smtp_ayrinti', 'form_bildirim_oku', 'form_bildirim_ayarla', 'smtp_varsayilan'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id', 'set_adsense_id', 'indexnow_hepsi', 'litespeed_oku', 'litespeed_cache_ac', 'litespeed_cache_kapat', 'onbellek_kapat', 'onbellek_ac', 'onbellek_durum', 'webp_uret', 'css_inline_ac', 'css_inline_kapat', 'smtp_oku', 'smtp_ayrinti', 'form_bildirim_oku', 'form_bildirim_ayarla', 'smtp_varsayilan', 'form_bildirim_ekle'],
             ],
         ],
     ]);
@@ -1470,6 +1470,27 @@ function kampanya_maintenance(WP_REST_Request $request) {
             $cik['bildirimler'][] = ['ad' => $v['name'] ?? '', 'etkin' => $v['status'] ?? null, 'sendTo' => $v['sendTo'] ?? null, 'konu' => $v['subject'] ?? '', 'gonderen' => $v['fromEmail'] ?? ''];
         }
         return $cik;
+    }
+    if ($action === 'form_bildirim_ekle') {
+        global $wpdb;
+        $t = $wpdb->prefix . 'fluentform_form_meta';
+        $id = (int) ($request->get_param('form') ?: 1);
+        $alici = sanitize_email((string) $request->get_param('alici'));
+        if (!$alici) { return new WP_Error('gecersiz', 'alici gerekli', ['status' => 400]); }
+        if ($wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $t WHERE form_id = %d AND meta_key = 'notifications'", $id))) {
+            return ['durum' => 'zaten var'];
+        }
+        $v = [
+            'name' => 'Yönetici bildirimi', 'enabled' => true, 'status' => true,
+            'sendTo' => ['type' => 'email', 'email' => $alici, 'field' => '', 'routing' => [['input_value' => '', 'field' => '', 'operator' => '=', 'email' => '']]],
+            'fromName' => '', 'fromEmail' => '', 'replyTo' => '{inputs.email}', 'bcc' => '',
+            'subject' => 'İletişim formu: {inputs.subject}',
+            'message' => '<p><strong>Ad:</strong> {inputs.names}</p><p><strong>E-posta:</strong> {inputs.email}</p><p><strong>Konu:</strong> {inputs.subject}</p><p><strong>Mesaj:</strong><br>{inputs.message}</p>',
+            'conditionals' => ['status' => false, 'type' => 'any', 'conditions' => [['field' => '', 'operator' => '=', 'value' => '']]],
+            'attachments' => [],
+        ];
+        $wpdb->insert($t, ['form_id' => $id, 'meta_key' => 'notifications', 'value' => wp_json_encode($v)]);
+        return ['durum' => 'eklendi', 'id' => $wpdb->insert_id];
     }
     if ($action === 'onbellek_durum') {
         $n = count((array) glob(Idk_Onbellek::dizin() . '/*.idk'));
