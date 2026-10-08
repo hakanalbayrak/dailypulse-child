@@ -1249,7 +1249,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id', 'set_adsense_id', 'indexnow_hepsi', 'litespeed_oku', 'litespeed_cache_ac', 'litespeed_cache_kapat', 'onbellek_kapat', 'onbellek_ac', 'onbellek_durum', 'webp_uret', 'css_inline_ac', 'css_inline_kapat'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id', 'set_adsense_id', 'indexnow_hepsi', 'litespeed_oku', 'litespeed_cache_ac', 'litespeed_cache_kapat', 'onbellek_kapat', 'onbellek_ac', 'onbellek_durum', 'webp_uret', 'css_inline_ac', 'css_inline_kapat', 'smtp_oku'],
             ],
         ],
     ]);
@@ -1419,6 +1419,17 @@ function kampanya_maintenance(WP_REST_Request $request) {
     if ($action === 'css_inline_ac' || $action === 'css_inline_kapat') {
         update_option('idk_kritik_css', $action === 'css_inline_ac' ? '1' : '0');
         return ['silinen' => Idk_Onbellek::temizle(), 'kritik_css' => get_option('idk_kritik_css')];
+    }
+    if ($action === 'smtp_oku') {
+        // Salt okunur ve gizli bilgisiz: FluentSMTP bağlantılarının sağlayıcısı ve gönderen adresi.
+        $a = get_option('fluentmail-settings', []);
+        $cik = ['varsayilan' => $a['misc']['default_connection'] ?? null, 'baglantilar' => []];
+        foreach ((array) ($a['connections'] ?? []) as $anahtar => $b) {
+            $ps = $b['provider_settings'] ?? [];
+            $cik['baglantilar'][] = ['id' => substr((string) $anahtar, 0, 8), 'saglayici' => $ps['provider'] ?? '?', 'gonderen' => $ps['sender_email'] ?? '', 'zorla' => $ps['force_from_email'] ?? null];
+        }
+        $cik['eslesmeler'] = array_keys((array) ($a['mappings'] ?? []));
+        return $cik;
     }
     if ($action === 'onbellek_durum') {
         $n = count((array) glob(Idk_Onbellek::dizin() . '/*.idk'));

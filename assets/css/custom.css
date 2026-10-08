@@ -2534,3 +2534,19 @@ html body .k-hero__trust a { display: inline-block; padding-block: 6px; }
 
 /* Sağlık uyarısı: yazının sonunda, ilgili rehberlerden önce */
 html body .entry-content .idk-uyari { margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d9d5cc; font-size: .875rem; line-height: 1.6; color: #66616f; }
+
+/* Makale sonu bülten kutusu */
+html body .idk-bulten { margin: 3rem 0 1rem; padding: 2rem 1.75rem; background: #17141A; border-radius: 12px; border-top: 4px solid #FFD600; }
+html body .idk-bulten .idk-bulten__etiket { margin: 0 0 .5rem; font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #FFD600 !important; }
+html body .idk-bulten .idk-bulten__baslik { margin: 0 0 .5rem; font-size: clamp(1.4rem, 3.5vw, 1.9rem); line-height: 1.15; color: #F7F4EC !important; }
+html body .idk-bulten .idk-bulten__metin { margin: 0 0 1.25rem; font-size: .98rem; line-height: 1.6; color: #D8D4CC !important; }
+html body .idk-bulten .idk-bulten__metin a, html body .idk-bulten .idk-bulten__onay a { color: #FFD600 !important; text-decoration: underline; }
+html body .idk-bulten .idk-bulten__satir { display: flex; flex-wrap: wrap; gap: 10px; }
+html body .idk-bulten .idk-bulten__giris { flex: 1 1 240px; min-height: 48px; padding: 0 14px; font-size: 16px; color: #17141A; background: #F7F4EC; border: 2px solid #F7F4EC; border-radius: 8px; }
+html body .idk-bulten .idk-bulten__dugme { min-height: 48px; padding: 0 26px; font-weight: 800; font-size: 15px; color: #17141A; background: #FFD600; border: 0; border-radius: 8px; cursor: pointer; }
+html body .idk-bulten .idk-bulten__dugme:disabled { opacity: .6; cursor: default; }
+html body .idk-bulten .idk-bulten__onay { display: flex; gap: 10px; align-items: flex-start; margin-top: 12px; font-size: 13px; line-height: 1.5; color: #D8D4CC !important; }
+html body .idk-bulten .idk-bulten__onay input { margin-top: 3px; flex: none; }
+html body .idk-bulten .idk-bulten__mesaj { margin: 12px 0 0; font-size: 14px; }
+html body .idk-bulten .idk-bulten__mesaj--hata { color: #FF8A7A !important; }
+html body .idk-bulten .idk-bulten__mesaj--tamam { color: #7DDC9A !important; }

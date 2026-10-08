@@ -218,3 +218,57 @@ function kampanya_content_extras($content) {
     }
     return $content . "\n" . $extra;
 }
+
+/* ------------------------------------------------------------------
+   Makale sonu bülten kutusu (2026-10-08): yazıyı sonuna kadar okuyan, abone olma olasılığı en yüksek kişidir.
+   Aynı /kampanya/v1/subscribe uç noktasını kullanır; KVKK onayı açıkça işaretlenir (önceden işaretli değil).
+   ------------------------------------------------------------------ */
+add_filter('the_content', function ($c) {
+    if (is_admin() || !is_singular('post') || !in_the_loop() || !is_main_query()) {
+        return $c;
+    }
+    $kvkk = esc_url(home_url('/kvkk-aydinlatma-metni/'));
+    $riza = esc_url(home_url('/acik-riza-metni/'));
+    $cik  = esc_url(home_url('/abonelikten-cik/'));
+    $kutu = <<<HTML
+<aside class="idk-bulten" aria-labelledby="idk-bulten-baslik">
+  <p class="idk-bulten__etiket">📬 Ücretsiz bülten</p>
+  <h2 class="idk-bulten__baslik" id="idk-bulten-baslik">Bunun gibi rehberler e-postanıza gelsin</h2>
+  <p class="idk-bulten__metin">Yeni yazılar çıktıkça haber verelim. Haftada en fazla 2 e-posta; istediğiniz zaman <a href="{$cik}">abonelikten çıkabilirsiniz</a>.</p>
+  <form class="idk-bulten__form" novalidate>
+    <div class="idk-bulten__satir">
+      <label class="screen-reader-text" for="idk-bulten-eposta">E-posta adresiniz</label>
+      <input type="email" id="idk-bulten-eposta" class="idk-bulten__giris" name="email" placeholder="e-posta adresiniz" autocomplete="email" required>
+      <button type="submit" class="idk-bulten__dugme">Abone Ol</button>
+    </div>
+    <label class="idk-bulten__onay">
+      <input type="checkbox" name="kvkk" required>
+      <span><a href="{$kvkk}" target="_blank" rel="noopener">KVKK Aydınlatma Metni</a>'ni ve <a href="{$riza}" target="_blank" rel="noopener">Açık Rıza Metni</a>'ni okudum, kabul ediyorum.</span>
+    </label>
+    <p class="idk-bulten__mesaj" role="alert" hidden></p>
+  </form>
+</aside>
+<script>
+(function () {
+  var f = document.querySelector('.idk-bulten__form'); if (!f) { return; }
+  var m = f.querySelector('.idk-bulten__mesaj'), b = f.querySelector('.idk-bulten__dugme'), e = f.querySelector('[name=email]'), k = f.querySelector('[name=kvkk]');
+  function goster(t, s) { m.textContent = s; m.className = 'idk-bulten__mesaj idk-bulten__mesaj--' + t; m.hidden = false; }
+  f.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var v = e.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { goster('hata', 'Lütfen geçerli bir e-posta adresi girin.'); e.focus(); return; }
+    if (!k.checked) { goster('hata', 'Devam etmek için KVKK ve Açık Rıza Metni\'ni onaylamanız gerekiyor.'); return; }
+    b.disabled = true; m.hidden = true;
+    fetch('/wp-json/kampanya/v1/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: v }) })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d && d.success) { goster('tamam', d.message || 'Abone oldunuz! Onay için e-postanızı kontrol edin.'); e.value = ''; b.textContent = '✓'; }
+        else { goster('hata', (d && (d.message || (d.data && d.data.message))) || 'Bir hata oluştu.'); b.disabled = false; }
+      })
+      .catch(function () { goster('hata', 'Bağlantı hatası. Lütfen tekrar deneyin.'); b.disabled = false; });
+  });
+})();
+</script>
+HTML;
+    return $c . $kutu;
+}, 20);
