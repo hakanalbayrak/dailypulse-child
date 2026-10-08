@@ -1429,6 +1429,8 @@ function kampanya_maintenance(WP_REST_Request $request) {
             $cik['baglantilar'][] = ['id' => substr((string) $anahtar, 0, 8), 'saglayici' => $ps['provider'] ?? '?', 'gonderen' => $ps['sender_email'] ?? '', 'zorla' => $ps['force_from_email'] ?? null];
         }
         $cik['eslesmeler'] = array_keys((array) ($a['mappings'] ?? []));
+        $c0 = reset($a['connections']) ?: [];
+        $cik['yapi'] = ['ust' => array_keys((array) $c0), 'ps' => array_keys((array) ($c0['provider_settings'] ?? [])), 'misc' => array_keys((array) ($a['misc'] ?? [])), 'sender' => $c0['provider_settings']['sender_email'] ?? ($c0['sender_email'] ?? null), 'prov' => $c0['provider_settings']['provider'] ?? ($c0['provider'] ?? null)];
         return $cik;
     }
     if ($action === 'onbellek_durum') {
