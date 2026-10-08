@@ -1417,14 +1417,8 @@ function kampanya_maintenance(WP_REST_Request $request) {
         return ['silinen' => Idk_Onbellek::temizle(), 'kapali' => Idk_Onbellek::kapali()];
     }
     if ($action === 'css_inline_ac' || $action === 'css_inline_kapat') {
-        $f = Idk_Onbellek::dizin() . '/INLINE_KAPALI';
-        if ($action === 'css_inline_kapat') {
-            is_dir(dirname($f)) || @mkdir(dirname($f), 0755, true);
-            @file_put_contents($f, '1');
-        } else {
-            @unlink($f);
-        }
-        return ['silinen' => Idk_Onbellek::temizle(), 'inline_kapali' => is_file($f)];
+        update_option('idk_kritik_css', $action === 'css_inline_ac' ? '1' : '0');
+        return ['silinen' => Idk_Onbellek::temizle(), 'kritik_css' => get_option('idk_kritik_css')];
     }
     if ($action === 'onbellek_durum') {
         $n = count((array) glob(Idk_Onbellek::dizin() . '/*.idk'));

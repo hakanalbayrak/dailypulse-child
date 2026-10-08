@@ -54,7 +54,8 @@ add_action('template_redirect', function () {
  */
 function idk_css_satir_ici($html)
 {
-    if (is_file(Idk_Onbellek::dizin() . '/INLINE_KAPALI')) {
+    // Varsayılan KAPALI (PageSpeed'de yerleşim kaymasına yol açtı); yalnızca idk_kritik_css=1 ise çalışır.
+    if (get_option('idk_kritik_css', '0') !== '1') {
         return $html;
     }
     $tip = is_front_page() ? 'anasayfa' : (is_singular('post') ? 'yazi' : (is_page() ? 'sayfa' : 'arsiv'));
