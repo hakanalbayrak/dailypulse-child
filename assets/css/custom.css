@@ -2497,7 +2497,9 @@ html body .idk-cerez .idk-cerez__dugmeler { display: flex; gap: 10px; }
 html body .idk-cerez .idk-cerez__btn {
   min-height: 44px;
   padding: 10px 22px;
-  font: 700 14px/1 inherit;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
   font-family: inherit;
   color: #F7F4EC;
   background: transparent;
