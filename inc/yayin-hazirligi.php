@@ -24,9 +24,9 @@ if (!defined('ABSPATH')) exit;
  *            12'yi sepet sayfası olarak tanımadığı için is_cart() yetmiyordu
  */
 function idk_noindex_idler() {
-    // 3300 (648 kelime, 10 ürün, yoğun affiliate), 3358 ve 3344 (~350 kelimelik kitap yazıları):
+    // 3300 (648 kelime, 10 ürün, yoğun affiliate), 3344 (kitap yazısı, 2026-10-08'de yeniden yazıldı ama ~550 kelime; 3358 genişletilip indekse alındı):
     // AdSense/Google "yetersiz içerik" değerlendirmesi için genişletilene kadar dizine girmez.
-    return [82, 83, 84, 85, 3364, 3365, 11, 12, 13, 14, 3300, 3358, 3344];
+    return [82, 83, 84, 85, 3364, 3365, 11, 12, 13, 14, 3300, 3344];
 }
 
 /* ------------------------------------------------------------------
