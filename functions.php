@@ -1456,19 +1456,20 @@ function kampanya_maintenance(WP_REST_Request $request) {
         global $wpdb;
         $t = $wpdb->prefix . 'fluentform_form_meta';
         $id = (int) ($request->get_param('form') ?: 1);
-        $satir = $wpdb->get_row($wpdb->prepare("SELECT id, value FROM $t WHERE form_id = %d AND meta_key = 'notifications'", $id), ARRAY_A);
-        $liste = $satir ? (json_decode($satir['value'], true) ?: []) : [];
-        if ($action === 'form_bildirim_ayarla') {
-            $alici = sanitize_email((string) $request->get_param('alici'));
-            if (!$alici || !$satir) { return new WP_Error('gecersiz', 'alici ya da bildirim yok', ['status' => 400]); }
-            if (isset($liste['sendTo'])) {            // tek bildirim (assoc dizi)
-                $liste['sendTo'] = ['type' => 'email', 'email' => $alici, 'field' => '', 'routing' => []];
-            } else {
-                foreach ($liste as $i => $n) { if (is_array($n) && isset($n['sendTo'])) { $liste[$i]['sendTo'] = ['type' => 'email', 'email' => $alici, 'field' => '', 'routing' => []]; } }
+        $alici = sanitize_email((string) $request->get_param('alici'));
+        $satirlar = (array) $wpdb->get_results($wpdb->prepare("SELECT id, meta_key, value FROM $t WHERE form_id = %d", $id), ARRAY_A);
+        $cik = ['form' => $id, 'anahtarlar' => [], 'bildirimler' => []];
+        foreach ($satirlar as $r) {
+            $cik['anahtarlar'][] = $r['meta_key'];
+            if ($r['meta_key'] !== 'notifications') { continue; }
+            $v = json_decode($r['value'], true) ?: [];
+            if ($action === 'form_bildirim_ayarla' && $alici && isset($v['sendTo'])) {
+                $v['sendTo'] = ['type' => 'email', 'email' => $alici, 'field' => '', 'routing' => []];
+                $wpdb->update($t, ['value' => wp_json_encode($v)], ['id' => $r['id']]);
             }
-            $wpdb->update($t, ['value' => wp_json_encode($liste)], ['id' => $satir['id']]);
+            $cik['bildirimler'][] = ['ad' => $v['name'] ?? '', 'etkin' => $v['status'] ?? null, 'sendTo' => $v['sendTo'] ?? null, 'konu' => $v['subject'] ?? '', 'gonderen' => $v['fromEmail'] ?? ''];
         }
-        return ['form' => $id, 'var' => (bool) $satir, 'bildirimler' => $liste];
+        return $cik;
     }
     if ($action === 'onbellek_durum') {
         $n = count((array) glob(Idk_Onbellek::dizin() . '/*.idk'));
