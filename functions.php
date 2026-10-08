@@ -1249,7 +1249,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id', 'set_adsense_id', 'indexnow_hepsi', 'litespeed_oku', 'litespeed_cache_ac', 'litespeed_cache_kapat', 'onbellek_kapat', 'onbellek_ac', 'onbellek_durum', 'webp_uret', 'css_inline_ac', 'css_inline_kapat', 'smtp_oku'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id', 'set_adsense_id', 'indexnow_hepsi', 'litespeed_oku', 'litespeed_cache_ac', 'litespeed_cache_kapat', 'onbellek_kapat', 'onbellek_ac', 'onbellek_durum', 'webp_uret', 'css_inline_ac', 'css_inline_kapat', 'smtp_oku', 'smtp_ayrinti', 'form_bildirim_oku', 'form_bildirim_ayarla', 'smtp_varsayilan'],
             ],
         ],
     ]);
@@ -1432,6 +1432,43 @@ function kampanya_maintenance(WP_REST_Request $request) {
         $c0 = reset($a['connections']) ?: [];
         $cik['yapi'] = ['ust' => array_keys((array) $c0), 'ps' => array_keys((array) ($c0['provider_settings'] ?? [])), 'misc' => array_keys((array) ($a['misc'] ?? [])), 'sender' => $c0['provider_settings']['sender_email'] ?? ($c0['sender_email'] ?? null), 'prov' => $c0['provider_settings']['provider'] ?? ($c0['provider'] ?? null)];
         return $cik;
+    }
+
+    if ($action === 'smtp_ayrinti') {
+        // Salt okunur: parola yok. Bağlantı başına sunucu/kullanıcı/gönderen.
+        $a = get_option('fluentmail-settings', []);
+        $cik = ['varsayilan' => $a['misc']['default_connection'] ?? null, 'yedek' => $a['misc']['fallback_connection'] ?? null, 'baglantilar' => []];
+        foreach ((array) ($a['connections'] ?? []) as $k => $b) {
+            $ps = $b['provider_settings'] ?? [];
+            $cik['baglantilar'][(string) $k] = ['saglayici' => $ps['provider'] ?? ($b['provider'] ?? '?'), 'host' => $ps['host'] ?? '', 'port' => $ps['port'] ?? '', 'sifreleme' => $ps['encryption'] ?? '', 'kullanici' => $ps['username'] ?? '', 'gonderen' => $ps['sender_email'] ?? '', 'ad' => $ps['sender_name'] ?? '', 'baslik' => $b['title'] ?? ''];
+        }
+        return $cik;
+    }
+    if ($action === 'smtp_varsayilan') {
+        $anahtar = (string) $request->get_param('baglanti');
+        $a = get_option('fluentmail-settings', []);
+        if (!isset($a['connections'][$anahtar])) { return new WP_Error('yok', 'baglanti bulunamadi', ['status' => 404]); }
+        $a['misc']['default_connection'] = $anahtar;
+        update_option('fluentmail-settings', $a);
+        return ['varsayilan' => $anahtar];
+    }
+    if ($action === 'form_bildirim_oku' || $action === 'form_bildirim_ayarla') {
+        global $wpdb;
+        $t = $wpdb->prefix . 'fluentform_form_meta';
+        $id = (int) ($request->get_param('form') ?: 1);
+        $satir = $wpdb->get_row($wpdb->prepare("SELECT id, value FROM $t WHERE form_id = %d AND meta_key = 'notifications'", $id), ARRAY_A);
+        $liste = $satir ? (json_decode($satir['value'], true) ?: []) : [];
+        if ($action === 'form_bildirim_ayarla') {
+            $alici = sanitize_email((string) $request->get_param('alici'));
+            if (!$alici || !$satir) { return new WP_Error('gecersiz', 'alici ya da bildirim yok', ['status' => 400]); }
+            if (isset($liste['sendTo'])) {            // tek bildirim (assoc dizi)
+                $liste['sendTo'] = ['type' => 'email', 'email' => $alici, 'field' => '', 'routing' => []];
+            } else {
+                foreach ($liste as $i => $n) { if (is_array($n) && isset($n['sendTo'])) { $liste[$i]['sendTo'] = ['type' => 'email', 'email' => $alici, 'field' => '', 'routing' => []]; } }
+            }
+            $wpdb->update($t, ['value' => wp_json_encode($liste)], ['id' => $satir['id']]);
+        }
+        return ['form' => $id, 'var' => (bool) $satir, 'bildirimler' => $liste];
     }
     if ($action === 'onbellek_durum') {
         $n = count((array) glob(Idk_Onbellek::dizin() . '/*.idk'));
