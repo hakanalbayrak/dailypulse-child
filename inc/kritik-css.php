@@ -2,7 +2,7 @@
 /**
  * Kritik CSS (scripts/kritik-css-uret.py üretir, assets/css/kritik/*.css + manifest.json).
  *
- * Sayfa türüne göre, o türdeki sayfalarda DOM'a eşleşen tüm kurallar HTML'ye gömülür; tam stil dosyaları
+ * Sayfa türüne göre, o türdeki sayfalarda DOM'a eşleşen tüm kurallar (her stil dosyası için ayrı parça, kendi <link>'inin yerinde) HTML'ye gömülür; tam stil dosyaları
  * (Blocksy main/page-title/sidebar, global.css, custom.min.css) render'ı ENGELLEMEDEN yüklenir. Kural seçimi
  * "ekranın üstü" değil "sayfadaki her öğe" olduğundan tam CSS gelince yalnızca etkileşim durumları eklenir,
  * yerleşim kaymaz.
@@ -100,26 +100,23 @@ function idk_kritik_durum()
     if (!$girdi) {
         return $durum;
     }
-    $css = is_file($dizin . basename($girdi['dosya'])) ? trim((string) file_get_contents($dizin . basename($girdi['dosya']))) : '';
-    if ($css === '') {
-        return $durum;
+    $veri = is_file($dizin . basename($girdi['dosya'])) ? json_decode((string) file_get_contents($dizin . basename($girdi['dosya'])), true) : null;
+    $css  = is_array($veri) && is_array($veri['css'] ?? null) ? $veri['css'] : [];
+    foreach ($girdi['handles'] as $h) {
+        if (!isset($css[$h]) || !is_string($css[$h])) {
+            return $durum;
+        }
     }
     foreach ($girdi['handles'] as $h) {
         if (idk_kritik_md5($h) !== ($girdi['md5'][$h] ?? false)) {
             return $durum;
         }
     }
-    $durum = ['css' => str_replace('</style', '<\\/style', $css), 'handles' => $girdi['handles']];
+    $durum = ['css' => array_map(function ($c) {
+        return str_replace('</style', '<\\/style', $c);
+    }, $css), 'handles' => $girdi['handles']];
     return $durum;
 }
-
-// Stil etiketleri basılmadan önce (wp_head 8) kritik CSS yerinde olmalı.
-add_action('wp_head', function () {
-    $d = idk_kritik_durum();
-    if ($d) {
-        echo '<style id="idk-kritik">' . $d['css'] . "</style>\n";
-    }
-}, 2);
 
 add_filter('style_loader_tag', function ($tag, $handle) {
     $d = idk_kritik_durum();
@@ -127,5 +124,7 @@ add_filter('style_loader_tag', function ($tag, $handle) {
         return $tag;
     }
     $async = preg_replace("/media=(['\"])all\\1/", "media='print' onload=\"this.media='all';this.onload=null\"", $tag, 1);
-    return $async . '<noscript>' . $tag . '</noscript>' . "\n";
+    // Kritik kural parçası, ait olduğu <link>'in tam yerinde: WordPress'in satır içi stilleriyle (global-styles vb.)
+    // olan basamaklı sıra (eşit özgüllükte sonraki kazanır) özgün sayfayla birebir aynı kalır.
+    return '<style id="idk-kritik-' . esc_attr($handle) . '">' . $d['css'][$handle] . "</style>\n" . $async . '<noscript>' . $tag . '</noscript>' . "\n";
 }, 30, 2);
