@@ -25,15 +25,15 @@ require_once DAILYPULSE_DIR . '/inc/alt-bilgi.php';
 require_once DAILYPULSE_DIR . '/inc/yazi-duzeni.php';
 
 // Liste sayfalarında sayfa başına 12 yazı: 3 ve 2 sütunlu ızgarada tam satır.
-// Blocksy (ebeveyn) kendi pre_get_posts kancasını bizden sonra kaydeder ve aynı
-// önceliklerde sıra kayıt sırasıdır; bu yüzden kancayı tema kurulduktan sonra ekliyoruz.
-add_action('after_setup_theme', function () {
+// Blocksy ve eklentileri kendi pre_get_posts kancalarını (aynı önceliklerde, kayıt
+// sırasıyla) bizden sonra kaydedip değeri 10'a çekiyor; ana sorgu `wp` aşamasında
+// çalıştığı için kancayı wp_loaded'da, yani hepsinden sonra ekliyoruz.
+add_action('wp_loaded', function () {
     add_action('pre_get_posts', function ($q) {
         if (!is_admin() && $q->is_main_query() && ($q->is_home() || $q->is_archive() || $q->is_search())) {
             $q->set('posts_per_page', 12);
             $q->set('ignore_sticky_posts', true);
-            $GLOBALS['idk_dbg'] = 'hook:' . $q->get('posts_per_page') . ':' . (int) $q->is_home();
-        } else { $GLOBALS['idk_dbg_s'] = (isset($GLOBALS['idk_dbg_s']) ? $GLOBALS['idk_dbg_s'] : '') . (int) $q->is_main_query() . (int) $q->is_home() . ','; }
+        }
     }, PHP_INT_MAX);
 }, 99);
 
