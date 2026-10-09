@@ -462,7 +462,7 @@ add_action('transition_post_status', function ($yeni, $eski, $post) {
 // ana sayfada en büyük boyama (LCP) hero metni, yani bu fontu bekleyen metin. Türkçe için hem
 // latin hem latin-ext alt kümesi gerekli (ğ ş İ latin-ext'te, ı latin'de).
 add_action('wp_head', function () {
-    foreach (['fraunces/fraunces-tr.woff2', 'sourcesans3/sourcesans3-tr.woff2'] as $f) {
+    foreach (['fraunces/fraunces-tr-v2.woff2', 'sourcesans3/sourcesans3-tr-v2.woff2'] as $f) {
         printf('<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin>' . "\n", esc_url(get_stylesheet_directory_uri() . '/assets/fonts/' . $f));
     }
 }, 1);
@@ -476,6 +476,20 @@ add_filter('style_loader_tag', function ($tag, $handle) {
     $async = preg_replace('/media=([\'"])all\1/', "media='print' onload=\"this.media='all'\"", $tag, 1);
     return $async . '<noscript>' . $tag . '</noscript>' . "\n";
 }, 10, 2);
+
+// Ana sayfa, liste (blog/kategori/arama) ve 404 şablonları blok içeriği basmaz ve kenar çubuğu yoktur:
+// WP blok kütüphanesi + global-styles (~27 KB satır içi) ile Blocksy sidebar.css boşuna render'ı geciktiriyordu.
+// Makale ve sayfalarda dokunulmaz (içerik blok kullanır).
+add_action('wp_enqueue_scripts', function () {
+    if (is_admin() || !(is_front_page() || is_home() || is_archive() || is_search() || is_404())
+        || (function_exists('is_woocommerce') && is_woocommerce())) {
+        return;
+    }
+    foreach (['ct-sidebar-styles', 'wp-block-library', 'wp-block-library-theme', 'global-styles', 'classic-theme-styles',
+              'wp-block-heading', 'wp-block-paragraph', 'wp-block-columns', 'wp-block-group'] as $h) {
+        wp_dequeue_style($h);
+    }
+}, 100);
 
 // jQuery <head>'de render'ı engelliyordu (~150 ms). Footer'a alınır; WordPress bağımlılık
 // sırasını korur, yani jQuery isteyen betikler hâlâ ondan SONRA çalışır. Başlıkta jQuery'yi

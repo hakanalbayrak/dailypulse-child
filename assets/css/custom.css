@@ -14,14 +14,14 @@
   font-style: normal;
   font-weight: 700 800;
   font-display: optional;
-  src: url('../fonts/fraunces/fraunces-tr.woff2') format('woff2');
+  src: url('../fonts/fraunces/fraunces-tr-v2.woff2') format('woff2');
 }
 @font-face {
   font-family: 'Source Sans 3';
   font-style: normal;
   font-weight: 400 700;
   font-display: optional;
-  src: url('../fonts/sourcesans3/sourcesans3-tr.woff2') format('woff2');
+  src: url('../fonts/sourcesans3/sourcesans3-tr-v2.woff2') format('woff2');
 }
 
 :root {
