@@ -446,3 +446,12 @@ a, button { -webkit-tap-highlight-color: rgba(14,122,95,.18); }
 /* Alt bilgi: telif satırı kapsayıcıyla hizalı, bağlantı aralığı daha sıkı (masaüstü) */
 .idk-altbilgi p.idk-altbilgi__alt { margin: 28px auto 0 !important; max-width: var(--k-max-w) !important; }
 @media (min-width: 900px) { footer.idk-altbilgi a { min-height: 34px; padding: 5px 0 !important; } .idk-altbilgi ul { gap: 0; } }
+
+/* Header: logo ve menü dikeyde aynı eksende (logo bağlantısı 20 px, SVG 52 px taşıyordu) */
+.ct-header [data-row="middle"] [data-column],
+.ct-header [data-row*="middle"] [data-column] { display: flex !important; align-items: center !important; }
+.ct-header .site-logo-container, .ct-header .site-branding { display: flex !important; align-items: center !important; height: auto !important; line-height: 0 !important; }
+.ct-header .site-logo-container a, .ct-header a.k-logo-link, .ct-header .custom-logo-link { display: flex !important; align-items: center !important; height: auto !important; }
+.k-logo-svg { height: 44px !important; width: auto !important; }
+@media (max-width: 900px) { .k-logo-svg { height: 38px !important; } }
+@media (max-width: 600px) { .k-logo-svg { height: 32px !important; } }
