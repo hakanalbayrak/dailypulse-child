@@ -494,6 +494,20 @@ add_action('wp_enqueue_scripts', 'idk_liste_stilleri_temizle', 100);
 // Bazı çekirdek stilleri (global-styles, blok başına satır içi) bundan sonra kuyruğa girer; basılmadan hemen önce tekrar temizle.
 add_action('wp_head', 'idk_liste_stilleri_temizle', 7);
 add_action('wp_footer', 'idk_liste_stilleri_temizle', 0);
+// global-styles (preset değişkenleri + utility sınıfları, ~23 KB) kuyruğa girmesin: kanca hiç çalışmasın.
+add_action('wp', function () {
+    if (is_admin() || !(is_front_page() || is_home() || is_archive() || is_search() || is_404())
+        || (function_exists('is_woocommerce') && is_woocommerce())) {
+        return;
+    }
+    foreach (['wp_enqueue_scripts', 'wp_footer'] as $kanca) {
+        foreach ([1, 10, 20] as $oncelik) {
+            remove_action($kanca, 'wp_enqueue_global_styles', $oncelik);
+        }
+    }
+    remove_action('wp_enqueue_scripts', 'wp_enqueue_global_styles_css_custom_properties');
+    remove_action('wp_footer', 'wp_enqueue_global_styles', 1);
+}, 1);
 
 // jQuery <head>'de render'ı engelliyordu (~150 ms). Footer'a alınır; WordPress bağımlılık
 // sırasını korur, yani jQuery isteyen betikler hâlâ ondan SONRA çalışır. Başlıkta jQuery'yi
