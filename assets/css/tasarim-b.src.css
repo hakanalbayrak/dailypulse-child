@@ -515,3 +515,8 @@ html body .idk-cerez .idk-cerez__btn:focus-visible { outline: 3px solid #fff; }
 }
 html body .idk-404 { max-width: none; margin: 0; }
 html body .idk-404 .idk-404__baslik { font-weight: 800; font-size: clamp(2rem, 4vw, 2.8rem); margin: 0 0 6px; }
+
+/* İletişim ve diğer eski sayfalar: soluk gri kutular beyaz karta */
+.entry-content .wp-block-group[style*="background-color:#f8f9fa"] { background: #fff !important; border: 1px solid var(--k-rule); border-radius: var(--k-radius) !important; }
+.entry-content .wp-block-group[style*="background-color:#f8f9fa"] p { font-size: 17px !important; }
+.page .entry-content h2.wp-block-heading { font-size: clamp(1.6rem, 3vw, 2rem) !important; }
