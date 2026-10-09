@@ -63,3 +63,20 @@ add_filter('nav_menu_link_attributes', function ($atts, $item) {
     }
     return $atts;
 }, 10, 2);
+
+/**
+ * Gövdedeki resimlere width/height ekle (yerleşim kayması önlemi): içerikteki eski
+ * <img> etiketleri boyutsuz; boyutu ek dosyasının üst verisinden okuyoruz.
+ */
+add_filter('the_content', function ($icerik) {
+    if (!is_singular('post') || !in_the_loop() || !is_main_query() || stripos($icerik, '<img') === false) { return $icerik; }
+    return preg_replace_callback('#<img\b[^>]*>#i', function ($m) {
+        $etiket = $m[0];
+        if (preg_match('/\swidth=/i', $etiket) && preg_match('/\sheight=/i', $etiket)) { return $etiket; }
+        if (!preg_match('/\ssrc=["\']([^"\']+)["\']/i', $etiket, $s)) { return $etiket; }
+        $id = attachment_url_to_postid($s[1]);
+        $meta = $id ? wp_get_attachment_metadata($id) : null;
+        if (!$meta || empty($meta['width']) || empty($meta['height'])) { return $etiket; }
+        return preg_replace('#<img\b#i', '<img width="' . (int) $meta['width'] . '" height="' . (int) $meta['height'] . '"', $etiket, 1);
+    }, $icerik);
+}, 100);

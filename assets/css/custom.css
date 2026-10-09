@@ -2964,4 +2964,16 @@ html body .idk-404 .idk-404__baslik { font-weight: 800; font-size: clamp(2rem, 4
   .fluentform fieldset > .ff_submit_btn_wrapper { grid-column: 2; margin-bottom: 0; }
 }
 .page-id-24 .entry-content .wp-block-columns { align-items: flex-start; }
+
+/* Dokunma alanları ≥ 40–44 px ve küçük etiket yazıları 13 px (denetim 2026-10-09) */
+.ct-header .site-logo-container a, .ct-header a.k-logo-link { min-height: 44px; }
+.k-nav-search-btn, .ct-header .ct-search-toggle, .ct-header [data-id="search"] a, .ct-header [data-id="search"] button { min-width: 44px; min-height: 44px; }
+.k-section-more { min-height: 44px; display: inline-flex; align-items: center; }
+footer.idk-altbilgi a { min-height: 40px; }
+.idk-altbilgi .idk-altbilgi__not a { min-height: 44px; padding: 10px 6px !important; }
+.idk-icindekiler a { padding: 8px 0; }
+.k-tag, .idk-kart__ust .k-tag { font-size: 13px; }
+.k-related__heading, .idk-bulten__etiket { font-size: 13px !important; }
+.idk-serit .k-consent-label { min-height: 44px; align-items: center; }
+.idk-serit .k-consent-text a { display: inline-block; padding: 4px 0; }
 /* <<< TASARIM-B */
