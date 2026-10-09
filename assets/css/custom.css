@@ -7,21 +7,54 @@
 /* Barlow fonts are loaded once, non-blocking, from functions.php (an @import here
    duplicated that request and delayed first paint by seconds). */
 
-/* Yazı tipleri: kendi sunucumuzdan, Türkçe karakterli tek dosya. font-display: optional +
-   preload (yayin-hazirligi.php) = yerleşim kayması yok. */
+/* Yazı tipleri: kendi sunucumuzdan, Türkçe karakterli tek dosya + preload (yayin-hazirligi.php).
+   font-display: fallback = 100 ms görünmez bekleme, yetişmezse yedekle çiz, gelince değiştir. Yedek yüzler
+   (Georgia/Arial üzerine size-adjust + dikey metrik) gerçek fontun ölçülerine yaklaştırıldı: değişimde kayma ~0.
+   Oranlar scripts/ içindeki ölçümden: Fraunces 800 / Georgia Bold = 0.904, Source Sans 3 400 / Arial = 0.931,
+   700 / Arial Bold = 0.912 (55 yazı başlığı ve özetiyle). */
 @font-face {
   font-family: 'Fraunces';
   font-style: normal;
   font-weight: 700 800;
-  font-display: optional;
+  font-display: fallback;
   src: url('../fonts/fraunces/fraunces-tr-v2.woff2') format('woff2');
 }
 @font-face {
   font-family: 'Source Sans 3';
   font-style: normal;
   font-weight: 400 700;
-  font-display: optional;
+  font-display: fallback;
   src: url('../fonts/sourcesans3/sourcesans3-tr-v2.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fraunces Fallback';
+  font-style: normal;
+  font-weight: 700 800;
+  src: local('Georgia Bold'), local('Georgia-Bold');
+  size-adjust: 90.4%;
+  ascent-override: 108.2%;
+  descent-override: 28.2%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Source Sans 3 Fallback';
+  font-style: normal;
+  font-weight: 400 500;
+  src: local('Arial'), local('ArialMT'), local('Liberation Sans'), local('Arimo');
+  size-adjust: 93.1%;
+  ascent-override: 110%;
+  descent-override: 43%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Source Sans 3 Fallback';
+  font-style: normal;
+  font-weight: 600 700;
+  src: local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold'), local('Arimo Bold');
+  size-adjust: 91.2%;
+  ascent-override: 112.3%;
+  descent-override: 43.9%;
+  line-gap-override: 0%;
 }
 
 :root {
@@ -2476,9 +2509,9 @@ html body .idk-bulten .idk-bulten__mesaj--tamam { color: #7DDC9A !important; }
   --k-black:#14201B; --k-gray-900:#26332D; --k-gray-700:#4F5F57; --k-gray-500:#5B6A62;
   --k-gray-300:#CBD5CC; --k-gray-100:#E4EAE3; --k-gray-50:#F3F5F1; --k-red:#A83A58; --k-red-dark:#8E2F49;
 
-  --f-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --f-display: 'Fraunces', 'Fraunces Fallback', Georgia, 'Times New Roman', serif;
   --f-body:    'Source Sans 3', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
-  --f-ui:      'Source Sans 3', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --f-ui:      'Source Sans 3', 'Source Sans 3 Fallback', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
 
   --k-radius:    8px;
   --k-radius-sm: 4px;
