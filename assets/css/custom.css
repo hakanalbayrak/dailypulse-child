@@ -2776,4 +2776,50 @@ html body .idk-serit button.k-subscribe-btn:hover { background: var(--k-green-dk
   .idk-kart--kart .idk-kart__ust time { display: none; }
   .k-posts-more { margin-top: 24px; }
 }
+
+/* Manşet kartı: görsel kalan yüksekliği doldurur, metin altta boşluk bırakmaz */
+.idk-kart--manset .idk-kart__govde { flex: 0 0 auto; }
+
+/* =====================================================================
+   ALT BİLGİ — üç sütun (inc/alt-bilgi.php); Blocksy footer'ı gizlenir
+   ===================================================================== */
+.ct-footer, footer.ct-footer { display: none !important; }
+footer.idk-altbilgi { background: var(--k-ink) !important; color: #E8EFEA; padding: 44px 24px 22px; border-top: 3px solid var(--k-green); margin-top: 0; }
+.idk-altbilgi__ic { max-width: var(--k-max-w); margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr); gap: 32px 48px; }
+.idk-altbilgi p { color: #C9D6CE !important; font-size: 16px; margin: 12px 0 0 !important; max-width: 46ch; }
+.idk-altbilgi .idk-altbilgi__not { font-size: 14px; color: #A9BBB0 !important; }
+.idk-altbilgi__logo { display: inline-block; background: none !important; background-image: none !important; }
+.idk-altbilgi__logo svg { height: 40px !important; width: auto; display: block; }
+footer.idk-altbilgi h2 { font-family: var(--f-display) !important; font-size: 18px !important; color: #fff !important; margin: 0 0 12px !important; letter-spacing: 0 !important; }
+.idk-altbilgi ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+footer.idk-altbilgi a { color: #E8EFEA !important; font-size: 16px !important; display: inline-block; padding: 7px 0 !important; min-height: 44px; line-height: 1.3; }
+footer.idk-altbilgi a:hover { color: var(--k-lime) !important; }
+.idk-altbilgi__alt { max-width: var(--k-max-w) !important; margin: 28px auto 0 !important; padding-top: 16px; border-top: 1px solid rgba(232,239,234,.14); font-size: 14px !important; color: #A9BBB0 !important; }
+@media (max-width: 899px) { .idk-altbilgi__ic { grid-template-columns: minmax(0,1fr) minmax(0,1fr); } .idk-altbilgi__marka { grid-column: 1 / -1; } }
+@media (max-width: 520px) { footer.idk-altbilgi { padding: 32px 16px 18px; } .idk-altbilgi__ic { grid-template-columns: minmax(0,1fr); gap: 20px; } }
+
+/* =====================================================================
+   MAKALE — sol sabit menü + okuma sütunu
+   ===================================================================== */
+.single-post .entry-content > .idk-yazi { max-width: 1060px !important; display: grid; grid-template-columns: 220px minmax(0, 740px); gap: 0 56px; justify-content: center; align-items: start; }
+.idk-yazi__govde { min-width: 0; }
+.idk-yazi__govde > * { max-width: 740px; margin-left: auto; margin-right: auto; }
+.idk-icindekiler { position: sticky; top: 96px; align-self: start; font-size: 15px; }
+.idk-icindekiler summary { font-family: var(--f-ui); font-weight: 700; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--k-ink-4); cursor: pointer; padding: 6px 0 10px; list-style: none; min-height: 44px; display: flex; align-items: center; }
+.idk-icindekiler summary::-webkit-details-marker { display: none; }
+.idk-icindekiler summary::after { content: "▾"; margin-left: 8px; }
+.idk-icindekiler details[open] summary::after { content: "▴"; }
+.idk-icindekiler ol { list-style: none; margin: 0; padding: 0 0 0 14px; border-left: 2px solid var(--k-rule); display: flex; flex-direction: column; gap: 2px; max-height: calc(100vh - 170px); overflow: auto; }
+.idk-icindekiler li { margin: 0 !important; font-size: 15px !important; line-height: 1.35 !important; }
+.idk-icindekiler a { display: block; padding: 6px 0; color: var(--k-ink-3) !important; text-decoration: none !important; font-weight: 600; background: none !important; }
+.idk-icindekiler a:hover { color: var(--k-green) !important; }
+.idk-ic__urun a { padding-left: 10px; font-weight: 500; }
+@media (max-width: 999px) {
+  .single-post .entry-content > .idk-yazi { display: block; max-width: 740px !important; }
+  .idk-icindekiler { position: static; margin: 0 0 20px; border: 1px solid var(--k-rule); border-radius: var(--k-radius); background: #fff; padding: 0 14px; }
+  .idk-icindekiler ol { border-left: none; padding: 0 0 10px; max-height: none; }
+}
+.entry-content h2[id], .entry-content h3[id] { scroll-margin-top: 90px; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 /* <<< TASARIM-B */

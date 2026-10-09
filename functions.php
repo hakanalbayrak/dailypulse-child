@@ -21,6 +21,8 @@ require_once DAILYPULSE_DIR . '/inc/yayin-hazirligi.php';
 require_once DAILYPULSE_DIR . '/inc/surum.php';
 require_once DAILYPULSE_DIR . '/inc/sayfa-onbellek.php';
 require_once DAILYPULSE_DIR . '/inc/webp.php';
+require_once DAILYPULSE_DIR . '/inc/alt-bilgi.php';
+require_once DAILYPULSE_DIR . '/inc/yazi-duzeni.php';
 
 /**
  * Barlow + Barlow Condensed artık temanın kendi assets/fonts/barlow/ klasöründen
@@ -154,7 +156,6 @@ function kampanya_logo_svg_dark() {
    FOOTER LOGO — inject dark logo SVG into footer bottom bar
    ============================================================ */
 
-add_action('wp_footer', 'kampanya_footer_logo_inject', 21);
 function kampanya_footer_logo_inject() {
     $svg = kampanya_logo_svg_dark();
     ?>
