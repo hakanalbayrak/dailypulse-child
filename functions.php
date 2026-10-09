@@ -128,25 +128,25 @@ function kampanya_logo_inline($html, $attachment_id, $size, $icon, $attr) {
 function kampanya_logo_svg() {
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 80"'
         . ' class="k-logo-svg" role="img" aria-label="ince detay">'
-        . '<rect x="8" y="8" width="64" height="64" rx="14" fill="#17141A"/>'
-        . '<circle cx="40" cy="24" r="6.5" fill="#FFD600"/>'
-        . '<rect x="35" y="35" width="10" height="26" rx="2" fill="#F7F4EC"/>'
-        . '<text x="88" y="55" font-family="\'Barlow Condensed\',sans-serif" font-size="46" fill="#17141A" letter-spacing="0.5">'
-        . '<tspan font-weight="400">ince </tspan><tspan font-weight="700">detay</tspan></text>'
+        . '<rect x="8" y="8" width="64" height="64" rx="16" fill="#14201B"/>'
+        . '<circle cx="40" cy="24" r="6.5" fill="#E6F25A"/>'
+        . '<rect x="35" y="35" width="10" height="26" rx="2.4" fill="#F3F5F1"/>'
+        . '<text x="88" y="54" font-family="\'Fraunces\',Georgia,serif" font-size="40" font-weight="800" fill="#14201B" letter-spacing="-0.4">'
+        . 'ince detay</text>'
         . '</svg>';
 }
 
 /**
- * Dark variant — white wordmark + yellow tag mark for use on black footer
+ * Dark variant — for the forest-green footer
  */
 function kampanya_logo_svg_dark() {
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 80"'
         . ' class="k-logo-svg k-logo-svg--dark" role="img" aria-label="ince detay">'
-        . '<rect x="8" y="8" width="64" height="64" rx="14" fill="#F7F4EC"/>'
-        . '<circle cx="40" cy="24" r="6.5" fill="#FFD600"/>'
-        . '<rect x="35" y="35" width="10" height="26" rx="2" fill="#17141A"/>'
-        . '<text x="88" y="55" font-family="\'Barlow Condensed\',sans-serif" font-size="46" fill="#F7F4EC" letter-spacing="0.5">'
-        . '<tspan font-weight="400">ince </tspan><tspan font-weight="700">detay</tspan></text>'
+        . '<rect x="8" y="8" width="64" height="64" rx="16" fill="#E6F25A"/>'
+        . '<circle cx="40" cy="24" r="6.5" fill="#14201B"/>'
+        . '<rect x="35" y="35" width="10" height="26" rx="2.4" fill="#14201B"/>'
+        . '<text x="88" y="54" font-family="\'Fraunces\',Georgia,serif" font-size="40" font-weight="800" fill="#F3F5F1" letter-spacing="-0.4">'
+        . 'ince detay</text>'
         . '</svg>';
 }
 

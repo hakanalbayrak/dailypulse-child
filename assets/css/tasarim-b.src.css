@@ -1,0 +1,266 @@
+/* =====================================================================
+   TASARIM B — Kuzey Yeşili (2026-10-09)
+   Kaynak: assets/css/tasarim-b.src.css  →  scripts/tasarim-uygula.py ile
+   custom.css'in sonuna eklenir. Eski kuralların üstüne yazar (daha geç = kazanır).
+
+   Renkler   Sis #F3F5F1 · Koyu orman #14201B · Yeşil #0E7A5F · Fosfor #E6F25A · Bordo #A83A58
+   Yazı      Başlık Fraunces 800 · gövde ve arayüz Source Sans 3
+   Kurallar  Yeşil yalnızca açık zeminde (düğme, bağlantı). Koyu zeminde fosfor.
+             Bordo yalnızca etiket ve uyarıda. Başlıklar cümle düzeni, büyük harf yok.
+   ===================================================================== */
+
+:root {
+  --k-green:       #0E7A5F;
+  --k-green-dk:    #0A6149;
+  --k-lime:        #E6F25A;
+  --k-lime-dim:    #D5E24A;
+
+  --k-yellow:      #E6F25A;   /* eski ad: artık fosfor; koyu zeminde vurgu, işaret kalemi */
+  --k-yellow-dim:  #D5E24A;
+  --k-yellow-wash: #E4EAE3;
+
+  --k-ink:    #14201B;
+  --k-ink-2:  #26332D;
+  --k-ink-3:  #4F5F57;
+  --k-ink-4:  #5B6A62;
+
+  --k-paper:   #F3F5F1;
+  --k-paper-2: #E4EAE3;
+  --k-paper-3: #D6DED6;
+  --k-white:   #FFFFFF;
+
+  --k-rule:     #CBD5CC;
+  --k-rule-ink: #14201B;
+
+  --k-signal:      #A83A58;
+  --k-signal-wash: #F4E3E8;
+
+  --k-link-blue:       #0E7A5F;
+  --k-link-blue-hover: #0A6149;
+
+  --k-black:#14201B; --k-gray-900:#26332D; --k-gray-700:#4F5F57; --k-gray-500:#5B6A62;
+  --k-gray-300:#CBD5CC; --k-gray-100:#E4EAE3; --k-gray-50:#F3F5F1; --k-red:#A83A58; --k-red-dark:#8E2F49;
+
+  --f-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --f-body:    'Source Sans 3', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --f-ui:      'Source Sans 3', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+
+  --k-radius:    8px;
+  --k-radius-sm: 4px;
+  --k-max-w:     1160px;
+}
+
+/* ── Tipografi ──────────────────────────────────────────────────── */
+body { font-size: 17px; line-height: 1.6; }
+h1, h2, h3, h4, h5, h6, .entry-title, .widget-title {
+  font-family: var(--f-display) !important;
+  font-weight: 800 !important;
+  text-transform: none !important;
+  letter-spacing: -0.01em !important;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+p, li { text-wrap: pretty; }
+.single-post .entry-content p,
+.single-post .entry-content li {
+  font-size: 18px; line-height: 1.7;
+}
+.single-post .entry-content p:not([style*="text-transform:uppercase"]):not([style*="font-weight:900"]),
+.single-post .entry-content li:not([style*="text-transform:uppercase"]):not([style*="font-weight:900"]) {
+  font-weight: 400 !important;
+}
+.single-post .entry-content h1,
+.single-post .entry-content h2,
+.single-post .entry-content h3,
+.single-post .entry-content h4 {
+  font-family: var(--f-display) !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.01em !important;
+}
+.single-post .entry-content h2 { font-size: 30px !important; line-height: 1.15 !important; }
+.single-post .entry-content h3 { font-size: 23px !important; line-height: 1.2 !important; }
+.single-post .entry-content h4 { font-size: 19px !important; }
+@media (max-width: 600px) {
+  .single-post .entry-content p, .single-post .entry-content li { font-size: 17px; }
+  .single-post .entry-content h2 { font-size: 25px !important; }
+  .single-post .entry-content h3 { font-size: 20px !important; }
+}
+.entry-content ul li, .entry-content ol li { font-size: 18px; }
+
+/* Satır içi stil taşıyan eski banner / başlık metinleri */
+.entry-content [style*="Barlow Condensed"],
+.entry-content [style*="Barlow"] { font-family: var(--f-display) !important; }
+.entry-content p[style*="text-transform:uppercase"] {
+  font-family: var(--f-ui) !important;
+  letter-spacing: .12em !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+}
+.entry-content [style*="color:#E4442B"], .entry-content [style*="color: #E4442B"] { color: var(--k-signal) !important; }
+
+/* ── Bağlantılar: yeşil, altı çizili ─────────────────────────────── */
+a { color: var(--k-ink-2) !important; }
+.single-post .entry-content a:not(.wp-block-button__link):not(.k-buybox__link) {
+  color: var(--k-green) !important;
+  text-decoration-color: var(--k-green) !important;
+  text-decoration-thickness: 1.5px;
+  font-weight: 600;
+}
+.single-post .entry-content a:not(.wp-block-button__link):not(.k-buybox__link):hover {
+  color: var(--k-green-dk) !important;
+  text-decoration-color: var(--k-green-dk) !important;
+}
+.single-post .entry-content p a[rel~="noopener"],
+.single-post .entry-content li a[rel~="noopener"] {
+  color: var(--k-green) !important;
+  text-decoration-color: var(--k-green) !important;
+}
+.single-post .entry-content p a[rel~="noopener"]:hover,
+.single-post .entry-content li a[rel~="noopener"]:hover {
+  color: var(--k-green-dk) !important;
+  background: rgba(14,122,95,.08) !important;
+}
+:focus-visible { outline: 3px solid #2F6BFF; outline-offset: 2px; }
+
+/* ── Üst bilgi (header) ─────────────────────────────────────────── */
+header[data-id="type-1"], .ct-header, .ct-header[data-id="type-1"] {
+  border-bottom: 1px solid var(--k-rule) !important;
+}
+.ct-header nav > ul > li > a,
+header .menu > li > a,
+.ct-header .ct-menu > li > a {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  padding: 8px 14px !important;
+  margin: 0 2px !important;
+}
+.ct-header nav > ul > li > a::after,
+.ct-header .ct-menu > li > a::after { background: var(--k-green); left: 14px; }
+.ct-header nav > ul > li > a:hover::after,
+.ct-header .ct-menu > li > a:hover::after { width: calc(100% - 28px); }
+.ct-header nav > ul > li > a:hover,
+.ct-header .ct-menu > li > a:hover { background: var(--k-paper-2) !important; }
+.ct-mobile-overlay nav a:hover, .ct-panel nav a:hover { background: var(--k-paper-2) !important; }
+.ct-mobile-overlay nav a, .ct-panel nav a, .ct-drawer nav a,
+.ct-mobile-overlay .menu-item a, .ct-panel .menu-item a {
+  font-size: 18px !important; min-height: 48px; display: flex !important; align-items: center;
+}
+
+/* ── Düğmeler: açık zeminde yeşil, beyaz yazı ───────────────────── */
+body .wp-block-button__link,
+body .entry-content .wp-block-button__link,
+body .wp-block-button > .wp-block-button__link,
+.wp-block-button__link,
+button[type="submit"]:not(.ct-toggle-close):not([data-button]):not(.wp-element-button),
+input[type="submit"],
+.ff-btn-submit {
+  background: var(--k-green) !important;
+  color: #fff !important;
+  font-family: var(--f-ui) !important;
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  border-radius: var(--k-radius) !important;
+  padding: 13px 26px !important;
+  min-height: 48px;
+  transform: none !important;
+  box-shadow: none !important;
+  transition: background var(--dur) var(--ease) !important;
+}
+body .wp-block-button__link:hover,
+body .entry-content .wp-block-button__link:hover,
+.wp-block-button__link:hover,
+button[type="submit"]:not(.ct-toggle-close):not([data-button]):not(.wp-element-button):hover,
+input[type="submit"]:hover,
+.ff-btn-submit:hover {
+  background: var(--k-green-dk) !important;
+  color: #fff !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+button:active, .wp-block-button__link:active { transform: translateY(1px) !important; }
+.ff-el-form-control:focus { box-shadow: 0 0 0 3px rgba(14,122,95,.18) !important; border-color: var(--k-green) !important; }
+input:focus, select:focus, textarea:focus { border-color: var(--k-green) !important; box-shadow: 0 0 0 3px rgba(14,122,95,.18) !important; }
+input[type="text"], input[type="email"], input[type="tel"], input[type="url"], input[type="search"], input[type="password"], select, textarea { font-size: 16px !important; min-height: 48px; }
+
+/* ── Etiket ve çipler: bordo yazı ───────────────────────────────── */
+.k-tag {
+  background: transparent; color: var(--k-signal);
+  padding: 0; border-radius: 0;
+  font-weight: 700; font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+}
+.k-post-cat, .chip {
+  border: none !important; background: transparent !important; color: var(--k-signal) !important;
+  padding: 0; font-size: 12px; font-weight: 700; letter-spacing: .08em; border-radius: 0;
+}
+.k-post-cat:hover, .chip:hover { background: transparent !important; text-decoration: underline !important; }
+
+/* ── Gövde bileşenleri ──────────────────────────────────────────── */
+.entry-content .wp-block-quote, .single-post .entry-content blockquote { border-left: 4px solid var(--k-green) !important; }
+.entry-content .wp-block-separator { background: var(--k-rule) !important; height: 2px !important; margin: 2.2rem 0 !important; }
+.entry-content .wp-block-group[style*="background:#FFF6B8"],
+.entry-content .wp-block-group[style*="background: #FFF6B8"] {
+  background: var(--k-paper-2) !important;
+  border-left: 6px solid var(--k-green) !important;
+  padding: 1.5rem 1.8rem !important;
+  margin-bottom: 1.6rem !important;
+}
+.entry-content .wp-block-group[style*="background:#FFF6B8"] h1 {
+  font-family: var(--f-display) !important;
+  font-weight: 800 !important;
+  font-size: clamp(1.9rem, 4.2vw, 3rem) !important;
+  letter-spacing: -.015em !important;
+  line-height: 1.08 !important;
+}
+.entry-content .wp-block-group[style*="background:#FFF6B8"] p { font-size: 1.05rem !important; color: var(--k-ink-3) !important; font-style: normal !important; }
+.entry-content .wp-block-group[style*="background:#FFF6B8"] p:first-child { color: var(--k-signal) !important; }
+/* Satın alma kutusu: koyu zemin, fosfor düğme */
+.entry-content .wp-block-group[style*="background:#17141A"],
+.k-buy-box { background: var(--k-ink) !important; border-radius: 12px !important; }
+.entry-content .wp-block-group[style*="background:#17141A"] p:first-child { font-family: var(--f-ui) !important; letter-spacing: .14em; font-size: 12px !important; }
+html body .entry-content p.k-buybox__product { font-family: var(--f-display) !important; font-weight: 800 !important; font-size: 1.5rem !important; text-transform: none !important; letter-spacing: -.01em !important; color: var(--k-lime) !important; }
+.entry-content [style*="background:#FFD600"] { background: var(--k-lime) !important; color: var(--k-ink) !important; border-radius: var(--k-radius) !important; font-weight: 800 !important; }
+.k-buy-box .wp-block-button__link,
+.entry-content .wp-block-group[style*="background:#17141A"] .wp-block-button__link { background: var(--k-lime) !important; color: var(--k-ink) !important; }
+.k-buy-box .wp-block-button__link:hover,
+.entry-content .wp-block-group[style*="background:#17141A"] .wp-block-button__link:hover { background: var(--k-lime-dim) !important; color: var(--k-ink) !important; }
+html body .single-post .entry-content a.k-buybox__link:hover .k-buybox__product { color: #fff !important; }
+
+/* ── Alt bilgi (footer) renkleri ────────────────────────────────── */
+footer.ct-footer::before, .ct-footer::before { background: var(--k-green); height: 3px; }
+.ct-footer a, footer a { background-image: linear-gradient(var(--k-lime), var(--k-lime)) !important; }
+footer, footer *, .ct-footer *, .ct-footer { color: #E8EFEA; }
+footer h4, .ct-footer h4, footer .widget-title, .ct-footer .widget-title { text-transform: none !important; letter-spacing: 0 !important; font-size: 16px !important; color: #fff !important; }
+
+/* ── Çerez bandı, bülten kutusu, 404, toast ─────────────────────── */
+html body .idk-cerez { border-left: 6px solid var(--k-lime); }
+html body .idk-cerez .idk-cerez__metin a { color: var(--k-lime) !important; }
+html body .idk-cerez .idk-cerez__btn--birincil { background: var(--k-lime); border-color: var(--k-lime); color: var(--k-ink); }
+html body .idk-404 .idk-404__btn { background: var(--k-green); color: #fff; }
+html body .idk-bulten { border-top: 4px solid var(--k-lime); }
+html body .idk-bulten .idk-bulten__etiket { color: var(--k-lime) !important; }
+html body .idk-bulten .idk-bulten__metin a, html body .idk-bulten .idk-bulten__onay a { color: var(--k-lime) !important; }
+html body .idk-bulten .idk-bulten__dugme { background: var(--k-lime); color: var(--k-ink); }
+html body .entry-content .k-card--dark .k-card__btn { background-color: var(--k-lime) !important; color: var(--k-ink) !important; }
+html body .entry-content .k-card--light .k-card__btn { color: var(--k-lime) !important; }
+.k-form-msg.k-msg-error, .k-unsub-msg.error, .k-toast--error { background: var(--k-signal); border-color: var(--k-signal); }
+.k-toast--success { color: var(--k-lime); }
+
+/* ── Ana sayfa: mevcut sınıfların renk ve yazı düzeltmeleri (düzen ayrı) ── */
+.k-post-card__title { text-transform: none !important; font-size: 21px !important; line-height: 1.15 !important; letter-spacing: -.01em; }
+.k-post-card--hero .k-post-card__title { font-size: 30px !important; }
+.k-post-card__title a { background-image: linear-gradient(var(--k-green), var(--k-green)) !important; background-size: 0% 3px !important; }
+.k-post-card:hover .k-post-card__title a { background-size: 100% 3px !important; }
+.k-post-card__excerpt { font-size: 16px !important; }
+.k-post-card__date { font-size: 13px; }
+.k-post-card__read { font-size: 14px !important; letter-spacing: 0 !important; text-transform: none !important; font-weight: 700 !important; color: var(--k-green) !important; border-bottom: none; }
+.k-section-title { font-size: 28px !important; text-transform: none !important; letter-spacing: -.01em !important; }
+.k-section-more { font-size: 14px !important; letter-spacing: 0 !important; text-transform: none !important; }
+.k-btn-outline { font-size: 15px !important; letter-spacing: 0 !important; text-transform: none !important; }
+
+/* Hero abone düğmesi koyu zeminde fosfor (genel düğme kuralından muaf) */
+html body button.k-subscribe-btn { background: var(--k-lime) !important; color: var(--k-ink) !important; }
+html body button.k-subscribe-btn:hover { background: var(--k-lime-dim) !important; }
