@@ -2699,4 +2699,81 @@ html body .entry-content .k-card--light .k-card__btn { color: var(--k-lime) !imp
 /* Hero abone düğmesi koyu zeminde fosfor (genel düğme kuralından muaf) */
 html body button.k-subscribe-btn { background: var(--k-lime) !important; color: var(--k-ink) !important; }
 html body button.k-subscribe-btn:hover { background: var(--k-lime-dim) !important; }
+
+/* =====================================================================
+   ANA SAYFA — tek satırlık abone şeridi + 1 manşet / 3 liste / 6 kart
+   ===================================================================== */
+.idk-serit { background: var(--k-paper-2); border-bottom: 1px solid var(--k-rule); padding: 28px 0; }
+.idk-serit__ic { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,1fr); gap: 20px 40px; align-items: center; }
+.idk-serit__baslik { font-size: clamp(1.7rem, 3.1vw, 2.5rem) !important; margin: 0 0 8px !important; color: var(--k-ink) !important; }
+.idk-serit__baslik mark { background: var(--k-lime); color: var(--k-ink); padding: 0 .14em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.idk-serit__alt { margin: 0 !important; font-size: 17px !important; color: var(--k-ink-3) !important; max-width: 52ch; }
+.idk-serit .k-subscribe-form { max-width: none; margin: 0; }
+.idk-serit .k-form-row { background: #fff; border: 1px solid var(--k-rule); border-radius: 10px; padding: 5px; margin-bottom: 10px; flex-direction: row; }
+.idk-serit .k-form-row:focus-within { border-color: var(--k-green); box-shadow: 0 0 0 3px rgba(14,122,95,.16); }
+.idk-serit .k-email-input { color: var(--k-ink) !important; padding: 12px 14px !important; min-height: 48px; }
+.idk-serit .k-email-input::placeholder { color: var(--k-ink-4) !important; }
+.idk-serit .k-autocomplete { padding: 12px 14px; }
+.idk-serit .k-autocomplete__suggest { color: rgba(20,32,27,.35); }
+html body .idk-serit button.k-subscribe-btn { background: var(--k-green) !important; color: #fff !important; font-size: 16px !important; letter-spacing: 0 !important; text-transform: none !important; padding: 0 22px !important; min-height: 48px; border-radius: 8px !important; width: auto !important; }
+html body .idk-serit button.k-subscribe-btn:hover { background: var(--k-green-dk) !important; transform: none !important; }
+.idk-serit .k-consent-row { margin: 0; }
+.idk-serit .k-consent-checkbox { width: 18px !important; height: 18px !important; accent-color: var(--k-green) !important; border-color: var(--k-ink-4) !important; }
+.idk-serit .k-consent-text { color: var(--k-ink-3) !important; font-size: 13px !important; letter-spacing: 0 !important; line-height: 1.45 !important; }
+.idk-serit .k-consent-text a { color: var(--k-green) !important; font-weight: 600; }
+.idk-serit .k-form-msg.k-msg-success { background: #fff; color: var(--k-ink) !important; border-color: var(--k-green); }
+
+.k-posts-section { padding: 36px 0 56px; }
+.k-container { max-width: var(--k-max-w); padding: 0 24px; }
+.k-section-head { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--k-rule); }
+
+.idk-izgara { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.idk-kart { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--k-rule); border-radius: var(--k-radius); overflow: hidden; min-width: 0; }
+.idk-kart a { text-decoration: none !important; background: none !important; background-image: none !important; }
+.idk-kart__gorsel { display: block; aspect-ratio: 16 / 9; background: var(--k-paper-3); overflow: hidden; }
+.idk-kart__img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.idk-kart__img--bos { background: var(--k-paper-3); }
+.idk-kart__govde { padding: 14px 16px 18px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.idk-kart__ust { margin: 0 !important; display: flex; gap: 10px; align-items: baseline; font-size: 13px; color: var(--k-ink-4) !important; }
+.idk-kart__ust .k-tag { font-size: 12px; }
+.idk-kart__baslik { margin: 0 !important; font-size: 19px !important; line-height: 1.2 !important; }
+.idk-kart__baslik a { color: var(--k-ink) !important; }
+.idk-kart:hover .idk-kart__baslik a { text-decoration: underline !important; text-decoration-color: var(--k-green); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.idk-kart__ozet { margin: 4px 0 0 !important; font-size: 17px !important; color: var(--k-ink-3) !important; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.idk-kart__oku { margin-top: auto; font-weight: 700; color: var(--k-green) !important; font-size: 16px; padding-top: 6px; }
+
+/* Manşet: iki sütun, üç satır; sağda üç liste satırı yüksekliği doldurur */
+.idk-kart--manset { grid-column: 1 / span 2; grid-row: 1 / span 3; }
+.idk-kart--manset .idk-kart__gorsel { flex: 1; aspect-ratio: auto; min-height: 220px; }
+.idk-kart--manset .idk-kart__baslik { font-size: 30px !important; }
+.idk-kart--liste { grid-column: 3; flex-direction: row; align-items: stretch; }
+.idk-kart--liste .idk-kart__gorsel { flex: 0 0 38%; aspect-ratio: auto; }
+.idk-kart--liste .idk-kart__govde { padding: 12px 14px; justify-content: center; }
+.idk-kart--liste .idk-kart__baslik { font-size: 16px !important; }
+.idk-kart--liste .idk-kart__ust time { display: none; }
+
+@media (max-width: 899px) {
+  .idk-serit__ic { grid-template-columns: minmax(0,1fr); }
+  .idk-izgara { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .idk-kart--manset { grid-column: 1 / -1; grid-row: auto; }
+  .idk-kart--manset .idk-kart__gorsel { aspect-ratio: 16 / 9; flex: none; min-height: 0; }
+  .idk-kart--liste { grid-column: 1 / -1; }
+  .idk-kart--liste .idk-kart__gorsel { flex-basis: 30%; min-height: 110px; }
+}
+@media (max-width: 599px) {
+  .idk-serit { padding: 18px 0; }
+  .idk-serit__baslik { font-size: 1.65rem !important; }
+  .idk-serit__alt { font-size: 16px !important; }
+  .k-container { padding: 0 16px; }
+  .k-posts-section { padding-top: 24px; }
+  .idk-izgara { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .idk-kart--manset .idk-kart__baslik { font-size: 24px !important; }
+  /* kartlar telefonda yatay satır: sol görsel, sağ başlık */
+  .idk-kart--kart { flex-direction: row; align-items: stretch; }
+  .idk-kart--kart .idk-kart__gorsel, .idk-kart--liste .idk-kart__gorsel { flex: 0 0 34%; aspect-ratio: auto; min-height: 104px; }
+  .idk-kart--kart .idk-kart__govde, .idk-kart--liste .idk-kart__govde { padding: 10px 12px; justify-content: center; }
+  .idk-kart--kart .idk-kart__baslik, .idk-kart--liste .idk-kart__baslik { font-size: 16.5px !important; }
+  .idk-kart--kart .idk-kart__ust time { display: none; }
+  .k-posts-more { margin-top: 24px; }
+}
 /* <<< TASARIM-B */
