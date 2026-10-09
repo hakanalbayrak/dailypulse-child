@@ -23,6 +23,7 @@ require_once DAILYPULSE_DIR . '/inc/sayfa-onbellek.php';
 require_once DAILYPULSE_DIR . '/inc/webp.php';
 require_once DAILYPULSE_DIR . '/inc/alt-bilgi.php';
 require_once DAILYPULSE_DIR . '/inc/yazi-duzeni.php';
+require_once DAILYPULSE_DIR . '/inc/kritik-css.php';
 
 
 /**
@@ -1251,7 +1252,7 @@ add_action('rest_api_init', function () {
             'action' => [
                 'required' => true,
                 'type'     => 'string',
-                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id', 'set_adsense_id', 'indexnow_hepsi', 'litespeed_oku', 'litespeed_cache_ac', 'litespeed_cache_kapat', 'onbellek_kapat', 'onbellek_ac', 'onbellek_durum', 'webp_uret', 'css_inline_ac', 'css_inline_kapat', 'smtp_oku', 'smtp_ayrinti', 'form_bildirim_oku', 'form_bildirim_ayarla', 'smtp_varsayilan', 'form_bildirim_ekle'],
+                'enum'     => ['diagnose', 'fix_litespeed_qs', 'list_updates', 'update_plugins', 'seo_diagnose', 'purge_cache_now', 'test_email', 'theme_mods_marka', 'set_analytics_id', 'set_adsense_id', 'indexnow_hepsi', 'litespeed_oku', 'litespeed_cache_ac', 'litespeed_cache_kapat', 'onbellek_kapat', 'onbellek_ac', 'onbellek_durum', 'webp_uret', 'smtp_oku', 'smtp_ayrinti', 'form_bildirim_oku', 'form_bildirim_ayarla', 'smtp_varsayilan', 'form_bildirim_ekle'],
             ],
         ],
     ]);
@@ -1417,10 +1418,6 @@ function kampanya_maintenance(WP_REST_Request $request) {
             @unlink($d . '/KAPALI');
         }
         return ['silinen' => Idk_Onbellek::temizle(), 'kapali' => Idk_Onbellek::kapali()];
-    }
-    if ($action === 'css_inline_ac' || $action === 'css_inline_kapat') {
-        update_option('idk_kritik_css', $action === 'css_inline_ac' ? '1' : '0');
-        return ['silinen' => Idk_Onbellek::temizle(), 'kritik_css' => get_option('idk_kritik_css')];
     }
     if ($action === 'smtp_oku') {
         // Salt okunur ve gizli bilgisiz: FluentSMTP bağlantılarının sağlayıcısı ve gönderen adresi.

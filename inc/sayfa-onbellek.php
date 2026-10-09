@@ -43,60 +43,6 @@ add_action('template_redirect', function () {
         return;
     }
     ob_start(function ($html) {
-        return Idk_Onbellek::kaydet(idk_css_satir_ici($html));
+        return Idk_Onbellek::kaydet($html);
     });
 }, 0);
-
-/**
- * Kritik CSS: ekranın üstünü boyamak için gereken kurallar (scripts/kritik-css.mjs üretir, sayfa türüne
- * göre assets/css/kritik-*.css) HTML'ye gömülür; tam stil dosyaları ilk boyamadan SONRA yüklenir
- * (media=print → all). Yalnızca anonim/önbellekli sayfalarda; kritik dosya yoksa hiçbir şey değişmez.
- */
-function idk_css_satir_ici($html)
-{
-    // Varsayılan KAPALI (PageSpeed'de yerleşim kaymasına yol açtı); yalnızca idk_kritik_css=1 ise çalışır.
-    if (get_option('idk_kritik_css', '0') !== '1') {
-        return $html;
-    }
-    $tip = is_front_page() ? 'anasayfa' : (is_singular('post') ? 'yazi' : (is_page() ? 'sayfa' : 'arsiv'));
-    $dosya = get_stylesheet_directory() . '/assets/css/kritik-' . $tip . '.css';
-    $kritik = is_file($dosya) ? trim((string) file_get_contents($dosya)) : '';
-    // Kritik CSS sayfaya gömülünce göreli url(../fonts/...) sayfa adresine göre çözülüp 404 verir; mutlak yap.
-    $kritik = preg_replace('#url\((["\']?)\.\./#', 'url($1' . get_stylesheet_directory_uri() . '/assets/', $kritik);
-    if ($kritik === '') {
-        return $html;
-    }
-    $kimlikler = ['blocksy-dynamic-global-css', 'dailypulse-custom-css', 'ct-main-styles-css', 'ct-page-title-styles-css'];
-    $parcalar = preg_split('#(<noscript>.*?</noscript>)#s', $html, -1, PREG_SPLIT_DELIM_CAPTURE);
-    $eklendi = false;
-    $adresler = [];
-    foreach ($parcalar as $i => $p) {
-        if ($i % 2 === 1) {
-            continue;
-        }
-        foreach ($kimlikler as $k) {
-            $p = preg_replace_callback(
-                "#<link rel='stylesheet' id='(" . preg_quote($k, '#') . ")' href='([^']+)' media='all' />#",
-                function ($m) use (&$eklendi, &$adresler, $kritik) {
-                    $once = '';
-                    if (!$eklendi) {
-                        $eklendi = true;
-                        $once = '<style id="idk-kritik">' . str_replace('</style', '<\\/style', $kritik) . "</style>\n";
-                    }
-                    $adresler[] = html_entity_decode($m[2]);
-                    return $once . "<noscript><link rel='stylesheet' id='" . $m[1] . "-ns' href='" . $m[2] . "' media='all' /></noscript>";
-                },
-                $p
-            );
-        }
-        $parcalar[$i] = $p;
-    }
-    $html = implode('', $parcalar);
-    if ($adresler) {
-        // Tam stil dosyaları sayfa yüklendikten ~1 sn sonra, sırayla (kritik CSS ilk ekranı zaten boyadı).
-        $js = '<script>addEventListener("load",function(){setTimeout(function(){' . wp_json_encode($adresler, JSON_UNESCAPED_SLASHES)
-            . '.forEach(function(u){var l=document.createElement("link");l.rel="stylesheet";l.href=u;document.head.appendChild(l)})},1000)})</script>';
-        $html = preg_replace('#</head>#', $js . "\n</head>", $html, 1);
-    }
-    return $html;
-}
