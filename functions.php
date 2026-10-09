@@ -24,6 +24,7 @@ require_once DAILYPULSE_DIR . '/inc/webp.php';
 require_once DAILYPULSE_DIR . '/inc/alt-bilgi.php';
 require_once DAILYPULSE_DIR . '/inc/yazi-duzeni.php';
 require_once DAILYPULSE_DIR . '/inc/kritik-css.php';
+require_once DAILYPULSE_DIR . '/inc/lcp-onyukle.php';
 
 
 /**
