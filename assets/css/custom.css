@@ -2955,4 +2955,12 @@ html body .idk-404 .idk-404__baslik { font-weight: 800; font-size: clamp(2rem, 4
 .entry-content .wp-block-group[style*="background-color:#f8f9fa"] { background: #fff !important; border: 1px solid var(--k-rule); border-radius: var(--k-radius) !important; }
 .entry-content .wp-block-group[style*="background-color:#f8f9fa"] p { font-size: 17px !important; }
 .page .entry-content h2.wp-block-heading { font-size: clamp(1.6rem, 3vw, 2rem) !important; }
+
+/* Turnstile korunur; doğrulama kutusu ile gönder düğmesi masaüstünde yan yana (boşluk kalkar) */
+@media (min-width: 640px) {
+  .fluentform fieldset { display: grid; grid-template-columns: minmax(0, max-content) minmax(0, 1fr); gap: 0 16px; align-items: center; }
+  .fluentform fieldset > * { grid-column: 1 / -1; }
+  .fluentform fieldset > .ff-el-group:has(.cf-turnstile) { grid-column: 1; margin-bottom: 0; }
+  .fluentform fieldset > .ff_submit_btn_wrapper { grid-column: 2; margin-bottom: 0; }
+}
 /* <<< TASARIM-B */
