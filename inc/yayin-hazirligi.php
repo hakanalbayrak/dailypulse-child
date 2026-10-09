@@ -242,7 +242,7 @@ add_action('wp_footer', function () {
         ? 'Bu site, çalışması için gerekli çerezleri kullanır. İzin verirseniz ziyaretçi sayısını anlamak ve reklam göstermek için analitik ve reklam çerezlerini de kullanırız.'
         : 'Bu site, çalışması için gerekli çerezleri kullanır. İzin verirseniz ziyaretçi sayısını anlamak için analitik çerezleri de kullanırız.';
     ?>
-<div id="idk-cerez" class="idk-cerez" role="region" aria-label="Çerez tercihi" hidden>
+<div id="idk-cerez" class="idk-cerez" role="region" aria-label="Çerez tercihi">
   <p class="idk-cerez__metin"><?php echo esc_html($metin); ?> Ayrıntılar: <a href="<?php echo esc_url(home_url('/cerez-politikasi/')); ?>">Çerez Politikası</a></p>
   <div class="idk-cerez__dugmeler">
     <button type="button" class="idk-cerez__btn" data-idk-cerez="reddet">Reddet</button>
@@ -279,17 +279,18 @@ add_action('wp_footer', function () {
     document.head.appendChild(s);
   }
   var secim = oku();
-  if (secim === 'kabul') { analitik(); reklam(); } else if (secim !== 'reddet') { kutu.hidden = false; }
+  // Banner HTML'de görünür gelir (LCP'yi geciktirmesin); karar verilmişse head'deki betik sınıfla gizler.
+  if (secim === 'kabul') { analitik(); reklam(); kutu.hidden = true; } else if (secim === 'reddet') { kutu.hidden = true; }
   kutu.addEventListener('click', function (e) {
     var b = e.target.closest('[data-idk-cerez]');
     if (!b) { return; }
     var v = b.getAttribute('data-idk-cerez');
-    yaz(v); kutu.hidden = true;
+    yaz(v); kutu.hidden = true; document.documentElement.classList.add('idk-cerez-tamam');
     if (v === 'kabul') { analitik(); reklam(); }
   });
   // Çerez politikasındaki "tercihleri değiştir" bağlantısı
   document.addEventListener('click', function (e) {
-    if (e.target.closest('[data-idk-cerez-ac]')) { e.preventDefault(); kutu.hidden = false; }
+    if (e.target.closest('[data-idk-cerez-ac]')) { e.preventDefault(); document.documentElement.classList.remove('idk-cerez-tamam'); kutu.hidden = false; }
   });
 })();
 </script>
@@ -611,3 +612,10 @@ foreach (['analytics-4', 'adsense', 'ads', 'tagmanager'] as $idk_modul) {
 }
 
 
+
+
+// Çerez kararı verilmişse banner'ı ilk boyamadan ÖNCE gizle (banner artık HTML'de görünür gelir).
+add_action('wp_head', function () {
+    if (is_admin() || is_feed() || is_embed()) { return; }
+    echo "<script>try{var v=localStorage.getItem('idk_cerez');if(!v){var m=document.cookie.match(/(?:^|; )idk_cerez=([^;]+)/);v=m&&m[1]}if(v==='kabul'||v==='reddet')document.documentElement.classList.add('idk-cerez-tamam')}catch(e){}</script>\n";
+}, 1);

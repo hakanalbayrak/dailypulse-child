@@ -545,3 +545,6 @@ footer.idk-altbilgi a { min-height: 40px; }
 /* Turnstile alanı için yer ayır: geç yüklenince düğmeyi kaydırıp CLS yapmasın */
 .fluentform .ff-el-group:has(.cf-turnstile) { min-height: 65px; }
 .fluentform .cf-turnstile, .fluentform .ff-el-turnstile { min-height: 65px; min-width: 300px; }
+
+/* Çerez bandı HTML'de görünür gelir; karar verilmişse head betiği bu sınıfı ekler */
+html.idk-cerez-tamam body .idk-cerez { display: none; }
