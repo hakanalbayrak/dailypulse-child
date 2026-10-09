@@ -50,3 +50,16 @@ add_filter('the_content', function ($icerik) {
           . '<script>(function(){var d=document.querySelector(".idk-icindekiler details");if(d&&matchMedia("(min-width:1000px)").matches)d.open=true})()</script>';
     return '<div class="idk-yazi">' . $menu . '<div class="idk-yazi__govde">' . $icerik . '</div></div>';
 }, 99);
+
+/**
+ * Üst menüde açık sayfayı işaretle (aria-current): Blocksy özel bağlantılı menü öğelerinde
+ * current-menu-item sınıfını vermiyor; menü altı çizgisi ve ekran okuyucu için gerekli.
+ */
+add_filter('nav_menu_link_attributes', function ($atts, $item) {
+    $yol = untrailingslashit(wp_parse_url($item->url, PHP_URL_PATH) ?: '/');
+    $su  = untrailingslashit(wp_parse_url(home_url(add_query_arg([])), PHP_URL_PATH) ?: '/');
+    if ($yol === $su || (is_singular('post') === false && is_home() && $yol === untrailingslashit(wp_parse_url(get_permalink(get_option('page_for_posts')), PHP_URL_PATH)))) {
+        $atts['aria-current'] = 'page';
+    }
+    return $atts;
+}, 10, 2);
