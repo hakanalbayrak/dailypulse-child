@@ -476,3 +476,4 @@ a, button { -webkit-tap-highlight-color: rgba(14,122,95,.18); }
 .ct-header nav > ul > li > a:hover::after { transform: scaleX(1); width: auto !important; }
 .ct-header nav > ul > li > a:focus-visible { background: transparent !important; color: var(--k-green-dk) !important; }
 .ct-header nav > ul > li > a { min-height: 44px; display: inline-flex; align-items: center; }
+.ct-header nav > ul > li > a::after { opacity: 1 !important; }
