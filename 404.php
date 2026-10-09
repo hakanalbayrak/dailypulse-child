@@ -1,13 +1,13 @@
 <?php
 /**
- * 404 — sayfa bulunamadı.
+ * 404 — sayfa bulunamadı (Tasarım B, 2026-10-09).
  *
- * Blocksy'nin varsayılan 404'ü yarı İngilizceydi ("Oops! That page can't be
- * found"). Burada Türkçe, arama kutusu ve son rehberlerle: ziyaretçiyi
- * çıkmaz sokakta bırakmaz.
+ * Türkçe, arama kutusu, kategori çipleri ve son rehberler: ziyaretçiyi çıkmaz sokakta
+ * bırakmaz. Son rehberler listedeki kartlarla aynı ızgarada (inc/kartlar.php).
  *
  * @package DailyPulse
  */
+require_once get_stylesheet_directory() . '/inc/kartlar.php';
 get_header();
 
 $son = get_posts([
@@ -15,26 +15,33 @@ $son = get_posts([
     'post_status'  => 'publish',
     'post__not_in' => function_exists('idk_noindex_idler') ? idk_noindex_idler() : [],
 ]);
+$kats = get_categories(['orderby' => 'count', 'order' => 'DESC', 'hide_empty' => true, 'exclude' => [1], 'number' => 8]);
 ?>
-<div class="ct-container" data-vertical-spacing="top:bottom">
-  <section id="primary" class="content-area idk-404">
-    <main id="main" class="site-main">
-      <h1 class="idk-404__baslik">Aradığınız sayfa bulunamadı</h1>
-      <p class="idk-404__metin">Bağlantı değişmiş ya da sayfa kaldırılmış olabilir. Aşağıdan arayabilir ya da son rehberlere göz atabilirsiniz.</p>
-      <?php get_search_form(); ?>
-      <?php if ($son) : ?>
-        <h2 class="idk-404__alt">Son rehberler</h2>
-        <ul class="idk-404__liste">
-          <?php foreach ($son as $y) : ?>
-            <li><a href="<?php echo esc_url(get_permalink($y)); ?>"><?php echo esc_html(wp_strip_all_tags($y->post_title)); ?></a></li>
-          <?php endforeach; ?>
-        </ul>
-      <?php endif; ?>
-      <p class="idk-404__dugmeler">
-        <a class="idk-404__btn" href="<?php echo esc_url(home_url('/')); ?>">Ana sayfaya dön</a>
-        <a class="idk-404__link" href="<?php echo esc_url(home_url('/blog/')); ?>">Tüm rehberler</a>
-      </p>
-    </main>
-  </section>
-</div>
+<main id="idk-404" class="idk-liste idk-404">
+  <header class="idk-liste__bas">
+    <div class="k-container">
+      <p class="k-tag">404</p>
+      <h1 class="idk-liste__baslik idk-404__baslik">Aradığınız sayfa bulunamadı</h1>
+      <p class="idk-liste__alt">Bağlantı değişmiş ya da sayfa kaldırılmış olabilir. Aşağıdan arayabilir ya da bir kategoriden başlayabilirsiniz.</p>
+      <form role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>" class="idk-arama">
+        <label class="screen-reader-text" for="idk-ara-404">Ara</label>
+        <input type="search" id="idk-ara-404" name="s" placeholder="Ürün ya da konu ara" autocomplete="off">
+        <button type="submit">Ara</button>
+      </form>
+      <nav class="idk-cipler" aria-label="Kategoriler">
+        <?php foreach ($kats as $k) : ?>
+          <a href="<?php echo esc_url(get_category_link($k)); ?>" class="idk-cip"><?php echo esc_html($k->name); ?></a>
+        <?php endforeach; ?>
+      </nav>
+    </div>
+  </header>
+  <?php if ($son) : ?>
+  <div class="k-container idk-liste__ic">
+    <div class="k-section-head"><h2 class="k-section-title">Son rehberler</h2><a href="<?php echo esc_url(home_url('/blog/')); ?>" class="k-section-more">Tümünü gör →</a></div>
+    <div class="idk-izgara idk-izgara--liste">
+      <?php foreach ($son as $y) { idk_ana_kart($y, 'kart'); } ?>
+    </div>
+  </div>
+  <?php endif; ?>
+</main>
 <?php get_footer();
