@@ -48,7 +48,7 @@ $blog    = get_permalink(get_option('page_for_posts'));
   <div class="k-container idk-liste__ic">
     <?php if (have_posts()) : ?>
       <div class="idk-izgara idk-izgara--liste">
-        <?php $i = 0; while (have_posts()) : the_post(); idk_ana_kart(get_post(), 'kart', $i === 0 && !is_paged()); $i++; endwhile; ?>
+        <?php $i = 0; while (have_posts()) : the_post(); idk_ana_kart(get_post(), 'kart', $i === 0 && !is_paged(), 'h2'); $i++; endwhile; ?>
       </div>
       <?php the_posts_pagination(['mid_size' => 1, 'prev_text' => '← Önceki', 'next_text' => 'Sonraki →', 'screen_reader_text' => 'Sayfalar']); ?>
     <?php else : ?>
