@@ -480,7 +480,7 @@ add_filter('style_loader_tag', function ($tag, $handle) {
 // Ana sayfa, liste (blog/kategori/arama) ve 404 şablonları blok içeriği basmaz ve kenar çubuğu yoktur:
 // WP blok kütüphanesi + global-styles (~27 KB satır içi) ile Blocksy sidebar.css boşuna render'ı geciktiriyordu.
 // Makale ve sayfalarda dokunulmaz (içerik blok kullanır).
-add_action('wp_enqueue_scripts', function () {
+function idk_liste_stilleri_temizle() {
     if (is_admin() || !(is_front_page() || is_home() || is_archive() || is_search() || is_404())
         || (function_exists('is_woocommerce') && is_woocommerce())) {
         return;
@@ -489,7 +489,11 @@ add_action('wp_enqueue_scripts', function () {
               'wp-block-heading', 'wp-block-paragraph', 'wp-block-columns', 'wp-block-group'] as $h) {
         wp_dequeue_style($h);
     }
-}, 100);
+}
+add_action('wp_enqueue_scripts', 'idk_liste_stilleri_temizle', 100);
+// Bazı çekirdek stilleri (global-styles, blok başına satır içi) bundan sonra kuyruğa girer; basılmadan hemen önce tekrar temizle.
+add_action('wp_head', 'idk_liste_stilleri_temizle', 7);
+add_action('wp_footer', 'idk_liste_stilleri_temizle', 0);
 
 // jQuery <head>'de render'ı engelliyordu (~150 ms). Footer'a alınır; WordPress bağımlılık
 // sırasını korur, yani jQuery isteyen betikler hâlâ ondan SONRA çalışır. Başlıkta jQuery'yi
