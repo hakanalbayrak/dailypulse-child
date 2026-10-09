@@ -2890,4 +2890,18 @@ a, button { -webkit-tap-highlight-color: rgba(14,122,95,.18); }
 .k-logo-svg { height: 44px !important; width: auto !important; }
 @media (max-width: 900px) { .k-logo-svg { height: 38px !important; } }
 @media (max-width: 600px) { .k-logo-svg { height: 32px !important; } }
+
+/* Menü hover: A — alt çizgi çizilir, zemin dolmaz; açık sayfada çizgi sürekli */
+.ct-header nav > ul > li > a:hover, .ct-header .ct-menu > li > a:hover,
+.ct-header .ct-menu > li > a:focus-visible { background: transparent !important; color: var(--k-green-dk) !important; }
+.ct-header nav > ul > li > a::after, .ct-header .ct-menu > li > a::after {
+  left: 14px; right: 14px; bottom: 6px; width: auto !important; height: 2px;
+  transform: scaleX(0); transform-origin: left; transition: transform .18s ease !important;
+}
+.ct-header nav > ul > li > a:hover::after, .ct-header .ct-menu > li > a:hover::after,
+.ct-header .ct-menu > li > a:focus-visible::after,
+.ct-header .ct-menu > li.current-menu-item > a::after,
+.ct-header .ct-menu > li.current_page_item > a::after,
+.ct-header .ct-menu > li > a[aria-current="page"]::after { transform: scaleX(1); width: auto !important; }
+.ct-header .ct-menu > li > a { min-height: 44px; display: inline-flex; align-items: center; }
 /* <<< TASARIM-B */
