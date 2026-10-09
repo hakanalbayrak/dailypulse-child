@@ -524,18 +524,18 @@ add_action('wp_enqueue_scripts', function () {
     }
 }, 1);
 
-// jQuery ve ona bağlı betikler (Fluent Forms gönderimi) gövdenin sonunda AYRIŞTIRICIYI bekletiyordu; ilk boyama
-// bu betiklerin indirilmesinden sonraya denk gelirse Lighthouse onları kritik yola sayıyor (Hakkımızda/İletişim: ~1 sn).
-// defer: belge sırası korunur, DOMContentLoaded'dan önce çalışır. Bu betiklere ait satır içi parçalar yalnızca
-// `-extra` veri tanımlarıdır (önce çalışması yeterli); jQuery'yi doğrudan çağıran satır içi betik eklenirse bu kural gözden geçirilmeli.
-add_filter('script_loader_tag', function ($tag, $handle) {
-    if (is_admin() || is_customize_preview() || strpos($tag, ' src=') === false || preg_match('/\s(defer|async)[\s=>]/', $tag)) {
-        return $tag;
-    }
+// jQuery ve ona bağlı betikler (Fluent Forms) İLK BOYAMADAN SONRA yüklenir. Neden: Fluent, Turnstile'ı jQuery hazır
+// olunca çiziyor ve Turnstile ayrı süreçte bir iframe açıyor; Chrome ana sayfanın ilk karesini iframe'in ilk karesine
+// kadar tutabiliyor. İframe boyamadan hemen ÖNCE oluşursa FCP ~0,6 sn yerine ~1,5 sn oluyor (Hakkımızda: skor 72 / 99
+// arasında dalgalanıyordu). Boyamayı bekleyince yarış ortadan kalkar; form ~0,1 sn sonra etkinleşir.
+// Turnstile api.js'e defer/async EKLENMEZ (Cloudflare: turnstile.ready() reddeder) ve yerinde kalır; Fluent onu jQuery
+// hazır olunca zaten görüyor. Bu betiklere ait satır içi parçalar yalnızca `-extra` veri tanımlarıdır; jQuery'yi
+// doğrudan çağıran satır içi betik eklenirse bu kural gözden geçirilmeli.
+function idk_gecikmeli_kume()
+{
     static $kume = null;
     if ($kume === null) {
         $w = wp_scripts();
-        // Turnstile api.js'e defer/async EKLENMEZ (Cloudflare: turnstile.ready() bunu reddeder, widget çizilmez).
         $kume = ['jquery' => 1, 'jquery-core' => 1, 'jquery-migrate' => 1];
         do {
             $degisti = false;
@@ -547,8 +547,32 @@ add_filter('script_loader_tag', function ($tag, $handle) {
             }
         } while ($degisti);
     }
-    return isset($kume[$handle]) ? preg_replace('/<script\b/', '<script defer', $tag, 1) : $tag;
+    return $kume;
+}
+
+function idk_gecikmeli_acik()
+{
+    return !is_admin() && !is_user_logged_in() && !is_customize_preview() && !is_feed();
+}
+
+add_filter('script_loader_tag', function ($tag, $handle) {
+    if (!idk_gecikmeli_acik() || !isset(idk_gecikmeli_kume()[$handle]) || !preg_match('/\ssrc=([\'"])([^\'"]+)\1/', $tag, $m)) {
+        return $tag;
+    }
+    $GLOBALS['idk_gecikmeli_var'] = true;
+    return '<script type="idk/gec" id="' . esc_attr($handle) . '-js" data-src="' . esc_attr(html_entity_decode($m[2])) . '"></script>' . "\n";
 }, 10, 2);
+
+add_action('wp_footer', function () {
+    if (empty($GLOBALS['idk_gecikmeli_var'])) {
+        return;
+    }
+    echo '<script>(function(){var l=[].slice.call(document.querySelectorAll(\'script[type="idk/gec"]\'));if(!l.length)return;var s=0;'
+        . 'function y(){if(s)return;s=1;l.forEach(function(o){var n=document.createElement("script");n.src=o.getAttribute("data-src");n.async=false;n.id=o.id;document.head.appendChild(n)})}'
+        . 'try{new PerformanceObserver(function(e,ob){e.getEntries().forEach(function(x){if(x.name==="first-contentful-paint"){ob.disconnect();setTimeout(y,80)}})}).observe({type:"paint",buffered:true})}'
+        . 'catch(e){addEventListener("load",function(){setTimeout(y,200)})}'
+        . 'setTimeout(y,2500)})()</script>' . "\n";
+}, 100);
 
 /* ------------------------------------------------------------------
    13. GOOGLE ADSENSE HAZIRLIĞI (2026-10-05)
