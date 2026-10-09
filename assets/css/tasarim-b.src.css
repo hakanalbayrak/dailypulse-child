@@ -417,3 +417,6 @@ a, button { -webkit-tap-highlight-color: rgba(14,122,95,.18); }
 /* Yeşil bağlantı yeşil-sis zeminde (4,3:1) yetersiz: orada koyu yeşil */
 .idk-serit .k-consent-text a, .idk-serit a { color: var(--k-green-dk) !important; }
 .entry-content .wp-block-group[style*="background:#FFF6B8"] a { color: var(--k-green-dk) !important; }
+
+/* Koyu bülten kutusundaki bağlantılar yeşil değil fosfor (yeşil koyu zeminde 3,5:1) */
+.single-post.single-post .entry-content .idk-bulten.idk-bulten a { color: var(--k-lime) !important; text-decoration-color: var(--k-lime) !important; }
