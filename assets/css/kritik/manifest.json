@@ -1,7 +1,7 @@
 {
  "anasayfa": [
   {
-   "dosya": "anasayfa-0.css",
+   "dosya": "anasayfa-0.json",
    "handles": [
     "blocksy-dynamic-global",
     "dailypulse-custom",
@@ -18,7 +18,7 @@
  ],
  "k404": [
   {
-   "dosya": "k404-0.css",
+   "dosya": "k404-0.json",
    "handles": [
     "blocksy-dynamic-global",
     "dailypulse-custom",
@@ -35,7 +35,7 @@
  ],
  "liste": [
   {
-   "dosya": "liste-0.css",
+   "dosya": "liste-0.json",
    "handles": [
     "blocksy-dynamic-global",
     "dailypulse-custom",
@@ -50,7 +50,7 @@
    }
   },
   {
-   "dosya": "liste-1.css",
+   "dosya": "liste-1.json",
    "handles": [
     "blocksy-dynamic-global",
     "dailypulse-custom",
@@ -65,7 +65,7 @@
  ],
  "sayfa": [
   {
-   "dosya": "sayfa-0.css",
+   "dosya": "sayfa-0.json",
    "handles": [
     "blocksy-dynamic-global",
     "dailypulse-custom",
@@ -82,7 +82,7 @@
  ],
  "yazi": [
   {
-   "dosya": "yazi-0.css",
+   "dosya": "yazi-0.json",
    "handles": [
     "blocksy-dynamic-global",
     "dailypulse-custom",
