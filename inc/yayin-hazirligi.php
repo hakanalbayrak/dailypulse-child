@@ -294,7 +294,7 @@ add_action('wp_footer', function () {
 })();
 </script>
     <?php
-}, 30);
+}, 1); // 1: banner betiği, footer'daki engelleyici betiklerden (jQuery, form, Turnstile) ÖNCE çalışsın; yoksa LCP öğesi banner olup geç görünüyor
 
 /* ------------------------------------------------------------------
    7b. GA4 etiketi + Consent Mode v2 (varsayılan: depolama reddedildi)

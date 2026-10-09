@@ -2976,4 +2976,8 @@ footer.idk-altbilgi a { min-height: 40px; }
 .k-related__heading, .idk-bulten__etiket { font-size: 13px !important; }
 .idk-serit .k-consent-label { min-height: 44px; align-items: center; }
 .idk-serit .k-consent-text a { display: inline-block; padding: 4px 0; }
+
+/* Turnstile alanı için yer ayır: geç yüklenince düğmeyi kaydırıp CLS yapmasın */
+.fluentform .ff-el-group:has(.cf-turnstile) { min-height: 65px; }
+.fluentform .cf-turnstile, .fluentform .ff-el-turnstile { min-height: 65px; min-width: 300px; }
 /* <<< TASARIM-B */
