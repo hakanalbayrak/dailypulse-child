@@ -524,7 +524,7 @@ add_action('wp_enqueue_scripts', function () {
     }
 }, 1);
 
-// jQuery ve ona bağlı betikler (Fluent Forms gönderimi, Turnstile) gövdenin sonunda AYRIŞTIRICIYI bekletiyordu; ilk boyama
+// jQuery ve ona bağlı betikler (Fluent Forms gönderimi) gövdenin sonunda AYRIŞTIRICIYI bekletiyordu; ilk boyama
 // bu betiklerin indirilmesinden sonraya denk gelirse Lighthouse onları kritik yola sayıyor (Hakkımızda/İletişim: ~1 sn).
 // defer: belge sırası korunur, DOMContentLoaded'dan önce çalışır. Bu betiklere ait satır içi parçalar yalnızca
 // `-extra` veri tanımlarıdır (önce çalışması yeterli); jQuery'yi doğrudan çağıran satır içi betik eklenirse bu kural gözden geçirilmeli.
@@ -535,7 +535,8 @@ add_filter('script_loader_tag', function ($tag, $handle) {
     static $kume = null;
     if ($kume === null) {
         $w = wp_scripts();
-        $kume = ['jquery' => 1, 'jquery-core' => 1, 'jquery-migrate' => 1, 'turnstile' => 1];
+        // Turnstile api.js'e defer/async EKLENMEZ (Cloudflare: turnstile.ready() bunu reddeder, widget çizilmez).
+        $kume = ['jquery' => 1, 'jquery-core' => 1, 'jquery-migrate' => 1];
         do {
             $degisti = false;
             foreach ($w->registered as $h => $r) {
