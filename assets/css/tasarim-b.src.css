@@ -487,3 +487,6 @@ a, button { -webkit-tap-highlight-color: rgba(14,122,95,.18); }
 .page .entry-content .wp-block-column h3 { font-size: 22px !important; }
 .page .ff-el-turnstile, .page .cf-turnstile { min-height: 0 !important; }
 .page .fluentform .ff-el-group { margin-bottom: 14px; }
+.idk-sayfa-baslik { text-align: center; margin-bottom: .4em !important; }
+.entry-content .wp-block-column p[style*="color:#ff5722"] { color: var(--k-green-dk) !important; font-family: var(--f-display) !important; font-size: 24px !important; font-weight: 800 !important; margin-bottom: 4px !important; }
+.entry-content .wp-block-column p[style*="color:#666666"] { font-size: 16px !important; }
