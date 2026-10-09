@@ -399,3 +399,9 @@ html { scroll-behavior: smooth; }
 /* Header: 120 px yerine 76 px */
 .ct-header [data-row] .ct-container { min-height: 76px !important; }
 @media (max-width: 600px) { .ct-header [data-row] .ct-container { min-height: 60px !important; } }
+
+@media (max-width: 520px) {
+  .idk-altbilgi__ic { grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 20px 16px; }
+  .idk-altbilgi__marka { grid-column: 1 / -1; }
+  footer.idk-altbilgi a { min-height: 40px; padding: 5px 0 !important; font-size: 15px !important; }
+}

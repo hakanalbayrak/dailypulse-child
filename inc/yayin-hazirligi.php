@@ -361,7 +361,7 @@ add_action('init', function () {
 }, 20);
 
 add_action('wp_head', function () {
-    echo '<meta name="theme-color" content="#17141A">' . "\n";
+    echo '<meta name="theme-color" content="#14201B">' . "\n";
 }, 3);
 
 // jquery-migrate (eski jQuery API'leri için uyumluluk katmanı) ön yüzde gerekmiyor
