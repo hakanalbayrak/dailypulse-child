@@ -65,18 +65,64 @@ add_filter('nav_menu_link_attributes', function ($atts, $item) {
 }, 10, 2);
 
 /**
- * Gövdedeki resimlere width/height ekle (yerleşim kayması önlemi): içerikteki eski
- * <img> etiketleri boyutsuz; boyutu ek dosyasının üst verisinden okuyoruz.
+ * Gövdedeki resimler: (1) width/height (yerleşim kayması önlemi; eski <img> etiketleri boyutsuz),
+ * (2) srcset + sizes (içerikteki etiketlerde wp-image-ID sınıfı olmadığından WP eklemiyor; 1600 px'lik dosya
+ * 360 px'lik yuvada gösteriliyordu), (3) ilk resim LCP adayıdır: fetchpriority=high, tembel yükleme yok.
+ * Boyutlar ek dosyasının üst verisinden okunur; src zaten .webp olabilir (webp.php), ona göre eşlenir.
  */
+function idk_icerik_gorsel_srcset($id, $meta)
+{
+    if (empty($meta['file']) || empty($meta['width']) || empty($meta['height'])) {
+        return '';
+    }
+    $up   = wp_get_upload_dir();
+    $dir  = trailingslashit(dirname($meta['file']));
+    $oran = $meta['height'] / $meta['width'];
+    $liste = [(int) $meta['width'] => $up['baseurl'] . '/' . $meta['file']];
+    foreach ((array) ($meta['sizes'] ?? []) as $b) {
+        // kırpılmış (kart) boyutları atla: yalnızca özgün en-boy oranını koruyanlar
+        if (!empty($b['width']) && !empty($b['height']) && abs($b['height'] / $b['width'] - $oran) < 0.02) {
+            $liste[(int) $b['width']] = $up['baseurl'] . '/' . $dir . $b['file'];
+        }
+    }
+    if (count($liste) < 2) {
+        return '';
+    }
+    ksort($liste);
+    $parca = [];
+    foreach ($liste as $w => $url) {
+        $parca[] = esc_url(function_exists('idk_webp_url') ? idk_webp_url($url) : $url) . ' ' . $w . 'w';
+    }
+    return implode(', ', $parca);
+}
+
 add_filter('the_content', function ($icerik) {
     if (!is_singular('post') || !in_the_loop() || !is_main_query() || stripos($icerik, '<img') === false) { return $icerik; }
-    return preg_replace_callback('#<img\b[^>]*>#i', function ($m) {
+    $sira = 0;
+    return preg_replace_callback('#<img\b[^>]*>#i', function ($m) use (&$sira) {
         $etiket = $m[0];
-        if (preg_match('/\swidth=/i', $etiket) && preg_match('/\sheight=/i', $etiket)) { return $etiket; }
-        if (!preg_match('/\ssrc=["\']([^"\']+)["\']/i', $etiket, $s)) { return $etiket; }
-        $id = attachment_url_to_postid(preg_replace('/\.webp$/i', '', $s[1]));
-        $meta = $id ? wp_get_attachment_metadata($id) : null;
-        if (!$meta || empty($meta['width']) || empty($meta['height'])) { return $etiket; }
-        return preg_replace('#<img\b#i', '<img width="' . (int) $meta['width'] . '" height="' . (int) $meta['height'] . '"', $etiket, 1);
+        $ilk = ($sira++ === 0);
+        $eklenen = '';
+        $id = 0;
+        $meta = null;
+        if (preg_match('/\ssrc=["\']([^"\']+)["\']/i', $etiket, $s)) {
+            $id = attachment_url_to_postid(preg_replace('/\.webp$/i', '', $s[1]));
+            $meta = $id ? wp_get_attachment_metadata($id) : null;
+        }
+        $meta_ok = $meta && !empty($meta['width']) && !empty($meta['height']);
+        if ($meta_ok && !(preg_match('/\swidth=/i', $etiket) && preg_match('/\sheight=/i', $etiket))) {
+            $eklenen .= ' width="' . (int) $meta['width'] . '" height="' . (int) $meta['height'] . '"';
+        }
+        if ($meta_ok && !preg_match('/\ssrcset=/i', $etiket)) {
+            $srcset = idk_icerik_gorsel_srcset($id, $meta);
+            if ($srcset !== '') {
+                $eklenen .= ' srcset="' . $srcset . '" sizes="(max-width: 760px) 100vw, 740px"';
+            }
+        }
+        if ($ilk && !preg_match('/\sfetchpriority=/i', $etiket)) {
+            $eklenen .= ' fetchpriority="high"';
+            $etiket = preg_replace('/\sloading=["\']lazy["\']/i', '', $etiket);
+        }
+        return $eklenen === '' ? $etiket : preg_replace('#<img\b#i', '<img' . $eklenen, $etiket, 1);
     }, $icerik);
 }, 100);
