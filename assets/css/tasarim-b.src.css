@@ -528,3 +528,4 @@ html body .idk-404 .idk-404__baslik { font-weight: 800; font-size: clamp(2rem, 4
   .fluentform fieldset > .ff-el-group:has(.cf-turnstile) { grid-column: 1; margin-bottom: 0; }
   .fluentform fieldset > .ff_submit_btn_wrapper { grid-column: 2; margin-bottom: 0; }
 }
+.page-id-24 .entry-content .wp-block-columns { align-items: flex-start; }
