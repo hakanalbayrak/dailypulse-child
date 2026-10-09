@@ -21,7 +21,6 @@ $kats    = get_categories(['orderby' => 'count', 'order' => 'DESC', 'hide_empty'
 $gecerli = is_category() ? get_queried_object_id() : 0;
 $blog    = get_permalink(get_option('page_for_posts'));
 ?>
-<!-- ppp=<?php echo (int) get_query_var('posts_per_page'); ?> found=<?php echo (int) $GLOBALS['wp_query']->found_posts; ?> n=<?php echo (int) $GLOBALS['wp_query']->post_count; ?> -->
 <main id="idk-liste" class="idk-liste">
   <header class="idk-liste__bas">
     <div class="k-container">
