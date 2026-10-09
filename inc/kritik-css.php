@@ -80,20 +80,28 @@ function idk_kritik_durum()
     }
     $dizin    = get_stylesheet_directory() . '/assets/css/kritik/';
     $manifest = is_file($dizin . 'manifest.json') ? json_decode((string) file_get_contents($dizin . 'manifest.json'), true) : null;
-    $girdi    = is_array($manifest) ? ($manifest[$tur] ?? null) : null;
-    $css      = is_file($dizin . $tur . '.css') ? trim((string) file_get_contents($dizin . $tur . '.css')) : '';
-    if (!$girdi || $css === '' || empty($girdi['handles']) || empty($girdi['md5'])) {
-        return $durum;
-    }
-    // Sayfada şu an kuyruklanmış hedef stil dosyaları, manifesttekiyle aynı küme olmalı.
+    $adaylar  = is_array($manifest) && is_array($manifest[$tur] ?? null) ? $manifest[$tur] : [];
+    // Sayfada şu an kuyruklanmış hedef stil dosyaları, bir manifest girdisindeki kümeyle aynı olmalı
+    // (aynı türde bile sayfalar farklı stil dosyaları yükleyebilir: blog dizini page-title.css yüklemez).
     $hedef = ['blocksy-dynamic-global', 'dailypulse-custom', 'ct-main-styles', 'ct-page-title-styles', 'ct-sidebar-styles'];
     $aktif = array_values(array_filter($hedef, function ($h) {
         return wp_style_is($h, 'enqueued');
     }));
-    $beklenen = $girdi['handles'];
     sort($aktif);
-    sort($beklenen);
-    if ($aktif !== $beklenen) {
+    $girdi = null;
+    foreach ($adaylar as $aday) {
+        $k = $aday['handles'] ?? [];
+        sort($k);
+        if ($k === $aktif && !empty($aday['md5']) && !empty($aday['dosya'])) {
+            $girdi = $aday;
+            break;
+        }
+    }
+    if (!$girdi) {
+        return $durum;
+    }
+    $css = is_file($dizin . basename($girdi['dosya'])) ? trim((string) file_get_contents($dizin . basename($girdi['dosya']))) : '';
+    if ($css === '') {
         return $durum;
     }
     foreach ($girdi['handles'] as $h) {
