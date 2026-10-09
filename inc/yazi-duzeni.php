@@ -74,7 +74,7 @@ add_filter('the_content', function ($icerik) {
         $etiket = $m[0];
         if (preg_match('/\swidth=/i', $etiket) && preg_match('/\sheight=/i', $etiket)) { return $etiket; }
         if (!preg_match('/\ssrc=["\']([^"\']+)["\']/i', $etiket, $s)) { return $etiket; }
-        $id = attachment_url_to_postid($s[1]);
+        $id = attachment_url_to_postid(preg_replace('/\.webp$/i', '', $s[1]));
         $meta = $id ? wp_get_attachment_metadata($id) : null;
         if (!$meta || empty($meta['width']) || empty($meta['height'])) { return $etiket; }
         return preg_replace('#<img\b#i', '<img width="' . (int) $meta['width'] . '" height="' . (int) $meta['height'] . '"', $etiket, 1);
