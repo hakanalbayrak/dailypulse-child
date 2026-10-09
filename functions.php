@@ -30,7 +30,7 @@ add_action('pre_get_posts', function ($q) {
         $q->set('posts_per_page', 12);
         $q->set('ignore_sticky_posts', true);
     }
-});
+}, 99);
 
 /**
  * Barlow + Barlow Condensed artık temanın kendi assets/fonts/barlow/ klasöründen

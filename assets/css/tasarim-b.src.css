@@ -442,3 +442,7 @@ a, button { -webkit-tap-highlight-color: rgba(14,122,95,.18); }
 .idk-arama input { flex: 1; min-width: 0; }
 @media (max-width: 899px) { .idk-izgara--liste { grid-template-columns: repeat(2, minmax(0,1fr)); } }
 @media (max-width: 599px) { .idk-izgara--liste { grid-template-columns: minmax(0,1fr); } .idk-liste__bas { padding-top: 18px; } .idk-cipler { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; margin-inline: -16px; padding-inline: 16px; scrollbar-width: none; } .idk-cip { white-space: nowrap; flex: none; } }
+
+/* Alt bilgi: telif satırı kapsayıcıyla hizalı, bağlantı aralığı daha sıkı (masaüstü) */
+.idk-altbilgi p.idk-altbilgi__alt { margin: 28px auto 0 !important; max-width: var(--k-max-w) !important; }
+@media (min-width: 900px) { footer.idk-altbilgi a { min-height: 34px; padding: 5px 0 !important; } .idk-altbilgi ul { gap: 0; } }
