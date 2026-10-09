@@ -2948,4 +2948,6 @@ html body .idk-cerez .idk-cerez__btn:focus-visible { outline: 3px solid #fff; }
   html body .idk-cerez .idk-cerez__metin { font-size: 14px; flex-basis: 100%; }
   html body .idk-cerez .idk-cerez__btn { min-height: 44px; padding: 10px 12px; }
 }
+html body .idk-404 { max-width: none; margin: 0; }
+html body .idk-404 .idk-404__baslik { font-weight: 800; font-size: clamp(2rem, 4vw, 2.8rem); margin: 0 0 6px; }
 /* <<< TASARIM-B */
