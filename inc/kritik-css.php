@@ -83,7 +83,8 @@ function idk_kritik_durum()
     $adaylar  = is_array($manifest) && is_array($manifest[$tur] ?? null) ? $manifest[$tur] : [];
     // Sayfada şu an kuyruklanmış hedef stil dosyaları, bir manifest girdisindeki kümeyle aynı olmalı
     // (aynı türde bile sayfalar farklı stil dosyaları yükleyebilir: blog dizini page-title.css yüklemez).
-    $hedef = ['blocksy-dynamic-global', 'dailypulse-custom', 'ct-main-styles', 'ct-page-title-styles', 'ct-sidebar-styles'];
+    $hedef = ['blocksy-dynamic-global', 'dailypulse-custom', 'ct-main-styles', 'ct-page-title-styles', 'ct-sidebar-styles',
+              'fluent-form-styles', 'fluentform-public-default'];
     $aktif = array_values(array_filter($hedef, function ($h) {
         return wp_style_is($h, 'enqueued');
     }));
@@ -123,8 +124,13 @@ add_filter('style_loader_tag', function ($tag, $handle) {
     if (!$d || !in_array($handle, $d['handles'], true)) {
         return $tag;
     }
+    $kritik = '<style id="idk-kritik-' . esc_attr($handle) . '">' . $d['css'][$handle] . "</style>\n";
+    if (strpos($tag, "media='print'") !== false) {
+        // yayin-hazirligi.php bu etiketi zaten engellemesiz yapmış (+ noscript): yalnızca kritik parçayı öne ekle
+        return $kritik . $tag;
+    }
     $async = preg_replace("/media=(['\"])all\\1/", "media='print' onload=\"this.media='all';this.onload=null\"", $tag, 1);
     // Kritik kural parçası, ait olduğu <link>'in tam yerinde: WordPress'in satır içi stilleriyle (global-styles vb.)
     // olan basamaklı sıra (eşit özgüllükte sonraki kazanır) özgün sayfayla birebir aynı kalır.
-    return '<style id="idk-kritik-' . esc_attr($handle) . '">' . $d['css'][$handle] . "</style>\n" . $async . '<noscript>' . $tag . '</noscript>' . "\n";
+    return $kritik . $async . '<noscript>' . $tag . '</noscript>' . "\n";
 }, 30, 2);

@@ -501,7 +501,7 @@ a, button { -webkit-tap-highlight-color: rgba(14,122,95,.18); }
 
 /* Çerez bandı: Yön B renkleri, eşit ağırlıklı butonlar, güvenli alan */
 html body .idk-cerez { background: var(--k-ink); border-left: 6px solid var(--k-lime); bottom: max(16px, env(safe-area-inset-bottom)); padding: 14px 18px; gap: 10px 20px; }
-html body .idk-cerez { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; }   /* web fontu beklemez: font değişiminde bant yüksekliği oynamaz (CLS) */
+html body .idk-cerez, html body .idk-cerez * { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif !important; }   /* web fontu beklemez: font değişiminde bant yüksekliği oynamaz (CLS) */
 html body .idk-cerez .idk-cerez__metin { color: #E8EFEA !important; font-size: 15px; line-height: 1.5; }
 html body .idk-cerez .idk-cerez__metin a { color: var(--k-lime) !important; }
 html body .idk-cerez .idk-cerez__btn { color: #E8EFEA; border: 2px solid #9DB0A5; font-size: 15px; background: transparent; }
