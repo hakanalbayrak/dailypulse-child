@@ -477,3 +477,13 @@ a, button { -webkit-tap-highlight-color: rgba(14,122,95,.18); }
 .ct-header nav > ul > li > a:focus-visible { background: transparent !important; color: var(--k-green-dk) !important; }
 .ct-header nav > ul > li > a { min-height: 44px; display: inline-flex; align-items: center; }
 .ct-header nav > ul > li > a::after { opacity: 1 !important; }
+
+/* Statik sayfalar (Hakkımızda vb.): kart sütunlar, eski satır içi turuncu/gri renkler yeni kimliğe */
+.page .entry-title, .page h1.page-title { text-align: center; }
+.page .entry-content .wp-block-columns .wp-block-column { background: #fff; border: 1px solid var(--k-rule); border-radius: var(--k-radius) !important; }
+.entry-content [style*="color:#ff5722"] { color: var(--k-green-dk) !important; font-family: var(--f-display) !important; font-size: 24px !important; font-weight: 800 !important; }
+.entry-content [style*="color:#666666"], .entry-content [style*="color:#666"] { color: var(--k-ink-3) !important; }
+.entry-content p[style*="color:#666666"] { font-size: 16px !important; }
+.page .entry-content .wp-block-column h3 { font-size: 22px !important; }
+.page .ff-el-turnstile, .page .cf-turnstile { min-height: 0 !important; }
+.page .fluentform .ff-el-group { margin-bottom: 14px; }
