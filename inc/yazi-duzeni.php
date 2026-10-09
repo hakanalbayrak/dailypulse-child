@@ -28,7 +28,7 @@ add_filter('the_content', function ($icerik) {
         $metin  = trim(wp_strip_all_tags($m[3]));
         $urun   = $etiket === 'h3' && preg_match('/^\d+\.\s/u', $metin);
         if ($etiket === 'h3' && !$urun) { return $m[0]; }
-        if ($metin === '' || stripos($metin, 'İlgili Rehberler') === 0) { return $m[0]; }
+        if ($metin === '' || stripos($metin, 'İlgili Rehberler') === 0 || stripos($metin, 'Bunun gibi rehberler') === 0) { return $m[0]; }
         if (preg_match('/\sid=["\']([^"\']+)["\']/', $m[2], $idm)) {
             $id = $idm[1]; $kullanilan[$id] = true; $attrs = $m[2];
         } else {

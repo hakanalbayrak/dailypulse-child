@@ -387,3 +387,15 @@ footer.idk-altbilgi a:hover { color: var(--k-lime) !important; }
 .entry-content h2[id], .entry-content h3[id] { scroll-margin-top: 90px; }
 html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* Makale: kart görünümünü kaldır, başlık boşluğunu daralt, kapak görselini geniş kırp */
+.single-post article.post, .single-post article.post:hover { background: transparent !important; border: none !important; box-shadow: none !important; transform: none !important; }
+.single-post .ct-container-full { padding-top: 20px !important; }
+.single-post .entry-content .wp-block-image.aligncenter:first-of-type img,
+.single-post .entry-content > .idk-yazi .idk-yazi__govde > figure.wp-block-image:first-of-type img { width: 100% !important; max-width: 100% !important; max-height: 440px; object-fit: cover; }
+.single-post .entry-content .idk-icindekiler a { color: var(--k-ink-3) !important; text-decoration: none !important; font-weight: 600; }
+.single-post .entry-content .idk-icindekiler a:hover { color: var(--k-green) !important; }
+
+/* Header: 120 px yerine 76 px */
+.ct-header [data-row] .ct-container { min-height: 76px !important; }
+@media (max-width: 600px) { .ct-header [data-row] .ct-container { min-height: 60px !important; } }
