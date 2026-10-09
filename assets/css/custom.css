@@ -2904,4 +2904,11 @@ a, button { -webkit-tap-highlight-color: rgba(14,122,95,.18); }
 .ct-header .ct-menu > li.current_page_item > a::after,
 .ct-header .ct-menu > li > a[aria-current="page"]::after { transform: scaleX(1); width: auto !important; }
 .ct-header .ct-menu > li > a { min-height: 44px; display: inline-flex; align-items: center; }
+
+/* Menü: açık sayfa ve odak çizgisi, Blocksy'nin gerçek yapısı (nav > ul > li > a) için */
+.ct-header nav > ul > li > a[aria-current="page"]::after,
+.ct-header nav > ul > li > a:focus-visible::after,
+.ct-header nav > ul > li > a:hover::after { transform: scaleX(1); width: auto !important; }
+.ct-header nav > ul > li > a:focus-visible { background: transparent !important; color: var(--k-green-dk) !important; }
+.ct-header nav > ul > li > a { min-height: 44px; display: inline-flex; align-items: center; }
 /* <<< TASARIM-B */
