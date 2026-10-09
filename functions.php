@@ -24,18 +24,6 @@ require_once DAILYPULSE_DIR . '/inc/webp.php';
 require_once DAILYPULSE_DIR . '/inc/alt-bilgi.php';
 require_once DAILYPULSE_DIR . '/inc/yazi-duzeni.php';
 
-// Liste sayfalarında sayfa başına 12 yazı: 3 ve 2 sütunlu ızgarada tam satır.
-// Blocksy ve eklentileri kendi pre_get_posts kancalarını (aynı önceliklerde, kayıt
-// sırasıyla) bizden sonra kaydedip değeri 10'a çekiyor; ana sorgu `wp` aşamasında
-// çalıştığı için kancayı wp_loaded'da, yani hepsinden sonra ekliyoruz.
-add_action('wp_loaded', function () {
-    add_action('pre_get_posts', function ($q) {
-        if (!is_admin() && $q->is_main_query() && ($q->is_home() || $q->is_archive() || $q->is_search())) {
-            $q->set('posts_per_page', 12);
-            $q->set('ignore_sticky_posts', true);
-        }
-    }, PHP_INT_MAX);
-}, 99);
 
 /**
  * Barlow + Barlow Condensed artık temanın kendi assets/fonts/barlow/ klasöründen

@@ -17,6 +17,16 @@ if (is_search()) {
     $baslik = 'Blog';
     $alt    = 'Bağımsız ürün rehberleri ve karşılaştırmalar, yeni yazılardan eskilere.';
 }
+// Ana sorgu Blocksy/eklenti kancalarıyla sayfa başına 10'a sabitleniyor (kancayla aşılamadı);
+// 3 ve 2 sütunda tam satır için 12'lik kendi sorgumuzu çalıştırıp sayfalamayı ona bağlıyoruz.
+$ana_sorgu = $GLOBALS['wp_query'];
+$sorgu = new WP_Query(array_merge((array) $ana_sorgu->query, [
+    'posts_per_page'      => 12,
+    'paged'               => max(1, (int) get_query_var('paged')),
+    'ignore_sticky_posts' => true,
+    'post_status'         => 'publish',
+]));
+$GLOBALS['wp_query'] = $sorgu;
 $kats    = get_categories(['orderby' => 'count', 'order' => 'DESC', 'hide_empty' => true, 'exclude' => [1]]);
 $gecerli = is_category() ? get_queried_object_id() : 0;
 $blog    = get_permalink(get_option('page_for_posts'));
@@ -53,3 +63,4 @@ $blog    = get_permalink(get_option('page_for_posts'));
     <?php endif; ?>
   </div>
 </main>
+<?php $GLOBALS['wp_query'] = $ana_sorgu; wp_reset_postdata(); ?>
