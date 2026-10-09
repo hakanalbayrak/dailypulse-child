@@ -32,7 +32,8 @@ add_action('after_setup_theme', function () {
         if (!is_admin() && $q->is_main_query() && ($q->is_home() || $q->is_archive() || $q->is_search())) {
             $q->set('posts_per_page', 12);
             $q->set('ignore_sticky_posts', true);
-        }
+            $GLOBALS['idk_dbg'] = 'hook:' . $q->get('posts_per_page') . ':' . (int) $q->is_home();
+        } else { $GLOBALS['idk_dbg_s'] = (isset($GLOBALS['idk_dbg_s']) ? $GLOBALS['idk_dbg_s'] : '') . (int) $q->is_main_query() . (int) $q->is_home() . ','; }
     }, PHP_INT_MAX);
 }, 99);
 
