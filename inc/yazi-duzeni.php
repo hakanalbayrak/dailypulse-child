@@ -19,6 +19,33 @@ function idk_baslik_id($metin, &$kullanilan) {
     return $id;
 }
 
+/**
+ * Makaledeki numaralı ürün başlıkları ("1. Ürün adı") -> [['id' => ..., 'ad' => ...], ...].
+ * Aşağıdaki the_content filtresiyle AYNI başlık taraması ve id üretimi (h2'ler de sayaca girer);
+ * ikisi birlikte değişmeli, yoksa şema bağlantıları menü bağlantılarından ayrışır.
+ */
+function idk_yazi_urunleri($icerik) {
+    $kullanilan = [];
+    $urunler = [];
+    preg_match_all('#<(h2|h3)([^>]*)>(.*?)</\1>#is', (string) $icerik, $bulunan, PREG_SET_ORDER);
+    foreach ($bulunan as $m) {
+        $etiket = strtolower($m[1]);
+        $metin  = trim(wp_strip_all_tags($m[3]));
+        $urun   = $etiket === 'h3' && preg_match('/^\d+\.\s/u', $metin);
+        if ($etiket === 'h3' && !$urun) { continue; }
+        if ($metin === '' || stripos($metin, 'İlgili Rehberler') === 0 || stripos($metin, 'Bunun gibi rehberler') === 0) { continue; }
+        if (preg_match('/\sid=["\']([^"\']+)["\']/', $m[2], $idm)) {
+            $id = $idm[1]; $kullanilan[$id] = true;
+        } else {
+            $id = idk_baslik_id($metin, $kullanilan);
+        }
+        if ($urun) {
+            $urunler[] = ['id' => $id, 'ad' => html_entity_decode(trim(preg_replace('/^\d+\.\s*/u', '', $metin)), ENT_QUOTES, 'UTF-8')];
+        }
+    }
+    return $urunler;
+}
+
 add_filter('the_content', function ($icerik) {
     if (!is_singular('post') || !in_the_loop() || !is_main_query()) { return $icerik; }
     $kullanilan = [];

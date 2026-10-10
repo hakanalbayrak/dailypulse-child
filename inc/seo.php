@@ -356,6 +356,24 @@ function kampanya_seo_schema() {
         }
         $graph[] = $article;
 
+        // Ürün sıralaması: numaralı ürün başlıkları ItemList olur (yapay zekâ ve arama motorları için).
+        // Bilerek Product değil: fiyat, puan ve stok yayınlamıyoruz; Product bunlar olmadan geçerli zengin sonuç vermez.
+        $urunler = function_exists('idk_yazi_urunleri') ? idk_yazi_urunleri($post ? $post->post_content : '') : [];
+        if (count($urunler) >= 3) {
+            $liste = [];
+            foreach ($urunler as $i => $u) {
+                $liste[] = ['@type' => 'ListItem', 'position' => $i + 1, 'name' => $u['ad'], 'url' => get_permalink($id) . '#' . $u['id']];
+            }
+            $graph[] = [
+                '@type'           => 'ItemList',
+                '@id'             => get_permalink($id) . '#urunler',
+                'name'            => wp_strip_all_tags(get_the_title($id)),
+                'itemListOrder'   => 'https://schema.org/ItemListOrderAscending',
+                'numberOfItems'   => count($liste),
+                'itemListElement' => $liste,
+            ];
+        }
+
         $faq = kampanya_seo_faq_pure($post ? $post->post_content : '');
         if (count($faq) >= 2) {
             $items = [];
