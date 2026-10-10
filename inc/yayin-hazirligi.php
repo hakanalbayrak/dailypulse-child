@@ -701,3 +701,13 @@ add_action('wp_head', function () {
     if (is_admin() || is_feed() || is_embed()) { return; }
     echo "<script>try{var v=localStorage.getItem('idk_cerez');if(!v){var m=document.cookie.match(/(?:^|; )idk_cerez=([^;]+)/);v=m&&m[1]}if(v==='kabul'||v==='reddet')document.documentElement.classList.add('idk-cerez-tamam')}catch(e){}</script>\n";
 }, 1);
+
+/* /favicon.ico: tarayıcılar ve botlar <link> okumadan bu adrese gider; PNG site simgesine kalıcı yönlendir. */
+add_action('init', function () {
+    $yol = strtok($_SERVER['REQUEST_URI'] ?? '', '?');
+    if ($yol === '/favicon.ico') {
+        $hedef = get_site_icon_url(192) ?: get_stylesheet_directory_uri() . '/assets/images/favicon.svg';
+        wp_redirect($hedef, 301);
+        exit;
+    }
+}, 1);
