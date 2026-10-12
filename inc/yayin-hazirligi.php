@@ -147,12 +147,12 @@ add_filter('wp_sitemaps_posts_query_args', function ($args, $post_type) {
 }, 10, 2);
 
 /* ------------------------------------------------------------------
-   5. robots.txt — /go/ yönlendirmeleri taranmasın
+   5. robots.txt — /go/ yönlendirmeleri ve RSS beslemeleri (/feed/) taranmasın
    ------------------------------------------------------------------ */
 add_filter('robots_txt', function ($out) {
     return str_replace(
         'Allow: /wp-admin/admin-ajax.php',
-        "Allow: /wp-admin/admin-ajax.php\nDisallow: /go/\nDisallow: /?s=\nDisallow: /search/",
+        "Allow: /wp-admin/admin-ajax.php\nDisallow: /go/\nDisallow: /?s=\nDisallow: /search/\nDisallow: /feed/\nDisallow: /*/feed/",
         $out
     ) . (stripos($out, 'Sitemap:') === false ? "\nSitemap: " . home_url('/sitemap.xml') . "\n" : '')
       . "\nUser-agent: Mediapartners-Google\nDisallow:\n";
