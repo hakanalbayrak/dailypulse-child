@@ -374,7 +374,7 @@ function kampanya_seo_schema() {
             ];
         }
 
-        $faq = kampanya_seo_faq_pure($post ? $post->post_content : '');
+        $faq = kampanya_seo_faq_pure($post ? $post->post_content : '', 20);
         if (count($faq) >= 2) {
             $items = [];
             foreach ($faq as $f) {
